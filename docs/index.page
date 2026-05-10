@@ -1,0 +1,70 @@
+# PageScript Documentation Site
+
+::page id=pagescript-docs title="PageScript Documentation"
+  ::tokens
+    color.bg="#f7f7f2"
+    color.ink="#202124"
+    color.accent="#116149"
+    color.panel="#ffffff"
+    color.line="#deded4"
+    radius.panel=14
+  ::/tokens
+
+  ::style scope=page
+    .docs-hero { background: radial-gradient(circle at 18% 18%, rgba(77,214,160,.22), transparent 30%), linear-gradient(135deg, #f7f7f2, #e7f1ea); }
+    .docs-card { min-height: 180px; }
+    .docs-card .ps-icon { color: var(--ps-accent); font-weight: 800; }
+  ::/style
+
+  ::hero class=docs-hero spacing=xl
+    heading="PageScript"
+    body="A draft standard for LLM-native web composition: compact .page source, normalized compiler IR, standalone HTML output, and a fixed declarative runtime."
+  ::/hero
+
+  ::section spacing=lg
+    heading="Start here"
+    body="The docs homepage is itself authored in PageScript and rendered by the GitHub Pages workflow."
+
+    ::grid columns=3 gap=md density=compact
+      ::card class=docs-card icon="01" title="Specification"
+        body="Normative Draft 0.4 language model, compiler pipeline, tokens, layout metadata, state, events, and renderable primitives. See SPEC.md."
+      ::/card
+
+      ::card class=docs-card icon="02" title="Conformance"
+        body="Parser, validator, IR, renderer, fixtures, schemas, and compatibility expectations for other implementations. See CONFORMANCE.md."
+      ::/card
+
+      ::card class=docs-card icon="03" title="Examples"
+        body="Product demos, interactive docs, guided tours, generated PageScript IR, and adapter snapshots. See examples/README.md."
+      ::/card
+    ::/grid
+  ::/section
+
+  ::scene id=compiler-pipeline layout=split title="Compiler pipeline"
+    heading="The standard is source-first, not renderer-first"
+    body="Agents write semantic composition. PageScript validates it, normalizes it into IR, and renders target output without source-authored JavaScript."
+
+    ::panel id=pipeline-steps title="Pipeline stages" density=spacious
+      ::stack gap=md
+        ::card icon="A" title=".page source"
+          body="Compact source optimized for LLM generation and human review."
+        ::/card
+        ::card icon="B" title="PageScript IR"
+          body="Normalized machine-readable representation for renderers and conformance tests."
+        ::/card
+        ::card icon="C" title="Standalone HTML"
+          body="HTML, CSS, SVG, and the fixed declarative runtime emitted by the compiler."
+        ::/card
+      ::/stack
+    ::/panel
+
+    ::panel id=release-checks title="Release gates" tone=muted density=compact
+      ::metric id=tests label="Conformance tests" value="12" tone=good
+      ::/metric
+      ::metric id=schemas label="Schemas" value="AST + IR + diagnostics" tone=accent
+      ::/metric
+      ::metric id=workflow label="Docs build" value=".page -> HTML" tone=good
+      ::/metric
+    ::/panel
+  ::/scene
+::/page

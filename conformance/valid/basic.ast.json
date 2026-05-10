@@ -1,0 +1,84 @@
+{
+  "type": "document",
+  "source": {
+    "line": 1,
+    "column": 1
+  },
+  "children": [
+    {
+      "type": "markdown",
+      "source": {
+        "line": 1,
+        "column": 1
+      },
+      "value": "# Basic Page"
+    },
+    {
+      "type": "page",
+      "source": {
+        "line": 3,
+        "column": 1
+      },
+      "attributes": {
+        "id": "basic",
+        "url": "/basic",
+        "title": "Basic Page",
+        "audience": "AI builders",
+        "goal": "Show a minimal page context.",
+        "context": "Describe why this page exists."
+      },
+      "children": [
+        {
+          "type": "tour",
+          "source": {
+            "line": 9,
+            "column": 1
+          },
+          "attributes": {
+            "id": "basic-tour"
+          },
+          "children": [
+            {
+              "type": "trigger",
+              "source": {
+                "line": 10,
+                "column": 1
+              },
+              "attributes": {
+                "type": "manual"
+              },
+              "triggerType": "manual"
+            },
+            {
+              "type": "step",
+              "source": {
+                "line": 13,
+                "column": 1
+              },
+              "attributes": {
+                "id": "hero",
+                "target": "#hero",
+                "position": "bottom",
+                "title": "Hero",
+                "body": "Start with the main message."
+              },
+              "id": "hero",
+              "target": "#hero",
+              "position": "bottom",
+              "title": "Hero",
+              "body": "Start with the main message."
+            }
+          ],
+          "id": "basic-tour"
+        }
+      ],
+      "id": "basic",
+      "title": "Basic Page",
+      "audience": "AI builders",
+      "goal": "Show a minimal page context.",
+      "context": "Describe why this page exists.",
+      "url": "/basic"
+    }
+  ],
+  "diagnostics": []
+}

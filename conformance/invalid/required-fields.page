@@ -1,0 +1,14 @@
+::page
+  ::tour id=dup
+    ::trigger pattern="/missing-type"
+    ::/trigger
+    ::step id=same
+    ::/step
+    ::step id=same target="#same"
+    ::/step
+  ::/tour
+::/page
+::page id=dup
+::/page
+::page id=dup
+::/page

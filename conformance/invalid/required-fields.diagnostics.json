@@ -1,0 +1,37 @@
+[
+  {
+    "severity": "error",
+    "code": "missing_page_id",
+    "message": "Page is missing required id.",
+    "line": 1,
+    "column": 1
+  },
+  {
+    "severity": "error",
+    "code": "missing_trigger_type",
+    "message": "Trigger is missing required type.",
+    "line": 3,
+    "column": 1
+  },
+  {
+    "severity": "error",
+    "code": "missing_step_target",
+    "message": "Step is missing required target.",
+    "line": 5,
+    "column": 1
+  },
+  {
+    "severity": "error",
+    "code": "duplicate_step_id",
+    "message": "Duplicate step id \"same\".",
+    "line": 7,
+    "column": 1
+  },
+  {
+    "severity": "error",
+    "code": "duplicate_page_id",
+    "message": "Duplicate page id \"dup\".",
+    "line": 13,
+    "column": 1
+  }
+]

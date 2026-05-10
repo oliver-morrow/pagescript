@@ -1,0 +1,66 @@
+{
+  "id": "dashboard-onboarding",
+  "title": "Dashboard Onboarding",
+  "description": "Guides new users through key metrics and filters.",
+  "options": {
+    "useModalOverlay": true
+  },
+  "triggers": [
+    {
+      "type": "trigger",
+      "source": {
+        "line": 10,
+        "column": 1
+      },
+      "attributes": {
+        "type": "url",
+        "pattern": "/dashboard",
+        "autoStart": true
+      },
+      "triggerType": "url",
+      "pattern": "/dashboard",
+      "autoStart": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "welcome",
+      "title": "Welcome to your dashboard",
+      "text": "This is where you see your live metrics.",
+      "attachTo": {
+        "element": ".hero",
+        "on": "bottom"
+      },
+      "meta": {
+        "order": 1
+      }
+    },
+    {
+      "id": "filters",
+      "title": "Filter your data",
+      "text": "Use these filters to narrow what you see.",
+      "attachTo": {
+        "element": "#filter-panel",
+        "on": "right"
+      },
+      "options": {
+        "scrollTo": true
+      },
+      "meta": {
+        "order": 2
+      }
+    },
+    {
+      "id": "export",
+      "title": "Share reports",
+      "text": "Export dashboard data as CSV when stakeholders need an offline copy.",
+      "attachTo": {
+        "element": "[data-tour='export']",
+        "on": "left"
+      },
+      "meta": {
+        "order": 3
+      }
+    }
+  ]
+}
