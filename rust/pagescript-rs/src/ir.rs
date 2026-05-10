@@ -10,6 +10,7 @@ pub struct PageIr {
     pub id: Option<String>,
     pub title: String,
     pub tokens: Map<String, Value>,
+    pub recipes: HashMap<String, RecipeIr>,
     pub body: Vec<IrNode>,
     pub effects: HashMap<String, EffectIr>,
     pub states: Vec<StateIr>,
@@ -98,6 +99,12 @@ pub struct EventIr {
     pub value: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RecipeIr {
+    pub name: String,
+    pub attributes: Map<String, Value>,
+}
+
 pub fn compile_page_ir(document: &DocumentNode, page_id: Option<&str>) -> Result<PageIr, String> {
     let page = select_page(document, page_id)?;
     let mut context = IrContext::default();
@@ -108,7 +115,7 @@ pub fn compile_page_ir(document: &DocumentNode, page_id: Option<&str>) -> Result
     let body = page
         .children
         .iter()
-        .filter_map(normalize_node)
+        .flat_map(|node| normalize_node(node, &context))
         .collect::<Vec<_>>();
 
     Ok(PageIr {
@@ -118,6 +125,19 @@ pub fn compile_page_ir(document: &DocumentNode, page_id: Option<&str>) -> Result
             .unwrap_or("PageScript Page")
             .to_string(),
         tokens: context.tokens,
+        recipes: context
+            .recipes
+            .iter()
+            .map(|(name, recipe)| {
+                (
+                    name.clone(),
+                    RecipeIr {
+                        name: name.clone(),
+                        attributes: recipe.attributes.clone(),
+                    },
+                )
+            })
+            .collect(),
         body,
         effects: context.effects,
         states: context.states,
@@ -129,10 +149,17 @@ pub fn compile_page_ir(document: &DocumentNode, page_id: Option<&str>) -> Result
 #[derive(Default)]
 struct IrContext {
     tokens: Map<String, Value>,
+    recipes: HashMap<String, RecipeDef>,
     effects: HashMap<String, EffectIr>,
     states: Vec<StateIr>,
     events: Vec<EventIr>,
     scoped_css: String,
+}
+
+#[derive(Debug, Clone)]
+struct RecipeDef {
+    attributes: Map<String, Value>,
+    template: Vec<Node>,
 }
 
 fn collect_head_data(node: &Node, context: &mut IrContext) {
@@ -181,9 +208,26 @@ fn collect_head_data(node: &Node, context: &mut IrContext) {
             context.scoped_css.push_str(&style_body(component));
             context.scoped_css.push('\n');
         }
+        "style-rule" => {
+            if let Some(rule) = style_rule_body(component) {
+                context.scoped_css.push_str(&rule);
+                context.scoped_css.push('\n');
+            }
+        }
         "tokens" => {
             for (key, value) in &component.attributes {
                 context.tokens.insert(key.clone(), value.clone());
+            }
+        }
+        "recipe" => {
+            if let Some(name) = string_attr(component, "name") {
+                context.recipes.insert(
+                    name.to_string(),
+                    RecipeDef {
+                        attributes: component.attributes.clone(),
+                        template: recipe_template(component),
+                    },
+                );
             }
         }
         _ => {}
@@ -194,14 +238,15 @@ fn collect_head_data(node: &Node, context: &mut IrContext) {
     }
 }
 
-fn normalize_node(node: &Node) -> Option<IrNode> {
+fn normalize_node(node: &Node, context: &IrContext) -> Vec<IrNode> {
     match node {
-        Node::Markdown(markdown) => Some(IrNode::Markdown(normalize_markdown(markdown))),
-        Node::Component(component) if is_compiler_only_component(component) => None,
-        Node::Component(component) => {
-            Some(IrNode::Component(Box::new(normalize_component(component))))
-        }
-        _ => None,
+        Node::Markdown(markdown) => vec![IrNode::Markdown(normalize_markdown(markdown))],
+        Node::Component(component) if component.name == "use" => expand_recipe(component, context),
+        Node::Component(component) if is_compiler_only_component(component) => Vec::new(),
+        Node::Component(component) => vec![IrNode::Component(Box::new(normalize_component(
+            component, context,
+        )))],
+        _ => Vec::new(),
     }
 }
 
@@ -211,7 +256,7 @@ fn normalize_markdown(node: &MarkdownNode) -> MarkdownIr {
     }
 }
 
-fn normalize_component(node: &ComponentNode) -> ComponentIr {
+fn normalize_component(node: &ComponentNode, context: &IrContext) -> ComponentIr {
     let graph = if node.name == "panel" {
         normalize_graph(node)
     } else {
@@ -220,11 +265,11 @@ fn normalize_component(node: &ComponentNode) -> ComponentIr {
     let children = node
         .children
         .iter()
-        .filter_map(|child| match child {
+        .flat_map(|child| match child {
             Node::Component(component) if matches!(component.name.as_str(), "node" | "edge") => {
-                None
+                Vec::new()
             }
-            _ => normalize_node(child),
+            _ => normalize_node(child, context),
         })
         .collect::<Vec<_>>();
 
@@ -234,6 +279,88 @@ fn normalize_component(node: &ComponentNode) -> ComponentIr {
         layout: normalize_layout(node),
         children,
         graph,
+    }
+}
+
+fn expand_recipe(component: &ComponentNode, context: &IrContext) -> Vec<IrNode> {
+    let Some(name) = string_attr(component, "recipe") else {
+        return Vec::new();
+    };
+    let Some(recipe) = context.recipes.get(name).cloned() else {
+        return Vec::new();
+    };
+    let mut values = recipe.attributes;
+    for (key, value) in &component.attributes {
+        if key != "recipe" {
+            values.insert(key.clone(), value.clone());
+        }
+    }
+    recipe
+        .template
+        .iter()
+        .map(|node| substitute_node(node, &values))
+        .flat_map(|node| normalize_node(&node, context))
+        .collect()
+}
+
+fn recipe_template(component: &ComponentNode) -> Vec<Node> {
+    component
+        .children
+        .iter()
+        .find_map(|child| match child {
+            Node::Component(template) if template.name == "template" => {
+                Some(template.children.clone())
+            }
+            _ => None,
+        })
+        .unwrap_or_else(|| component.children.clone())
+}
+
+fn substitute_node(node: &Node, values: &Map<String, Value>) -> Node {
+    match node {
+        Node::Markdown(markdown) => Node::Markdown(MarkdownNode {
+            source: markdown.source.clone(),
+            value: substitute_string(&markdown.value, values),
+        }),
+        Node::Component(component) => Node::Component(ComponentNode {
+            name: component.name.clone(),
+            source: component.source.clone(),
+            attributes: component
+                .attributes
+                .iter()
+                .map(|(key, value)| (key.clone(), substitute_value(value, values)))
+                .collect(),
+            children: component
+                .children
+                .iter()
+                .map(|child| substitute_node(child, values))
+                .collect(),
+        }),
+        other => other.clone(),
+    }
+}
+
+fn substitute_value(value: &Value, values: &Map<String, Value>) -> Value {
+    match value {
+        Value::String(text) => Value::String(substitute_string(text, values)),
+        _ => value.clone(),
+    }
+}
+
+fn substitute_string(input: &str, values: &Map<String, Value>) -> String {
+    let mut output = input.to_string();
+    for (key, value) in values {
+        output = output.replace(&format!("${key}"), &stringify_value(value));
+    }
+    output
+}
+
+fn stringify_value(value: &Value) -> String {
+    match value {
+        Value::String(value) => value.clone(),
+        Value::Number(value) => value.to_string(),
+        Value::Bool(value) => value.to_string(),
+        _ => value.to_string(),
     }
 }
 
@@ -299,7 +426,16 @@ fn normalize_graph(panel: &ComponentNode) -> Option<GraphIr> {
 fn is_compiler_only_component(component: &ComponentNode) -> bool {
     matches!(
         component.name.as_str(),
-        "state" | "event" | "effect" | "style" | "tokens" | "node" | "edge"
+        "state"
+            | "event"
+            | "effect"
+            | "style"
+            | "style-rule"
+            | "tokens"
+            | "recipe"
+            | "template"
+            | "node"
+            | "edge"
     )
 }
 
@@ -334,6 +470,14 @@ fn style_body(component: &ComponentNode) -> String {
         })
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+fn style_rule_body(component: &ComponentNode) -> Option<String> {
+    let selector = string_attr(component, "selector")?;
+    let body = string_attr(component, "props")
+        .map(ToOwned::to_owned)
+        .unwrap_or_else(|| style_body(component));
+    Some(format!("{selector}{{{body}}}"))
 }
 
 fn string_attr<'a>(node: &'a ComponentNode, key: &str) -> Option<&'a str> {

@@ -118,7 +118,16 @@
             "event",
             "effect",
             "style",
-            "tokens"
+            "tokens",
+            "el",
+            "attr",
+            "style-rule",
+            "slot",
+            "recipe",
+            "template",
+            "use",
+            "bind",
+            "on"
           ]
         },
         "source": { "$ref": "#/$defs/source" },

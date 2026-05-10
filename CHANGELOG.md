@@ -9,3 +9,4 @@
 - Rust reference implementation with native CLI and conformance tests.
 - Renderable PageScript components and standalone HTML rendering.
 - TypeScript implementation moved to `legacy/typescript-reference`; Rust is canonical.
+- Draft 0.5 Web Core Kernel with generic elements, attributes, style rules, recipe expansion, safety validation, and a rendered kernel example.

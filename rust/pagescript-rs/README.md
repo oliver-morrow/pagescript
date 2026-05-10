@@ -1,6 +1,6 @@
 # pagescript-rs
 
-Rust reference implementation for the PageScript Draft 0.4 LLM-native web composition standard.
+Rust reference implementation for the PageScript Draft 0.5 LLM-native web composition standard.
 
 This crate provides:
 

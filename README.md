@@ -1,9 +1,9 @@
 # PageScript
 
-[![Spec](https://img.shields.io/badge/spec-Draft%200.4-blue)](./SPEC.md)
+[![Spec](https://img.shields.io/badge/spec-Draft%200.5-blue)](./SPEC.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-PageScript is a draft open standard for LLM-native web composition. It lets AI coding tools and humans write compact `.page` files using semantic layout, design tokens, data, interaction, graph, and effect primitives, then compile them into standalone HTML.
+PageScript is a draft open standard for LLM-native web composition. It lets AI coding tools and humans write compact `.page` files using semantic layout, design tokens, data, interaction, graph, effect, and Web Core Kernel primitives, then compile them into standalone HTML.
 
 The canonical implementation is Rust:
 
@@ -12,7 +12,7 @@ The canonical implementation is Rust:
 
 ## Status
 
-- Standard status: Draft 0.4
+- Standard status: Draft 0.5
 - Canonical implementation: Rust
 - TypeScript implementation: legacy
 
@@ -27,6 +27,7 @@ During local development:
 ```sh
 cargo run -p pagescript-rs -- validate examples/data-lineage-demo.page
 cargo run -p pagescript-rs -- render examples/data-lineage-demo.page > lineage-demo.html
+cargo run -p pagescript-rs -- render examples/web-core-kernel.page > web-core-kernel.html
 ```
 
 ## Example
@@ -60,6 +61,24 @@ cargo run -p pagescript-rs -- render examples/data-lineage-demo.page > lineage-d
 ::/page
 ```
 
+Draft 0.5 also includes a generic Web Core Kernel for browser-native expansion:
+
+```text
+::recipe name=link-card
+  ::template
+    ::el tag=a class="card" href="$href"
+      ::attr name=aria-label value="$title"
+      ::/attr
+      ::text value="$title"
+      ::/text
+    ::/el
+  ::/template
+::/recipe
+
+::use recipe=link-card title="Spec" href="./SPEC.md"
+::/use
+```
+
 ## Rust API
 
 ```rust
@@ -78,6 +97,7 @@ pagescript-rs validate examples/data-lineage-demo.page
 pagescript-rs ast examples/data-lineage-demo.page
 pagescript-rs ir examples/data-lineage-demo.page
 pagescript-rs render examples/data-lineage-demo.page > lineage-demo.html
+pagescript-rs render examples/web-core-kernel.page > web-core-kernel.html
 pagescript-rs convert examples/dashboard.page --target shepherd --tour dashboard-onboarding
 ```
 

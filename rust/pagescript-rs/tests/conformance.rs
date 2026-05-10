@@ -266,3 +266,50 @@ fn validates_draft_04_primitive_rules() {
     assert!(codes.contains(&"invalid_style_scope"));
     assert!(codes.contains(&"invalid_token_value"));
 }
+
+#[test]
+fn renders_web_core_kernel_recipe_expansion() {
+    let source = fs::read_to_string("../../examples/web-core-kernel.page").unwrap();
+    let document = parse_page_script(&source);
+
+    assert_eq!(validate_document(&document), Vec::new());
+    let ir = compile_page_ir(&document, Some("web-core-kernel")).unwrap();
+    let html = render_to_html(&document, Some("web-core-kernel")).unwrap();
+
+    assert!(ir.recipes.contains_key("kernel-card"));
+    assert!(html.contains("<main class=\"kernel-shell\">"));
+    assert!(
+        html.contains(
+            "<a class=\"kernel-card\" href=\"#semantic\" aria-label=\"Semantic Source\">"
+        )
+    );
+    assert!(html.contains("Semantic components stay efficient for LLMs"));
+    assert!(html.contains(".kernel-card:hover"));
+    assert!(html.contains("Draft 0.5 Web Core Kernel"));
+    assert!(!html.contains("<use"));
+    assert!(!html.contains("<script src="));
+    assert!(!source.contains("<script"));
+}
+
+#[test]
+fn validates_web_core_kernel_safety_rules() {
+    let source = r##"::page id=unsafe
+  ::el tag=script
+    ::text value="bad"
+    ::/text
+  ::/el
+  ::attr name=onclick value="bad()"
+  ::/attr
+  ::use recipe=missing
+  ::/use
+::/page"##;
+    let diagnostics = validate_document(&parse_page_script(source));
+    let codes = diagnostics
+        .iter()
+        .map(|diagnostic| diagnostic.code.as_str())
+        .collect::<Vec<_>>();
+
+    assert!(codes.contains(&"unsafe_element_tag"));
+    assert!(codes.contains(&"unsafe_attribute_name"));
+    assert!(codes.contains(&"unknown_recipe"));
+}
