@@ -50,5 +50,4 @@ jobs:
           pagescript-rs convert examples/dashboard.page --target intro --tour dashboard-onboarding > "$RUNNER_TEMP/dashboard.intro.json"
           jq -e '.id == "dashboard-onboarding"' "$RUNNER_TEMP/dashboard.shepherd.json"
           jq -e '.tokens["color.accent"] == "#4dd6a0"' "$RUNNER_TEMP/revenue.ir.json"
-          rg 'Autonomous revenue operations' "$RUNNER_TEMP/revenue.html"
-
+          grep -F 'Autonomous revenue operations' "$RUNNER_TEMP/revenue.html"

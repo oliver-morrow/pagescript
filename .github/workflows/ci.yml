@@ -85,13 +85,13 @@ jobs:
           cargo run -p pagescript-rs --locked -- render examples/interactive-doc.page --page agent-docs > target/pagescript-smoke/interactive-doc.html
           cargo run -p pagescript-rs --locked -- render docs/index.page --page pagescript-docs > target/pagescript-smoke/docs-index.html
 
-          rg '<svg class="ps-graph"' target/pagescript-smoke/lineage-demo.html
-          rg 'PageScript Documentation' target/pagescript-smoke/docs-index.html
-          rg 'data-ps-node="identity"' target/pagescript-smoke/revenue-command-center.html
-          rg 'ps-runtime-config' target/pagescript-smoke/revenue-command-center.html
-          rg -- '--ps-token-color-accent' target/pagescript-smoke/revenue-command-center.html
-          ! rg 'transform:scale' target/pagescript-smoke/*.html
-          ! rg '<script' examples/*.page
+          grep -F '<svg class="ps-graph"' target/pagescript-smoke/lineage-demo.html
+          grep -F 'PageScript Documentation' target/pagescript-smoke/docs-index.html
+          grep -F 'data-ps-node="identity"' target/pagescript-smoke/revenue-command-center.html
+          grep -F 'ps-runtime-config' target/pagescript-smoke/revenue-command-center.html
+          grep -F -- '--ps-token-color-accent' target/pagescript-smoke/revenue-command-center.html
+          ! grep -F 'transform:scale' target/pagescript-smoke/*.html
+          ! grep -F '<script' examples/*.page
 
       - name: Inspect normalized IR
         run: |
