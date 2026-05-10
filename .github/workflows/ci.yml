@@ -5,16 +5,105 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
-  verify:
+  rust:
+    name: Rust / ${{ matrix.os }} / ${{ matrix.toolchain }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        toolchain: [stable]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rustfmt, clippy
+          cache: true
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --locked
+
+      - name: Build release
+        run: cargo build --release --locked
+
+  conformance:
+    name: Conformance and examples
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-          components: rustfmt, clippy
-      - run: cargo fmt --all --check
-      - run: cargo clippy --all-targets -- -D warnings
-      - run: cargo test
+          cache: true
+
+      - name: Validate JSON schemas and fixtures
+        run: |
+          set -euo pipefail
+          for file in schemas/*.json conformance/**/*.json examples/*.json; do
+            jq empty "$file"
+          done
+
+      - name: Validate PageScript examples
+        run: |
+          set -euo pipefail
+          cargo run -p pagescript-rs --locked -- validate examples/data-lineage-demo.page
+          cargo run -p pagescript-rs --locked -- validate examples/autonomous-revenue-command-center.page
+          cargo run -p pagescript-rs --locked -- validate examples/interactive-doc.page
+          cargo run -p pagescript-rs --locked -- validate examples/dashboard.page
+          cargo run -p pagescript-rs --locked -- validate examples/dashboard.tour
+          cargo run -p pagescript-rs --locked -- validate examples/minimal.tour
+          cargo run -p pagescript-rs --locked -- validate docs/index.page
+
+      - name: Render and inspect examples
+        run: |
+          set -euo pipefail
+          mkdir -p target/pagescript-smoke
+          cargo run -p pagescript-rs --locked -- render examples/data-lineage-demo.page --page lineage-demo > target/pagescript-smoke/lineage-demo.html
+          cargo run -p pagescript-rs --locked -- render examples/autonomous-revenue-command-center.page --page revenue-command-center > target/pagescript-smoke/revenue-command-center.html
+          cargo run -p pagescript-rs --locked -- render examples/interactive-doc.page --page agent-docs > target/pagescript-smoke/interactive-doc.html
+          cargo run -p pagescript-rs --locked -- render docs/index.page --page pagescript-docs > target/pagescript-smoke/docs-index.html
+
+          rg '<svg class="ps-graph"' target/pagescript-smoke/lineage-demo.html
+          rg 'PageScript Documentation' target/pagescript-smoke/docs-index.html
+          rg 'data-ps-node="identity"' target/pagescript-smoke/revenue-command-center.html
+          rg 'ps-runtime-config' target/pagescript-smoke/revenue-command-center.html
+          rg -- '--ps-token-color-accent' target/pagescript-smoke/revenue-command-center.html
+          ! rg 'transform:scale' target/pagescript-smoke/*.html
+          ! rg '<script' examples/*.page
+
+      - name: Inspect normalized IR
+        run: |
+          set -euo pipefail
+          cargo run -p pagescript-rs --locked -- ir examples/autonomous-revenue-command-center.page --page revenue-command-center > target/pagescript-smoke/revenue-command-center.ir.json
+          jq -e '.tokens["color.accent"] == "#4dd6a0"' target/pagescript-smoke/revenue-command-center.ir.json
+          jq -e '[.. | objects | select(has("graph")) | .graph.nodes | length] | any(. == 5)' target/pagescript-smoke/revenue-command-center.ir.json
+          jq -e '[.. | objects | select(has("layout")) | .layout.density] | any(. == "spacious")' target/pagescript-smoke/revenue-command-center.ir.json
+
+      - name: Upload rendered smoke artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pagescript-rendered-smoke
+          path: target/pagescript-smoke/
+          if-no-files-found: error

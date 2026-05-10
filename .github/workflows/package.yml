@@ -1,0 +1,54 @@
+name: Package Smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  crate:
+    name: Crate package and install smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+
+      - name: Verify package contents
+        run: cargo package -p pagescript-rs --locked --list
+
+      - name: Dry-run crate publish
+        run: cargo publish -p pagescript-rs --locked --dry-run
+
+      - name: Install CLI from workspace
+        run: |
+          set -euo pipefail
+          cargo install --path rust/pagescript-rs --locked --root "$RUNNER_TEMP/pagescript-install"
+          echo "$RUNNER_TEMP/pagescript-install/bin" >> "$GITHUB_PATH"
+
+      - name: Smoke test installed CLI
+        run: |
+          set -euo pipefail
+          pagescript-rs validate examples/autonomous-revenue-command-center.page
+          pagescript-rs ast examples/dashboard.page > "$RUNNER_TEMP/dashboard.ast.json"
+          pagescript-rs ir examples/autonomous-revenue-command-center.page --page revenue-command-center > "$RUNNER_TEMP/revenue.ir.json"
+          pagescript-rs render examples/autonomous-revenue-command-center.page --page revenue-command-center > "$RUNNER_TEMP/revenue.html"
+          pagescript-rs convert examples/dashboard.page --target shepherd --tour dashboard-onboarding > "$RUNNER_TEMP/dashboard.shepherd.json"
+          pagescript-rs convert examples/dashboard.page --target intro --tour dashboard-onboarding > "$RUNNER_TEMP/dashboard.intro.json"
+          jq -e '.id == "dashboard-onboarding"' "$RUNNER_TEMP/dashboard.shepherd.json"
+          jq -e '.tokens["color.accent"] == "#4dd6a0"' "$RUNNER_TEMP/revenue.ir.json"
+          rg 'Autonomous revenue operations' "$RUNNER_TEMP/revenue.html"
+
