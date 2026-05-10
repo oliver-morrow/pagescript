@@ -1,0 +1,74 @@
+::recipe name=split-section
+  ::template
+    ::section
+      ::grid columns=2 gap=large
+        ::slot name=left
+        ::/slot
+        ::slot name=right
+        ::/slot
+      ::/grid
+    ::/section
+  ::/template
+::/recipe
+
+::recipe name=sidebar-layout
+  ::template
+    ::grid columns=12 gap=none
+      ::el tag=aside class="sidebar" style="grid-column: span 3"
+        ::slot name=sidebar
+        ::/slot
+      ::/el
+      ::el tag=main style="grid-column: span 9"
+        ::slot name=main
+        ::/slot
+      ::/el
+    ::/grid
+  ::/template
+::/recipe
+
+::recipe name=bento-grid
+  ::template
+    ::grid columns=4 gap=medium
+      ::slot
+      ::/slot
+    ::/grid
+  ::/template
+::/recipe
+
+::recipe name=media-panel
+  ::template
+    ::card
+      ::stack align=center
+        ::slot name=media
+        ::/slot
+        ::el tag=div class="content"
+          ::slot name=content
+          ::/slot
+        ::/el
+      ::/stack
+    ::/card
+  ::/template
+::/recipe
+
+::recipe name=comparison-grid
+  ::template
+    ::grid columns=2 gap=large
+      ::stack align=center
+        ::el tag=h4
+          ::text value=$left-title
+          ::/text
+        ::/el
+        ::slot name=left
+        ::/slot
+      ::/stack
+      ::stack align=center
+        ::el tag=h4
+          ::text value=$right-title
+          ::/text
+        ::/el
+        ::slot name=right
+        ::/slot
+      ::/stack
+    ::/grid
+  ::/template
+::/recipe

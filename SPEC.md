@@ -1,6 +1,6 @@
 # PageScript LLM-Native Web Composition
 
-PageScript is a compact source language for LLM-native web composition. Agents and humans write `.page` files with semantic layout, design tokens, data, interaction, and effect primitives; the compiler emits polished standalone HTML/CSS/SVG with a fixed declarative runtime.
+PageScript is a compact source language for LLM-native web composition. Agents and humans write `.page` files with semantic layout, design tokens, data, interaction, effect, and Web Core Kernel primitives; the compiler emits polished standalone HTML/CSS/SVG with a fixed declarative runtime.
 
 Interactive documentation is one use case. The broader target is product demo pages, architecture explainers, launch pages, onboarding pages, generated product pages, and codebase-aware web experiences.
 
@@ -12,7 +12,7 @@ Interactive documentation is one use case. The broader target is product demo pa
 - Primary implementation: Rust compiler and CLI
 - Interaction model: declarative runtime only; source-authored JavaScript is not allowed
 - Design system: declarative tokens through `::tokens`
-- Advanced styling: scoped CSS through `::style scope=page|component`
+- Advanced styling: scoped CSS through `::style scope=page|component` and focused `::style-rule`
 
 The canonical parser AST remains generic: `document`, `page`, `component`, `markdown`, and compatibility nodes for `tour`, `step`, and `trigger`.
 
@@ -26,7 +26,9 @@ PageScript is not a collection of hardcoded demo templates. A conforming compile
 4. Render the IR into a target such as standalone HTML/CSS/SVG.
 5. Attach only the fixed declarative runtime required by state, events, and effects.
 
-The IR is the compiler boundary. It contains normalized page metadata, design tokens, layout metadata, component nodes, graph nodes and edges, declared state, events, effects, and scoped CSS. Output renderers should consume IR rather than walking raw source syntax directly.
+The IR is the compiler boundary. It contains normalized page metadata, design tokens, recipe definitions, layout metadata, component nodes, graph nodes and edges, declared state, events, effects, and scoped CSS. Output renderers should consume IR rather than walking raw source syntax directly.
+
+Draft 0.5 adds a Web Core Kernel. The intent is similar to compressed data transport: `.page` source stays small and semantic for LLM generation, while recipes and kernel primitives act as the decompression key that expands into browser-native HTML/CSS/SVG at render time.
 
 ## Core Web Composition Example
 
@@ -110,6 +112,93 @@ Attribute keys may contain letters, numbers, `_`, `-`, and `.`. Dotted keys are 
 
 Allowed effect types are `flow`, `pulse`, `glow`, `count-up`, and `reveal`.
 
+## Standard Library
+
+PageScript standard libraries are `.page` files containing reusable `recipe` definitions.
+They are imported with `::import from="..."`.
+Imports are compile-time only.
+
+- `::import from=<path>`: load recipes from another `.page` file
+
+Implementation rules:
+- `from` must be a relative path.
+- Absolute paths and paths containing `..` must be rejected for safety.
+- Imported recipes are merged into the current page recipe context.
+- Local recipes override imported recipes with the same name.
+- Imports are recursive; imported files may themselves import other files.
+
+## Web Core Kernel
+
+The Web Core Kernel gives PageScript native browser reach without allowing source-authored JavaScript:
+
+- `::el tag=<html-tag>`: generic browser element
+- `::attr name=<attr> value=<value>`: child attribute for `el`
+- `::text value=<text>`: raw escaped text node
+- `::style-rule selector=<css-selector>`: focused CSS rule body
+- `::recipe name=<name>`: reusable expansion unit
+- `::template`: recipe body
+- `::use recipe=<name>`: compile-time recipe invocation
+- `::slot name=<name>`: named or default expansion slot
+- `::bind state=<id>`: declarative binding hook
+- `::on event=<event> action=<action>`: declarative event hook
+
+Recipes are expanded into IR before rendering. For example:
+
+```text
+::recipe name=link-card
+  ::template
+    ::el tag=a class="card" href="$href"
+      ::attr name=aria-label value="$title"
+      ::/attr
+      ::text value="$title"
+      ::/text
+    ::/el
+  ::/template
+::/recipe
+
+::use recipe=link-card title="Spec" href="./SPEC.md"
+::/use
+```
+
+The compiler substitutes `$title` and `$href`, then renders an ordinary HTML anchor.
+
+### Named Slots
+
+Draft 0.6 introduces named slots for recipe composition:
+
+```text
+::recipe name=product-hero
+  ::template
+    ::hero
+      ::el tag=h1
+        ::text value=$title
+        ::/text
+      ::/el
+      ::slot name=actions
+      ::/slot
+    ::/hero
+  ::/template
+::/recipe
+```
+
+Usage with named slots:
+
+```text
+::use recipe=product-hero title="PageScript"
+  ::slot name=actions
+    ::button label="Get Started"
+    ::/button
+  ::/slot
+::/use
+```
+
+Compiler behavior:
+- Replace `::slot name=<name>` inside the recipe template with matching slot children from the `::use`.
+- If no matching slot exists in the `::use`, render the recipe slot's default children.
+- If a `::use` provides children without a `::slot` wrapper, they are treated as the content for the unnamed (default) slot.
+
+Validators must reject unsafe element tags such as `script`, `iframe`, `object`, and `embed`, and unsafe attributes such as `onclick` and `srcdoc`.
+
 ## Design Tokens
 
 Tokens are compiler-readable design inputs, not raw CSS. Renderers may map known tokens to CSS variables and preserve unknown tokens under implementation-specific names.
@@ -123,7 +212,7 @@ Tokens are compiler-readable design inputs, not raw CSS. Renderers may map known
 ::/tokens
 ```
 
-Draft 0.4 defines these common aliases:
+Draft 0.5 defines these common aliases:
 
 - `color.bg` -> page background
 - `color.ink` -> primary text
@@ -173,7 +262,7 @@ Renderers inject scoped style text into the compiled document. Validators must r
 
 ## Validation
 
-Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect IDs, invalid effect types, invalid style scopes, invalid token values, and compatibility-tour errors.
+Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, unknown recipes, and compatibility-tour errors.
 
 ## Org-Level Agent Workflow
 

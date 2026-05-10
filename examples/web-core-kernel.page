@@ -1,0 +1,118 @@
+::page id=web-core-kernel title="Web Core Kernel Demo"
+  ::tokens
+    color.bg="#f6f8fb"
+    color.ink="#15191f"
+    color.muted="#5e6875"
+    color.accent="#246bfe"
+    color.panel="#ffffff"
+    color.line="#d8e0eb"
+    radius.panel=18
+  ::/tokens
+
+  ::recipe name=kernel-card
+    ::template
+      ::el tag=a class="kernel-card" href="$href"
+        ::attr name=aria-label value="$title"
+        ::/attr
+        ::el tag=span class="kernel-card__index"
+          ::text value="$index"
+          ::/text
+        ::/el
+        ::el tag=strong class="kernel-card__title"
+          ::text value="$title"
+          ::/text
+        ::/el
+        ::el tag=p class="kernel-card__body"
+          ::text value="$body"
+          ::/text
+        ::/el
+      ::/el
+    ::/template
+  ::/recipe
+
+  ::style-rule selector=".kernel-shell"
+    min-height: 100vh;
+    padding: 48px 0;
+    background:
+      radial-gradient(circle at 20% 12%, rgba(36, 107, 254, .18), transparent 28%),
+      linear-gradient(180deg, #f6f8fb 0%, #eaf0f8 100%);
+  ::/style-rule
+
+  ::style-rule selector=".kernel-grid"
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 26px;
+  ::/style-rule
+
+  ::style-rule selector=".kernel-card"
+    color: inherit;
+    text-decoration: none;
+    display: grid;
+    gap: 14px;
+    min-height: 230px;
+    padding: 22px;
+    border: 1px solid rgba(21, 25, 31, .10);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .82);
+    box-shadow: 0 18px 50px rgba(21, 25, 31, .10);
+    transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+  ::/style-rule
+
+  ::style-rule selector=".kernel-card:hover"
+    transform: translateY(-5px);
+    border-color: rgba(36, 107, 254, .46);
+    box-shadow: 0 26px 70px rgba(36, 107, 254, .16);
+  ::/style-rule
+
+  ::style-rule selector=".kernel-card__index"
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: #15191f;
+    color: #fff;
+    font-weight: 800;
+  ::/style-rule
+
+  ::style-rule selector=".kernel-card__title"
+    font-size: 1.2rem;
+  ::/style-rule
+
+  ::style-rule selector=".kernel-card__body"
+    color: var(--ps-muted);
+    margin: 0;
+  ::/style-rule
+
+  ::style-rule selector="@media(max-width:860px){.kernel-grid"
+    grid-template-columns: 1fr;
+  }
+  ::/style-rule
+
+  ::el tag=main class="kernel-shell"
+    ::el tag=section class="ps-container"
+      ::el tag=p class="kernel-kicker"
+        ::text value="Draft 0.5 Web Core Kernel"
+        ::/text
+      ::/el
+      ::el tag=h1 class="kernel-title"
+        ::text value="A compact PageScript file can expand into browser-native HTML and CSS."
+        ::/text
+      ::/el
+      ::el tag=p class="kernel-lede"
+        ::text value="Semantic components stay efficient for LLMs, while kernel primitives act like the decompression key: recipes, elements, attributes, and style rules expand into real web UI."
+        ::/text
+      ::/el
+
+      ::el tag=div class="kernel-grid"
+        ::use recipe=kernel-card index="01" title="Semantic Source" body="Agents write compact declarations instead of verbose nested HTML." href="#semantic"
+        ::/use
+        ::use recipe=kernel-card index="02" title="Recipe Expansion" body="The compiler expands reusable recipes into stable Web IR before rendering." href="#recipes"
+        ::/use
+        ::use recipe=kernel-card index="03" title="Native Browser Output" body="The browser receives ordinary HTML, scoped CSS, SVG, and a fixed runtime." href="#browser"
+        ::/use
+      ::/el
+    ::/el
+  ::/el
+::/page

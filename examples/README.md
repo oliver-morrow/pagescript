@@ -1,8 +1,20 @@
 # PageScript Examples
 
+## `product-intelligence-demo.page`
+
+The Draft 0.6 flagship. Demonstrates the PageScript standard library, named slots, and recursive imports. Composes a high-fidelity landing page with metrics and data flows using mostly imported recipes from `stdlib/`.
+
+Useful commands:
+
+```sh
+pagescript-rs validate examples/product-intelligence-demo.page
+pagescript-rs ir examples/product-intelligence-demo.page
+pagescript-rs render examples/product-intelligence-demo.page > demo.html
+```
+
 ## `data-lineage-demo.page`
 
-Shows the Draft 0.4 web composition target: a product demo page with scene, panels, SVG lineage graph, metrics, effects, state, events, design tokens, layout metadata, and scoped CSS.
+Shows the Draft 0.5 web composition target: a product demo page with scene, panels, SVG lineage graph, metrics, effects, state, events, design tokens, layout metadata, and scoped CSS.
 
 Useful commands:
 
@@ -10,6 +22,18 @@ Useful commands:
 pagescript-rs validate examples/data-lineage-demo.page
 pagescript-rs ir examples/data-lineage-demo.page
 pagescript-rs render examples/data-lineage-demo.page > lineage-demo.html
+```
+
+## `web-core-kernel.page`
+
+Shows the Draft 0.5 Web Core Kernel: generic `el` and `attr` primitives, focused `style-rule` blocks, escaped text nodes, and compile-time `recipe`/`use` expansion into ordinary HTML.
+
+Useful commands:
+
+```sh
+pagescript-rs validate examples/web-core-kernel.page
+pagescript-rs ir examples/web-core-kernel.page --page web-core-kernel
+pagescript-rs render examples/web-core-kernel.page > web-core-kernel.html
 ```
 
 ## `autonomous-revenue-command-center.page`

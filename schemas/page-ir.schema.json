@@ -3,12 +3,16 @@
   "$id": "https://pagescript.org/schemas/page-ir.schema.json",
   "title": "PageScript IR",
   "type": "object",
-  "required": ["title", "tokens", "body", "effects", "states", "events", "scoped_css"],
+  "required": ["title", "tokens", "recipes", "body", "effects", "states", "events", "scoped_css"],
   "additionalProperties": false,
   "properties": {
     "id": { "type": ["string", "null"] },
     "title": { "type": "string" },
     "tokens": { "$ref": "#/$defs/attributes" },
+    "recipes": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/recipe" }
+    },
     "body": {
       "type": "array",
       "items": { "$ref": "#/$defs/node" }
@@ -146,6 +150,15 @@
         "on": { "type": "string" },
         "set": { "type": "string" },
         "value": { "type": "string" }
+      }
+    },
+    "recipe": {
+      "type": "object",
+      "required": ["name", "attributes"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "attributes": { "$ref": "#/$defs/attributes" }
       }
     }
   }

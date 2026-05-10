@@ -1,9 +1,9 @@
 # PageScript
 
-[![Spec](https://img.shields.io/badge/spec-Draft%200.4-blue)](./SPEC.md)
+[![Spec](https://img.shields.io/badge/spec-Draft%200.6-blue)](./SPEC.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-PageScript is a draft open standard for LLM-native web composition. It lets AI coding tools and humans write compact `.page` files using semantic layout, design tokens, data, interaction, graph, and effect primitives, then compile them into standalone HTML.
+PageScript is a draft open standard for LLM-native web composition. It lets AI coding tools and humans write compact `.page` files using semantic layout, design tokens, data, interaction, graph, effect, and Web Core Kernel primitives, then compile them into standalone HTML.
 
 The canonical implementation is Rust:
 
@@ -12,7 +12,7 @@ The canonical implementation is Rust:
 
 ## Status
 
-- Standard status: Draft 0.4
+- Standard status: Draft 0.6
 - Canonical implementation: Rust
 - TypeScript implementation: legacy
 
@@ -25,8 +25,8 @@ cargo install --path rust/pagescript-rs
 During local development:
 
 ```sh
-cargo run -p pagescript-rs -- validate examples/data-lineage-demo.page
-cargo run -p pagescript-rs -- render examples/data-lineage-demo.page > lineage-demo.html
+cargo run -p pagescript-rs -- validate examples/product-intelligence-demo.page
+cargo run -p pagescript-rs -- render examples/product-intelligence-demo.page > demo.html
 ```
 
 ## Example
@@ -60,15 +60,38 @@ cargo run -p pagescript-rs -- render examples/data-lineage-demo.page > lineage-d
 ::/page
 ```
 
+Draft 0.5 introduced the generic Web Core Kernel, and Draft 0.6 adds the Standard Library for browser-native expansion:
+
+```text
+::import from="stdlib/product.page"
+::/import
+
+::use recipe=product-hero title="PageScript" subtitle="LLM-native web composition"
+  ::slot name=actions
+    ::button label="Get Started" action=toggle target=signup
+    ::/button
+  ::/slot
+::/use
+```
+
+## Standard Library
+
+PageScript includes a built-in standard library of reusable recipes in `stdlib/`:
+
+- `product.page`: Marketing and landing page components
+- `data.page`: Data visualization and dashboard components
+- `docs.page`: Documentation and API reference components
+- `layout.page`: Layout and grid systems
+
 ## Rust API
 
 ```rust
 use pagescript_rs::{compile_page_ir, parse_page_script, render_to_html, validate_document};
 
 let document = parse_page_script(source);
-let diagnostics = validate_document(&document);
-let ir = compile_page_ir(&document, None)?;
-let html = render_to_html(&document, None)?;
+let diagnostics = validate_document(&document, Some(base_path));
+let ir = compile_page_ir(&document, None, Some(base_path))?;
+let html = render_to_html(&document, None, Some(base_path))?;
 ```
 
 ## CLI
@@ -78,6 +101,7 @@ pagescript-rs validate examples/data-lineage-demo.page
 pagescript-rs ast examples/data-lineage-demo.page
 pagescript-rs ir examples/data-lineage-demo.page
 pagescript-rs render examples/data-lineage-demo.page > lineage-demo.html
+pagescript-rs render examples/web-core-kernel.page > web-core-kernel.html
 pagescript-rs convert examples/dashboard.page --target shepherd --tour dashboard-onboarding
 ```
 

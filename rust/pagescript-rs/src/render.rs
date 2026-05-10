@@ -4,11 +4,16 @@ use serde_json::{Value, json};
 
 use crate::{
     ir::{ComponentIr, GraphIr, GraphNodeIr, IrNode, MarkdownIr, PageIr, compile_page_ir},
+    resolver::Resolver,
     types::{AttributeValue, DocumentNode},
 };
 
-pub fn render_to_html(document: &DocumentNode, page_id: Option<&str>) -> Result<String, String> {
-    let page = compile_page_ir(document, page_id)?;
+pub fn render_to_html(
+    document: &DocumentNode,
+    page_id: Option<&str>,
+    resolver: &Resolver,
+) -> Result<String, String> {
+    let page = compile_page_ir(document, page_id, resolver)?;
     let context = RenderContext { page: &page };
     let body = page
         .body
@@ -142,6 +147,8 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
         ),
         "scene" => render_scene(node, context),
         "panel" => render_panel(node, context),
+        "el" => render_el(node, context),
+        "slot" => children,
         "stack" => format!(
             "<div class=\"{}\"{}>{children}</div>",
             component_classes(node, &["ps-stack", &gap(node)], context),
@@ -168,13 +175,17 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
             action_attrs(node),
             escape_html(string_attr(node, "label").unwrap_or("Button"))
         ),
-        "text" => format!(
-            "<div class=\"{}\"{}>{}{}{children}</div>",
-            component_classes(node, &["ps-text"], context),
-            id_attr(node),
-            heading(node, "h3"),
-            body(node)
-        ),
+        "text" => string_attr(node, "value")
+            .map(escape_html)
+            .unwrap_or_else(|| {
+                format!(
+                    "<div class=\"{}\"{}>{}{}{children}</div>",
+                    component_classes(node, &["ps-text"], context),
+                    id_attr(node),
+                    heading(node, "h3"),
+                    body(node)
+                )
+            }),
         "image" => format!(
             "<figure class=\"{}\"{}><img src=\"{}\" alt=\"{}\">{}</figure>",
             component_classes(node, &["ps-image"], context),
@@ -183,6 +194,7 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
             escape_attr(string_attr(node, "alt").unwrap_or("")),
             caption(node)
         ),
+        "attr" | "bind" | "on" => String::new(),
         "modal" => format!(
             "<dialog class=\"ps-modal\" id=\"{}\">\n  <form method=\"dialog\"><button class=\"ps-modal-close\" aria-label=\"Close\">x</button></form>\n  {}{}{children}\n</dialog>",
             escape_attr(string_attr(node, "id").unwrap_or("")),
@@ -207,6 +219,30 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
         "log" => render_log(node),
         _ => children,
     }
+}
+
+fn render_el(node: &ComponentIr, context: &RenderContext<'_>) -> String {
+    let tag = string_attr(node, "tag")
+        .filter(|tag| is_safe_tag(tag))
+        .unwrap_or("div");
+    let attrs = generic_attrs(node);
+    if is_void_tag(tag) {
+        return format!("<{tag}{attrs}>");
+    }
+    let children = node
+        .children
+        .iter()
+        .filter_map(|child| match child {
+            IrNode::Component(component)
+                if matches!(component.name.as_str(), "attr" | "bind" | "on") =>
+            {
+                None
+            }
+            _ => Some(render_node(child, context)),
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!("<{tag}{attrs}>{children}</{tag}>")
 }
 
 fn render_scene(node: &ComponentIr, context: &RenderContext<'_>) -> String {
@@ -441,6 +477,83 @@ fn action_attrs(node: &ComponentIr) -> String {
     format!(" data-action=\"{}\"{}", escape_attr(action), target)
 }
 
+fn generic_attrs(node: &ComponentIr) -> String {
+    let mut attrs = node
+        .attributes
+        .iter()
+        .filter_map(|(name, value)| {
+            if matches!(
+                name.as_str(),
+                "tag" | "layout" | "density" | "gap" | "columns" | "align"
+            ) {
+                None
+            } else {
+                render_attr(name, value)
+            }
+        })
+        .collect::<Vec<_>>();
+
+    for child in &node.children {
+        let IrNode::Component(component) = child else {
+            continue;
+        };
+        match component.name.as_str() {
+            "attr" => {
+                if let (Some(name), Some(value)) = (
+                    string_attr(component, "name"),
+                    component.attributes.get("value"),
+                ) && let Some(rendered) = render_attr(name, value)
+                {
+                    attrs.push(rendered);
+                }
+            }
+            "bind" => {
+                if let Some(state) = string_attr(component, "state") {
+                    attrs.push(format!("data-ps-bind=\"{}\"", escape_attr(state)));
+                }
+                if let Some(target) = string_attr(component, "target") {
+                    attrs.push(format!("data-ps-bind-target=\"{}\"", escape_attr(target)));
+                }
+            }
+            "on" => {
+                if let Some(event) = string_attr(component, "event") {
+                    attrs.push(format!("data-ps-on=\"{}\"", escape_attr(event)));
+                }
+                if let Some(action) = string_attr(component, "action") {
+                    attrs.push(format!("data-ps-action=\"{}\"", escape_attr(action)));
+                }
+                if let Some(target) = string_attr(component, "target") {
+                    attrs.push(format!("data-ps-target=\"{}\"", escape_attr(target)));
+                }
+            }
+            _ => {}
+        }
+    }
+
+    if attrs.is_empty() {
+        String::new()
+    } else {
+        format!(" {}", attrs.join(" "))
+    }
+}
+
+fn render_attr(name: &str, value: &Value) -> Option<String> {
+    if !is_safe_attr_name(name) {
+        return None;
+    }
+    match value {
+        Value::Bool(true) => Some(escape_attr(name)),
+        Value::Bool(false) | Value::Null => None,
+        Value::String(value) => Some(format!("{}=\"{}\"", escape_attr(name), escape_attr(value))),
+        Value::Number(value) => Some(format!("{}=\"{}\"", escape_attr(name), value)),
+        _ => Some(format!(
+            "{}=\"{}\"",
+            escape_attr(name),
+            escape_attr(&value.to_string())
+        )),
+    }
+}
+
 fn id_attr(node: &ComponentIr) -> String {
     string_attr(node, "id")
         .map(|id| format!(" id=\"{}\"", escape_attr(id)))
@@ -595,11 +708,48 @@ fn escape_css_value(value: &str) -> String {
         .collect()
 }
 
+fn is_safe_tag(value: &str) -> bool {
+    !matches!(value, "script" | "iframe" | "object" | "embed")
+        && !value.is_empty()
+        && value
+            .chars()
+            .all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-')
+}
+
+fn is_void_tag(value: &str) -> bool {
+    matches!(
+        value,
+        "area"
+            | "base"
+            | "br"
+            | "col"
+            | "embed"
+            | "hr"
+            | "img"
+            | "input"
+            | "link"
+            | "meta"
+            | "param"
+            | "source"
+            | "track"
+            | "wbr"
+    )
+}
+
+fn is_safe_attr_name(value: &str) -> bool {
+    !value.is_empty()
+        && !value.eq_ignore_ascii_case("srcdoc")
+        && !value.to_ascii_lowercase().starts_with("on")
+        && value
+            .chars()
+            .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | ':'))
+}
+
 fn base_css() -> &'static str {
-    r#":root{color-scheme:light;--ps-bg:#f7f7f2;--ps-ink:#202124;--ps-muted:#62645f;--ps-line:#deded4;--ps-accent:#116149;--ps-accent-ink:#fff;--ps-panel:#fff;--ps-radius:12px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-*{box-sizing:border-box}body{margin:0;background:var(--ps-bg);color:var(--ps-ink);line-height:1.5}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.4rem,6vw,5rem);line-height:.98;max-width:11ch}h2{font-size:clamp(1.8rem,3vw,3rem);line-height:1.05}h3{font-size:1.1rem}.ps-container{width:min(1180px,calc(100% - 32px));margin:0 auto}.ps-hero{min-height:72vh;display:flex;align-items:center}.ps-hero-inner{display:grid;gap:24px}.ps-section{padding:72px 0}.ps-space-sm{padding-block:32px}.ps-space-md{padding-block:56px}.ps-space-lg{padding-block:88px}.ps-space-xl{padding-block:120px}.ps-density-compact{--ps-density-pad:16px;--ps-density-gap:12px}.ps-density-spacious{--ps-density-pad:32px;--ps-density-gap:24px}.ps-tone-dark{background:#16201d;color:#f7f7f2}.ps-tone-accent{background:#dcefe7}.ps-tone-muted{background:#ecece3}.ps-tone-good{background:#e3f8ee;color:#12382a}.ps-stack{display:grid}.ps-gap-sm{gap:12px}.ps-gap-md{gap:20px}.ps-gap-lg{gap:32px}.ps-grid{display:grid;grid-template-columns:repeat(var(--ps-columns),minmax(0,1fr));gap:24px}.ps-card,.ps-panel{background:var(--ps-panel);border:1px solid var(--ps-line);border-radius:var(--ps-radius);padding:var(--ps-density-pad,24px);display:grid;gap:var(--ps-density-gap,16px);box-shadow:0 1px 1px rgba(0,0,0,.04)}.ps-icon{font-size:1.4rem}.ps-button{width:max-content;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}.ps-button-primary{background:var(--ps-accent);color:var(--ps-accent-ink)}.ps-button-secondary{background:#fff;color:var(--ps-ink);border:1px solid var(--ps-line)}.ps-text{display:grid;gap:12px}.ps-image img{width:100%;height:auto;border-radius:var(--ps-radius)}.ps-modal{border:0;border-radius:16px;padding:28px;max-width:640px}.ps-modal::backdrop{background:rgba(0,0,0,.45)}.ps-modal-close{float:right}.ps-form{display:grid;gap:16px}.ps-field{display:grid;gap:6px}.ps-field input{font:inherit;padding:12px;border:1px solid var(--ps-line);border-radius:8px}.ps-scene{padding:88px 0;background:linear-gradient(135deg,#f8faf6,#e9f1ec)}.ps-scene-header{display:grid;gap:12px;margin-bottom:28px}.ps-scene-body{display:grid;gap:24px}.ps-scene-split .ps-scene-body{grid-template-columns:minmax(0,1.4fr) minmax(320px,.8fr);align-items:start}.ps-graph{width:100%;min-height:380px;overflow:visible}.ps-graph-edge{fill:none;stroke:#8aa89b;stroke-width:3;marker-end:url(#ps-arrow);stroke-linecap:round}.ps-graph-node{cursor:pointer}.ps-graph-node rect{fill:#fff;stroke:#b9cbc3;stroke-width:1.5;filter:drop-shadow(0 8px 16px rgba(17,97,73,.10))}.ps-graph-node text{font-size:13px;dominant-baseline:middle}.ps-graph-label{font-weight:700}.ps-graph-icon{font-size:16px}.ps-status-active rect{stroke:#116149}.ps-status-syncing rect{stroke:#3976d8}.ps-status-ready rect{stroke:#7b4fc5}.ps-status-warning rect{stroke:#b7791f}.ps-metric{display:grid;gap:4px;padding:16px;border:1px solid var(--ps-line);border-radius:12px;background:#fff}.ps-metric span{font-size:.82rem;color:var(--ps-muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}.ps-metric strong{font-size:1.7rem}.ps-log{display:grid;gap:8px;margin:0;padding:0;list-style:none}.ps-log li{display:flex;justify-content:space-between;gap:16px;padding:10px 12px;border:1px solid var(--ps-line);border-radius:10px;background:#fff}.ps-effect-flow{stroke-dasharray:10 10;animation:ps-flow 1.4s linear infinite}.ps-effect-pulse{animation:ps-pulse 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}.ps-graph-node.ps-effect-pulse{animation:ps-pulse-svg 1.6s ease-in-out infinite}.ps-effect-glow rect,.ps-effect-glow{filter:drop-shadow(0 0 12px rgba(17,97,73,.35))}.ps-effect-reveal{animation:ps-reveal .7s ease-out both}.ps-effect-count-up strong{animation:ps-pulse 1.2s ease-in-out 2}@keyframes ps-flow{to{stroke-dashoffset:-40}}@keyframes ps-pulse{50%{opacity:.62;filter:brightness(1.08)}}@keyframes ps-pulse-svg{50%{opacity:.64}}@keyframes ps-reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@media(max-width:860px){.ps-grid,.ps-scene-split .ps-scene-body{grid-template-columns:1fr}.ps-hero{min-height:auto}.ps-space-lg,.ps-space-xl{padding-block:56px}}"#
+    r#":root{color-scheme:light;--ps-bg:#f7f7f2;--ps-ink:#202124;--ps-muted:#62645f;--ps-line:#deded4;--ps-accent:#116149;--ps-accent-ink:#fff;--ps-panel:#fff;--ps-radius:12px;--ps-shadow:0 1px 2px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+html{scroll-behavior:smooth}*{box-sizing:border-box}body{margin:0;background:var(--ps-bg);color:var(--ps-ink);line-height:1.5}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.4rem,6vw,5rem);line-height:.98;max-width:11ch}h2{font-size:clamp(1.8rem,3vw,3rem);line-height:1.05}h3{font-size:1.1rem}.ps-container{width:min(1180px,calc(100% - 32px));margin:0 auto}.ps-hero{min-height:72vh;display:flex;align-items:center}.ps-hero-inner{display:grid;gap:24px}.ps-section{padding:72px 0}.ps-space-sm{padding-block:32px}.ps-space-md{padding-block:56px}.ps-space-lg{padding-block:88px}.ps-space-xl{padding-block:120px}.ps-density-compact{--ps-density-pad:16px;--ps-density-gap:12px}.ps-density-spacious{--ps-density-pad:32px;--ps-density-gap:24px}.ps-tone-dark{background:#16201d;color:#f7f7f2}.ps-tone-accent{background:#dcefe7}.ps-tone-muted{background:#ecece3}.ps-tone-good{background:#e3f8ee;color:#12382a}.ps-stack{display:grid}.ps-gap-sm{gap:12px}.ps-gap-md{gap:20px}.ps-gap-lg{gap:32px}.ps-grid{display:grid;grid-template-columns:repeat(var(--ps-columns),minmax(0,1fr));gap:24px}.ps-card,.ps-panel{background:var(--ps-panel);border:1px solid var(--ps-line);border-radius:var(--ps-radius);padding:var(--ps-density-pad,24px);display:grid;gap:var(--ps-density-gap,16px);box-shadow:var(--ps-shadow);transition:transform 0.2s ease, box-shadow 0.2s ease}.ps-card:hover{transform:translateY(-2px);box-shadow:0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)}.ps-icon{font-size:1.4rem}.ps-button{width:max-content;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;transition:filter 0.2s ease}.ps-button:active{filter:brightness(0.9)}.ps-button-primary{background:var(--ps-accent);color:var(--ps-accent-ink)}.ps-button-secondary{background:#fff;color:var(--ps-ink);border:1px solid var(--ps-line)}.ps-text{display:grid;gap:12px}.ps-image img{width:100%;height:auto;border-radius:var(--ps-radius)}.ps-modal{border:0;border-radius:16px;padding:28px;max-width:640px}.ps-modal::backdrop{background:rgba(0,0,0,.45)}.ps-modal-close{float:right}.ps-form{display:grid;gap:16px}.ps-field{display:grid;gap:6px}.ps-field input{font:inherit;padding:12px;border:1px solid var(--ps-line);border-radius:8px}.ps-scene{padding:88px 0;background:var(--ps-bg)}.ps-scene-inner{display:grid;gap:40px}.ps-scene-full .ps-scene-inner{grid-template-columns:1fr}.ps-scene-split .ps-scene-inner{grid-template-columns:1fr 1fr}.ps-metric{display:grid;gap:4px}.ps-metric-label{font-size:.85rem;font-weight:600;color:var(--ps-muted);text-transform:uppercase;letter-spacing:.05em}.ps-metric-value{font-size:2.2rem;font-weight:800;letter-spacing:-.02em}.ps-log{background:#000;color:#0f0;font-family:monospace;padding:16px;border-radius:8px;font-size:.9rem;min-height:140px}.ps-graph{width:100%;height:auto;overflow:visible}.ps-graph-node-rect{fill:#fff;stroke:var(--ps-line);stroke-width:1}.ps-status-active .ps-graph-node-rect{stroke:var(--ps-accent);stroke-width:2}.ps-graph-node-text{font-size:12px;font-weight:600;fill:var(--ps-ink)}.ps-graph-edge path{fill:none;stroke:var(--ps-line);stroke-width:2}.ps-effect-flow{stroke-dasharray:8 8;animation:ps-flow 1s linear infinite}@keyframes ps-flow{from{stroke-dashoffset:16}to{stroke-dashoffset:0}}.ps-effect-pulse,.ps-pulse-svg{animation:ps-pulse 2s ease-in-out infinite}@keyframes ps-pulse{0%,100%{opacity:1}50%{opacity:.4}}.ps-effect-glow{filter:drop-shadow(0 0 8px var(--ps-accent))}.ps-reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease-out, transform 0.6s ease-out}.ps-reveal-visible{opacity:1;transform:translateY(0)}"#
 }
 
 fn base_js() -> &'static str {
-    r#"(()=>{const cfg=JSON.parse(document.getElementById("ps-runtime-config")?.textContent||"{\"states\":[],\"events\":[]}");const state={};for(const item of cfg.states||[]){state[item.id]=item.default;document.body.dataset["state"+item.id.charAt(0).toUpperCase()+item.id.slice(1)]=item.default}function setState(id,value){state[id]=value;document.body.dataset["state"+id.charAt(0).toUpperCase()+id.slice(1)]=value;document.querySelectorAll("[data-ps-node]").forEach(node=>node.classList.toggle("is-selected",node.dataset.psStateValue===value))}document.addEventListener("click",(event)=>{const button=event.target.closest("[data-action]");if(button){const action=button.dataset.action;const target=button.dataset.target;if(action==="open-modal"&&target){document.getElementById(target)?.showModal?.()}if(action==="toggle"&&target){document.getElementById(target)?.toggleAttribute("hidden")}}const graphNode=event.target.closest("[data-ps-node]");if(graphNode){for(const rule of cfg.events||[]){if(rule.on==="node.click"){const value=rule.value==="$node.id"?graphNode.dataset.psStateValue:rule.value;setState(rule.set,value)}}}});for(const [id,value] of Object.entries(state)){setState(id,value)}})()"#
+    r#"(()=>{const cfg=JSON.parse(document.getElementById("ps-runtime-config")?.textContent||"{\"states\":[],\"events\":[]}");const state={};for(const item of cfg.states||[]){state[item.id]=item.default;document.body.dataset["state"+item.id.charAt(0).toUpperCase()+item.id.slice(1)]=item.default}function setState(id,value){state[id]=value;document.body.dataset["state"+id.charAt(0).toUpperCase()+id.slice(1)]=value;document.querySelectorAll("[data-ps-node]").forEach(node=>node.classList.toggle("is-selected",node.dataset.psStateValue===value))}document.addEventListener("click",(event)=>{const button=event.target.closest("[data-action]");if(button){const action=button.dataset.action;const target=button.dataset.target;if(action==="open-modal"&&target){document.getElementById(target)?.showModal?.()}if(action==="toggle"&&target){document.getElementById(target)?.toggleAttribute("hidden")}}const graphNode=event.target.closest("[data-ps-node]");if(graphNode){for(const rule of cfg.events||[]){if(rule.on==="node.click"){const value=rule.value==="$node.id"?graphNode.dataset.psStateValue:rule.value;setState(rule.set,value)}}}});const obs=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("ps-reveal-visible");obs.unobserve(entry.target)}})},{threshold:0.1});document.querySelectorAll(".ps-card, .ps-section, .ps-hero, .ps-panel").forEach(el=>{el.classList.add("ps-reveal");obs.observe(el)});for(const [id,value] of Object.entries(state)){setState(id,value)}})()"#
 }

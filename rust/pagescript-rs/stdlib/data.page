@@ -1,0 +1,54 @@
+::recipe name=lineage-node-card
+  ::template
+    ::card
+      ::metric id=$id label=$label value=$value
+      ::/metric
+    ::/card
+  ::/template
+::/recipe
+
+::recipe name=pipeline-stage
+  ::template
+    ::stack
+      ::el tag=h4
+        ::text value=$title
+        ::/text
+      ::/el
+      ::slot
+      ::/slot
+    ::/stack
+  ::/template
+::/recipe
+
+::recipe name=metric-card
+  ::template
+    ::card
+      ::metric id=$id label=$label value=$value tone=$tone
+      ::/metric
+    ::/card
+  ::/template
+::/recipe
+
+::recipe name=event-log-row
+  ::template
+    ::stack layout=horizontal gap=small
+      ::el tag=span class="timestamp"
+        ::text value=$time
+        ::/text
+      ::/el
+      ::el tag=span class="event"
+        ::text value=$event
+        ::/text
+      ::/el
+    ::/stack
+  ::/template
+::/recipe
+
+::recipe name=data-flow-panel
+  ::template
+    ::panel id=$id
+      ::slot
+      ::/slot
+    ::/panel
+  ::/template
+::/recipe

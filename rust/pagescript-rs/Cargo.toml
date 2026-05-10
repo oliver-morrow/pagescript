@@ -6,7 +6,7 @@ description = "Rust reference implementation for the PageScript LLM-native web c
 license = "MIT"
 repository = "https://github.com/pagescript/pagescript"
 readme = "README.md"
-include = ["Cargo.toml", "README.md", "src/**/*.rs"]
+include = ["Cargo.toml", "README.md", "src/**/*.rs", "stdlib/**/*.page"]
 
 [lib]
 name = "pagescript_rs"
