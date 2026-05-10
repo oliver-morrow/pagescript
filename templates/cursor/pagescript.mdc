@@ -22,5 +22,10 @@ Use high-level primitives:
 - `::card`
 - `::button`
 - `::modal`
+- `::recipe`
+- `::use`
+- `::el`
+- `::attr`
+- `::style-rule`
 
 Keep pages compact and reviewable. Use `::tokens` before scoped CSS when a value is part of the page's design system. Validate with `pagescript-rs validate <file>` and render with `pagescript-rs render <file>`.

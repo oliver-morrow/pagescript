@@ -27,7 +27,7 @@
 
     ::grid columns=3 gap=md density=compact
       ::card class=docs-card icon="01" title="Specification"
-        body="Normative Draft 0.4 language model, compiler pipeline, tokens, layout metadata, state, events, and renderable primitives. See SPEC.md."
+        body="Normative Draft 0.5 language model, compiler pipeline, tokens, recipes, Web Core Kernel, state, events, and renderable primitives. See SPEC.md."
       ::/card
 
       ::card class=docs-card icon="02" title="Conformance"

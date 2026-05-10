@@ -24,6 +24,8 @@ HTML/CSS/JS are excellent browser targets but noisy authoring formats for LLMs. 
 
 Guided tours were the first interaction primitive because they have clear runtime mappings to libraries like Shepherd.js and Intro.js. They are now a compatibility feature. The primary PageScript path is LLM-native web composition for product demos, explainers, generated pages, and interactive documentation.
 
+Draft 0.5 adds the Web Core Kernel because semantic components alone can become too narrow. The kernel keeps files compact for LLMs, then lets the compiler expand recipes, generic elements, attributes, and style rules into browser-native HTML/CSS. That preserves the “small source travels well, browser expands it locally” property without turning `.page` files into raw JavaScript.
+
 ## Design Principles
 
 - Composition primitives first: describe layout, data, graph, state, and effects with compact semantic blocks.

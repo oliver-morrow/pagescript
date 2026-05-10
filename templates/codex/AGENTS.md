@@ -11,6 +11,8 @@ Do not hand-write generated HTML unless explicitly requested. Prefer:
 - `::metric`, `::state`, `::event`, and `::effect` for declarative demos
 - `::section` for content bands
 - `::grid` and `::card` for grouped concepts
+- `::recipe`, `::template`, and `::use` when repeating a UI shape
+- `::el`, `::attr`, `::text value`, and `::style-rule` when the page needs browser-native structure beyond semantic primitives
 - `::button action=open-modal target=<id>` for simple interactions
 - `::modal id=<id>` for supporting detail
 

@@ -142,6 +142,8 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
         ),
         "scene" => render_scene(node, context),
         "panel" => render_panel(node, context),
+        "el" => render_el(node, context),
+        "slot" => children,
         "stack" => format!(
             "<div class=\"{}\"{}>{children}</div>",
             component_classes(node, &["ps-stack", &gap(node)], context),
@@ -168,13 +170,17 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
             action_attrs(node),
             escape_html(string_attr(node, "label").unwrap_or("Button"))
         ),
-        "text" => format!(
-            "<div class=\"{}\"{}>{}{}{children}</div>",
-            component_classes(node, &["ps-text"], context),
-            id_attr(node),
-            heading(node, "h3"),
-            body(node)
-        ),
+        "text" => string_attr(node, "value")
+            .map(escape_html)
+            .unwrap_or_else(|| {
+                format!(
+                    "<div class=\"{}\"{}>{}{}{children}</div>",
+                    component_classes(node, &["ps-text"], context),
+                    id_attr(node),
+                    heading(node, "h3"),
+                    body(node)
+                )
+            }),
         "image" => format!(
             "<figure class=\"{}\"{}><img src=\"{}\" alt=\"{}\">{}</figure>",
             component_classes(node, &["ps-image"], context),
@@ -183,6 +189,7 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
             escape_attr(string_attr(node, "alt").unwrap_or("")),
             caption(node)
         ),
+        "attr" | "bind" | "on" => String::new(),
         "modal" => format!(
             "<dialog class=\"ps-modal\" id=\"{}\">\n  <form method=\"dialog\"><button class=\"ps-modal-close\" aria-label=\"Close\">x</button></form>\n  {}{}{children}\n</dialog>",
             escape_attr(string_attr(node, "id").unwrap_or("")),
@@ -207,6 +214,30 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
         "log" => render_log(node),
         _ => children,
     }
+}
+
+fn render_el(node: &ComponentIr, context: &RenderContext<'_>) -> String {
+    let tag = string_attr(node, "tag")
+        .filter(|tag| is_safe_tag(tag))
+        .unwrap_or("div");
+    let attrs = generic_attrs(node);
+    if is_void_tag(tag) {
+        return format!("<{tag}{attrs}>");
+    }
+    let children = node
+        .children
+        .iter()
+        .filter_map(|child| match child {
+            IrNode::Component(component)
+                if matches!(component.name.as_str(), "attr" | "bind" | "on") =>
+            {
+                None
+            }
+            _ => Some(render_node(child, context)),
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!("<{tag}{attrs}>{children}</{tag}>")
 }
 
 fn render_scene(node: &ComponentIr, context: &RenderContext<'_>) -> String {
@@ -441,6 +472,83 @@ fn action_attrs(node: &ComponentIr) -> String {
     format!(" data-action=\"{}\"{}", escape_attr(action), target)
 }
 
+fn generic_attrs(node: &ComponentIr) -> String {
+    let mut attrs = node
+        .attributes
+        .iter()
+        .filter_map(|(name, value)| {
+            if matches!(
+                name.as_str(),
+                "tag" | "layout" | "density" | "gap" | "columns" | "align"
+            ) {
+                None
+            } else {
+                render_attr(name, value)
+            }
+        })
+        .collect::<Vec<_>>();
+
+    for child in &node.children {
+        let IrNode::Component(component) = child else {
+            continue;
+        };
+        match component.name.as_str() {
+            "attr" => {
+                if let (Some(name), Some(value)) = (
+                    string_attr(component, "name"),
+                    component.attributes.get("value"),
+                ) && let Some(rendered) = render_attr(name, value)
+                {
+                    attrs.push(rendered);
+                }
+            }
+            "bind" => {
+                if let Some(state) = string_attr(component, "state") {
+                    attrs.push(format!("data-ps-bind=\"{}\"", escape_attr(state)));
+                }
+                if let Some(target) = string_attr(component, "target") {
+                    attrs.push(format!("data-ps-bind-target=\"{}\"", escape_attr(target)));
+                }
+            }
+            "on" => {
+                if let Some(event) = string_attr(component, "event") {
+                    attrs.push(format!("data-ps-on=\"{}\"", escape_attr(event)));
+                }
+                if let Some(action) = string_attr(component, "action") {
+                    attrs.push(format!("data-ps-action=\"{}\"", escape_attr(action)));
+                }
+                if let Some(target) = string_attr(component, "target") {
+                    attrs.push(format!("data-ps-target=\"{}\"", escape_attr(target)));
+                }
+            }
+            _ => {}
+        }
+    }
+
+    if attrs.is_empty() {
+        String::new()
+    } else {
+        format!(" {}", attrs.join(" "))
+    }
+}
+
+fn render_attr(name: &str, value: &Value) -> Option<String> {
+    if !is_safe_attr_name(name) {
+        return None;
+    }
+    match value {
+        Value::Bool(true) => Some(escape_attr(name)),
+        Value::Bool(false) | Value::Null => None,
+        Value::String(value) => Some(format!("{}=\"{}\"", escape_attr(name), escape_attr(value))),
+        Value::Number(value) => Some(format!("{}=\"{}\"", escape_attr(name), value)),
+        _ => Some(format!(
+            "{}=\"{}\"",
+            escape_attr(name),
+            escape_attr(&value.to_string())
+        )),
+    }
+}
+
 fn id_attr(node: &ComponentIr) -> String {
     string_attr(node, "id")
         .map(|id| format!(" id=\"{}\"", escape_attr(id)))
@@ -593,6 +701,43 @@ fn escape_css_value(value: &str) -> String {
         .chars()
         .filter(|ch| !matches!(ch, ';' | '{' | '}'))
         .collect()
+}
+
+fn is_safe_tag(value: &str) -> bool {
+    !matches!(value, "script" | "iframe" | "object" | "embed")
+        && !value.is_empty()
+        && value
+            .chars()
+            .all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-')
+}
+
+fn is_void_tag(value: &str) -> bool {
+    matches!(
+        value,
+        "area"
+            | "base"
+            | "br"
+            | "col"
+            | "embed"
+            | "hr"
+            | "img"
+            | "input"
+            | "link"
+            | "meta"
+            | "param"
+            | "source"
+            | "track"
+            | "wbr"
+    )
+}
+
+fn is_safe_attr_name(value: &str) -> bool {
+    !value.is_empty()
+        && !value.eq_ignore_ascii_case("srcdoc")
+        && !value.to_ascii_lowercase().starts_with("on")
+        && value
+            .chars()
+            .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | ':'))
 }
 
 fn base_css() -> &'static str {

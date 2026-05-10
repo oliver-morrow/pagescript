@@ -44,6 +44,12 @@ fn validate_page(
 
     let mut ids = PageIds::default();
     for child in &page.children {
+        if let Node::Component(component) = child {
+            collect_recipe_names(component, &mut ids.known_recipe_names);
+        }
+    }
+
+    for child in &page.children {
         match child {
             Node::Tour(tour) => validate_tour(tour, diagnostics, tour_ids),
             Node::Component(component) => validate_component(component, diagnostics, &mut ids),
@@ -58,6 +64,8 @@ struct PageIds {
     node_ids: HashSet<String>,
     state_ids: HashSet<String>,
     effect_ids: HashSet<String>,
+    known_recipe_names: HashSet<String>,
+    seen_recipe_names: HashSet<String>,
 }
 
 fn validate_component(
@@ -79,6 +87,13 @@ fn validate_component(
         "effect" => &["id", "type"][..],
         "style" => &["scope"][..],
         "tokens" => &[][..],
+        "el" => &["tag"][..],
+        "attr" => &["name", "value"][..],
+        "style-rule" => &["selector"][..],
+        "recipe" => &["name"][..],
+        "use" => &["recipe"][..],
+        "bind" => &["state"][..],
+        "on" => &["event", "action"][..],
         _ => &[],
     };
 
@@ -182,7 +197,63 @@ fn validate_component_semantics(
                 }
             }
         }
+        "el" => {
+            if let Some(tag) = component
+                .attributes
+                .get("tag")
+                .and_then(|value| value.as_str())
+            {
+                validate_element_tag(tag, component, diagnostics);
+            }
+        }
+        "attr" => {
+            if let Some(name) = component
+                .attributes
+                .get("name")
+                .and_then(|value| value.as_str())
+            {
+                validate_attribute_name(name, component, diagnostics);
+            }
+        }
+        "recipe" => record_unique_attr(
+            &mut ids.seen_recipe_names,
+            component,
+            diagnostics,
+            "name",
+            "duplicate_recipe_name",
+            "recipe",
+        ),
+        "use" => {
+            if let Some(name) = component
+                .attributes
+                .get("recipe")
+                .and_then(|value| value.as_str())
+                && !ids.known_recipe_names.contains(name)
+            {
+                diagnostics.push(error(
+                    "unknown_recipe",
+                    format!("Recipe \"{name}\" was not found."),
+                    component.source.line,
+                ));
+            }
+        }
         _ => {}
+    }
+}
+
+fn collect_recipe_names(component: &ComponentNode, names: &mut HashSet<String>) {
+    if component.name == "recipe"
+        && let Some(name) = component
+            .attributes
+            .get("name")
+            .and_then(|value| value.as_str())
+    {
+        names.insert(name.to_string());
+    }
+    for child in &component.children {
+        if let Node::Component(component) = child {
+            collect_recipe_names(component, names);
+        }
     }
 }
 
@@ -207,6 +278,71 @@ fn record_unique_id(
             component.source.line,
         ));
     }
+}
+
+fn record_unique_attr(
+    set: &mut HashSet<String>,
+    component: &ComponentNode,
+    diagnostics: &mut Vec<Diagnostic>,
+    attr: &str,
+    code: &str,
+    label: &str,
+) {
+    let Some(id) = component
+        .attributes
+        .get(attr)
+        .and_then(|value| value.as_str())
+    else {
+        return;
+    };
+    if !set.insert(id.to_string()) {
+        diagnostics.push(error(
+            code,
+            format!("Duplicate {label} name \"{id}\"."),
+            component.source.line,
+        ));
+    }
+}
+
+fn validate_element_tag(tag: &str, component: &ComponentNode, diagnostics: &mut Vec<Diagnostic>) {
+    if !is_safe_tag_name(tag) || matches!(tag, "script" | "iframe" | "object" | "embed") {
+        diagnostics.push(error(
+            "unsafe_element_tag",
+            format!("Element tag \"{tag}\" is not allowed."),
+            component.source.line,
+        ));
+    }
+}
+
+fn validate_attribute_name(
+    name: &str,
+    component: &ComponentNode,
+    diagnostics: &mut Vec<Diagnostic>,
+) {
+    if !is_safe_attribute_name(name)
+        || name.eq_ignore_ascii_case("srcdoc")
+        || name.to_ascii_lowercase().starts_with("on")
+    {
+        diagnostics.push(error(
+            "unsafe_attribute_name",
+            format!("Attribute \"{name}\" is not allowed."),
+            component.source.line,
+        ));
+    }
+}
+
+fn is_safe_tag_name(value: &str) -> bool {
+    !value.is_empty()
+        && value
+            .chars()
+            .all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-')
+}
+
+fn is_safe_attribute_name(value: &str) -> bool {
+    !value.is_empty()
+        && value
+            .chars()
+            .all(|ch| ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | ':'))
 }
 
 fn validate_tour(
