@@ -112,6 +112,21 @@ Attribute keys may contain letters, numbers, `_`, `-`, and `.`. Dotted keys are 
 
 Allowed effect types are `flow`, `pulse`, `glow`, `count-up`, and `reveal`.
 
+## Standard Library
+
+PageScript standard libraries are `.page` files containing reusable `recipe` definitions.
+They are imported with `::import from="..."`.
+Imports are compile-time only.
+
+- `::import from=<path>`: load recipes from another `.page` file
+
+Implementation rules:
+- `from` must be a relative path.
+- Absolute paths and paths containing `..` must be rejected for safety.
+- Imported recipes are merged into the current page recipe context.
+- Local recipes override imported recipes with the same name.
+- Imports are recursive; imported files may themselves import other files.
+
 ## Web Core Kernel
 
 The Web Core Kernel gives PageScript native browser reach without allowing source-authored JavaScript:
@@ -123,7 +138,7 @@ The Web Core Kernel gives PageScript native browser reach without allowing sourc
 - `::recipe name=<name>`: reusable expansion unit
 - `::template`: recipe body
 - `::use recipe=<name>`: compile-time recipe invocation
-- `::slot`: transparent grouping node
+- `::slot name=<name>`: named or default expansion slot
 - `::bind state=<id>`: declarative binding hook
 - `::on event=<event> action=<action>`: declarative event hook
 
@@ -145,7 +160,44 @@ Recipes are expanded into IR before rendering. For example:
 ::/use
 ```
 
-The compiler substitutes `$title` and `$href`, then renders an ordinary HTML anchor. Validators must reject unsafe element tags such as `script`, `iframe`, `object`, and `embed`, and unsafe attributes such as `onclick` and `srcdoc`.
+The compiler substitutes `$title` and `$href`, then renders an ordinary HTML anchor.
+
+### Named Slots
+
+Draft 0.6 introduces named slots for recipe composition:
+
+```text
+::recipe name=product-hero
+  ::template
+    ::hero
+      ::el tag=h1
+        ::text value=$title
+        ::/text
+      ::/el
+      ::slot name=actions
+      ::/slot
+    ::/hero
+  ::/template
+::/recipe
+```
+
+Usage with named slots:
+
+```text
+::use recipe=product-hero title="PageScript"
+  ::slot name=actions
+    ::button label="Get Started"
+    ::/button
+  ::/slot
+::/use
+```
+
+Compiler behavior:
+- Replace `::slot name=<name>` inside the recipe template with matching slot children from the `::use`.
+- If no matching slot exists in the `::use`, render the recipe slot's default children.
+- If a `::use` provides children without a `::slot` wrapper, they are treated as the content for the unnamed (default) slot.
+
+Validators must reject unsafe element tags such as `script`, `iframe`, `object`, and `embed`, and unsafe attributes such as `onclick` and `srcdoc`.
 
 ## Design Tokens
 

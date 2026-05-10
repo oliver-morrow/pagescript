@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
+use crate::parser::parse_page_script;
+use crate::resolver::Resolver;
 use crate::types::{AttributeValue, ComponentNode, DocumentNode, MarkdownNode, Node, PageNode};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -105,9 +107,21 @@ pub struct RecipeIr {
     pub attributes: Map<String, Value>,
 }
 
-pub fn compile_page_ir(document: &DocumentNode, page_id: Option<&str>) -> Result<PageIr, String> {
+pub fn compile_page_ir(
+    document: &DocumentNode,
+    page_id: Option<&str>,
+    resolver: &Resolver,
+) -> Result<PageIr, String> {
     let page = select_page(document, page_id)?;
-    let mut context = IrContext::default();
+    let mut context = IrContext {
+        resolver,
+        tokens: Map::new(),
+        recipes: HashMap::new(),
+        effects: HashMap::new(),
+        states: Vec::new(),
+        events: Vec::new(),
+        scoped_css: String::new(),
+    };
     for child in &page.children {
         collect_head_data(child, &mut context);
     }
@@ -146,8 +160,8 @@ pub fn compile_page_ir(document: &DocumentNode, page_id: Option<&str>) -> Result
     })
 }
 
-#[derive(Default)]
-struct IrContext {
+struct IrContext<'a> {
+    resolver: &'a Resolver,
     tokens: Map<String, Value>,
     recipes: HashMap<String, RecipeDef>,
     effects: HashMap<String, EffectIr>,
@@ -230,6 +244,16 @@ fn collect_head_data(node: &Node, context: &mut IrContext) {
                 );
             }
         }
+        "import" => {
+            if let Some(from) = string_attr(component, "from")
+                && let Ok(source) = context.resolver.resolve(from)
+            {
+                let imported_doc = parse_page_script(&source);
+                for child in &imported_doc.children {
+                    collect_imported_recipes(child, context);
+                }
+            }
+        }
         _ => {}
     }
 
@@ -238,7 +262,35 @@ fn collect_head_data(node: &Node, context: &mut IrContext) {
     }
 }
 
-fn normalize_node(node: &Node, context: &IrContext) -> Vec<IrNode> {
+fn collect_imported_recipes(node: &Node, context: &mut IrContext) {
+    match node {
+        Node::Page(page) => {
+            for child in &page.children {
+                collect_imported_recipes(child, context);
+            }
+        }
+        Node::Component(component) => {
+            if component.name == "recipe"
+                && let Some(name) = string_attr(component, "name")
+                && !context.recipes.contains_key(name)
+            {
+                context.recipes.insert(
+                    name.to_string(),
+                    RecipeDef {
+                        attributes: component.attributes.clone(),
+                        template: recipe_template(component),
+                    },
+                );
+            }
+            for child in &component.children {
+                collect_imported_recipes(child, context);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn normalize_node<'a>(node: &Node, context: &IrContext<'a>) -> Vec<IrNode> {
     match node {
         Node::Markdown(markdown) => vec![IrNode::Markdown(normalize_markdown(markdown))],
         Node::Component(component) if component.name == "use" => expand_recipe(component, context),
@@ -256,7 +308,7 @@ fn normalize_markdown(node: &MarkdownNode) -> MarkdownIr {
     }
 }
 
-fn normalize_component(node: &ComponentNode, context: &IrContext) -> ComponentIr {
+fn normalize_component<'a>(node: &ComponentNode, context: &IrContext<'a>) -> ComponentIr {
     let graph = if node.name == "panel" {
         normalize_graph(node)
     } else {
@@ -282,7 +334,7 @@ fn normalize_component(node: &ComponentNode, context: &IrContext) -> ComponentIr
     }
 }
 
-fn expand_recipe(component: &ComponentNode, context: &IrContext) -> Vec<IrNode> {
+fn expand_recipe<'a>(component: &ComponentNode, context: &IrContext<'a>) -> Vec<IrNode> {
     let Some(name) = string_attr(component, "recipe") else {
         return Vec::new();
     };
@@ -295,10 +347,30 @@ fn expand_recipe(component: &ComponentNode, context: &IrContext) -> Vec<IrNode> 
             values.insert(key.clone(), value.clone());
         }
     }
+
+    let mut slots = HashMap::new();
+    let mut default_slot_children = Vec::new();
+
+    for child in &component.children {
+        match child {
+            Node::Component(slot_comp) if slot_comp.name == "slot" => {
+                let slot_name = string_attr(slot_comp, "name").unwrap_or("");
+                slots.insert(slot_name.to_string(), slot_comp.children.clone());
+            }
+            _ => {
+                default_slot_children.push(child.clone());
+            }
+        }
+    }
+
+    if !default_slot_children.is_empty() {
+        slots.entry("".to_string()).or_insert(default_slot_children);
+    }
+
     recipe
         .template
         .iter()
-        .map(|node| substitute_node(node, &values))
+        .flat_map(|node| substitute_node(node, &values, &slots))
         .flat_map(|node| normalize_node(&node, context))
         .collect()
 }
@@ -316,13 +388,29 @@ fn recipe_template(component: &ComponentNode) -> Vec<Node> {
         .unwrap_or_else(|| component.children.clone())
 }
 
-fn substitute_node(node: &Node, values: &Map<String, Value>) -> Node {
+fn substitute_node(
+    node: &Node,
+    values: &Map<String, Value>,
+    slots: &HashMap<String, Vec<Node>>,
+) -> Vec<Node> {
     match node {
-        Node::Markdown(markdown) => Node::Markdown(MarkdownNode {
+        Node::Markdown(markdown) => vec![Node::Markdown(MarkdownNode {
             source: markdown.source.clone(),
             value: substitute_string(&markdown.value, values),
-        }),
-        Node::Component(component) => Node::Component(ComponentNode {
+        })],
+        Node::Component(component) if component.name == "slot" => {
+            let slot_name = string_attr(component, "name").unwrap_or("");
+            if let Some(content) = slots.get(slot_name) {
+                content.clone()
+            } else {
+                component
+                    .children
+                    .iter()
+                    .flat_map(|child| substitute_node(child, values, slots))
+                    .collect()
+            }
+        }
+        Node::Component(component) => vec![Node::Component(ComponentNode {
             name: component.name.clone(),
             source: component.source.clone(),
             attributes: component
@@ -333,10 +421,10 @@ fn substitute_node(node: &Node, values: &Map<String, Value>) -> Node {
             children: component
                 .children
                 .iter()
-                .map(|child| substitute_node(child, values))
+                .flat_map(|child| substitute_node(child, values, slots))
                 .collect(),
-        }),
-        other => other.clone(),
+        })],
+        other => vec![other.clone()],
     }
 }
 
@@ -436,6 +524,8 @@ fn is_compiler_only_component(component: &ComponentNode) -> bool {
             | "template"
             | "node"
             | "edge"
+            | "import"
+            | "slot"
     )
 }
 

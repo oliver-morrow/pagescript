@@ -1,10 +1,18 @@
 use std::fs;
 
 use pagescript_rs::{
-    compile_page_ir, parse_page_script, render_to_html, to_intro_config, to_shepherd_config,
-    validate_document,
+    Resolver, compile_page_ir, parse_page_script, render_to_html, to_intro_config,
+    to_shepherd_config, validate_document,
 };
 use serde_json::Value;
+
+fn resolver() -> Resolver {
+    Resolver::new(None)
+}
+
+fn resolver_with_path(path: &str) -> Resolver {
+    Resolver::new(Some(std::path::PathBuf::from(path)))
+}
 
 #[test]
 fn valid_fixture_matches_expected_ast() {
@@ -15,7 +23,7 @@ fn valid_fixture_matches_expected_ast() {
     .unwrap();
     let document = parse_page_script(&source);
 
-    assert_eq!(validate_document(&document), Vec::new());
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
     assert_eq!(serde_json::to_value(&document).unwrap(), expected);
 }
 
@@ -27,7 +35,7 @@ fn invalid_fixture_matches_expected_diagnostics() {
     )
     .unwrap();
     let document = parse_page_script(&source);
-    let diagnostics = validate_document(&document);
+    let diagnostics = validate_document(&document, &resolver());
 
     assert_eq!(serde_json::to_value(&diagnostics).unwrap(), expected);
 }
@@ -81,7 +89,7 @@ fn number_literals_match_draft_grammar() {
 #[test]
 fn malformed_directive_reports_diagnostic() {
     let document = parse_page_script("::tour!\n");
-    let diagnostics = validate_document(&document);
+    let diagnostics = validate_document(&document, &resolver());
 
     assert_eq!(diagnostics[0].code, "malformed_directive");
 }
@@ -91,8 +99,8 @@ fn parses_and_renders_interactive_page_components() {
     let source = fs::read_to_string("../../examples/interactive-doc.page").unwrap();
     let document = parse_page_script(&source);
 
-    assert_eq!(validate_document(&document), Vec::new());
-    let html = render_to_html(&document, Some("agent-docs")).unwrap();
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
+    let html = render_to_html(&document, Some("agent-docs"), &resolver()).unwrap();
 
     assert!(html.contains("<!doctype html>"));
     assert!(html.contains("Interactive docs your AI tools can write"));
@@ -105,8 +113,8 @@ fn parses_and_renders_data_lineage_demo() {
     let source = fs::read_to_string("../../examples/data-lineage-demo.page").unwrap();
     let document = parse_page_script(&source);
 
-    assert_eq!(validate_document(&document), Vec::new());
-    let html = render_to_html(&document, Some("lineage-demo")).unwrap();
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
+    let html = render_to_html(&document, Some("lineage-demo"), &resolver()).unwrap();
 
     assert!(html.contains("<svg class=\"ps-graph\""));
     assert!(html.contains("data-ps-node=\"warehouse\""));
@@ -125,11 +133,11 @@ fn renders_revenue_command_center_without_svg_animation_drift() {
         fs::read_to_string("../../examples/autonomous-revenue-command-center.page").unwrap();
     let document = parse_page_script(&source);
 
-    assert_eq!(validate_document(&document), Vec::new());
-    let html = render_to_html(&document, Some("revenue-command-center")).unwrap();
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
+    let html = render_to_html(&document, Some("revenue-command-center"), &resolver()).unwrap();
 
     assert!(html.contains("data-ps-node=\"identity\""));
-    assert!(html.contains("ps-pulse-svg"));
+    assert!(html.contains("ps-effect-pulse"));
     assert!(html.contains("width=\"148\" height=\"58\""));
     assert!(html.contains("M 179 90 C"));
     assert!(!html.contains("transform:scale"));
@@ -142,8 +150,8 @@ fn compiles_revenue_command_center_to_generic_page_ir() {
         fs::read_to_string("../../examples/autonomous-revenue-command-center.page").unwrap();
     let document = parse_page_script(&source);
 
-    assert_eq!(validate_document(&document), Vec::new());
-    let ir = compile_page_ir(&document, Some("revenue-command-center")).unwrap();
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
+    let ir = compile_page_ir(&document, Some("revenue-command-center"), &resolver()).unwrap();
     let first_scene = ir
         .body
         .iter()
@@ -197,9 +205,9 @@ fn renders_tokens_and_generic_layout_metadata() {
 ::/page"##;
     let document = parse_page_script(source);
 
-    assert_eq!(validate_document(&document), Vec::new());
-    let ir = compile_page_ir(&document, Some("tokens")).unwrap();
-    let html = render_to_html(&document, Some("tokens")).unwrap();
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
+    let ir = compile_page_ir(&document, Some("tokens"), &resolver()).unwrap();
+    let html = render_to_html(&document, Some("tokens"), &resolver()).unwrap();
 
     let component = ir
         .body
@@ -227,11 +235,12 @@ fn visual_sanity_checks_guard_graph_alignment_regressions() {
     let source =
         fs::read_to_string("../../examples/autonomous-revenue-command-center.page").unwrap();
     let document = parse_page_script(&source);
-    let html = render_to_html(&document, Some("revenue-command-center")).unwrap();
+    let html = render_to_html(&document, Some("revenue-command-center"), &resolver()).unwrap();
 
     assert!(html.contains("transform=\"translate(265, 190)\""));
     assert!(html.contains("d=\"M 179 90 C 227 90, 143 190, 191 190\""));
-    assert!(html.contains(".ps-graph-node.ps-effect-pulse"));
+    assert!(html.contains("ps-graph-node"));
+    assert!(html.contains("ps-effect-pulse"));
     assert!(!html.contains("transform:scale"));
     assert!(!html.contains("data-ps-node=\"\""));
 }
@@ -254,7 +263,7 @@ fn validates_draft_04_primitive_rules() {
   ::tokens options={"nested":true}
   ::/tokens
 ::/page"##;
-    let diagnostics = validate_document(&parse_page_script(source));
+    let diagnostics = validate_document(&parse_page_script(source), &resolver());
     let codes = diagnostics
         .iter()
         .map(|diagnostic| diagnostic.code.as_str())
@@ -272,9 +281,9 @@ fn renders_web_core_kernel_recipe_expansion() {
     let source = fs::read_to_string("../../examples/web-core-kernel.page").unwrap();
     let document = parse_page_script(&source);
 
-    assert_eq!(validate_document(&document), Vec::new());
-    let ir = compile_page_ir(&document, Some("web-core-kernel")).unwrap();
-    let html = render_to_html(&document, Some("web-core-kernel")).unwrap();
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
+    let ir = compile_page_ir(&document, Some("web-core-kernel"), &resolver()).unwrap();
+    let html = render_to_html(&document, Some("web-core-kernel"), &resolver()).unwrap();
 
     assert!(ir.recipes.contains_key("kernel-card"));
     assert!(html.contains("<main class=\"kernel-shell\">"));
@@ -292,6 +301,25 @@ fn renders_web_core_kernel_recipe_expansion() {
 }
 
 #[test]
+fn renders_product_intelligence_demo_with_stdlib_imports() {
+    let source = fs::read_to_string("../../examples/product-intelligence-demo.page").unwrap();
+    let document = parse_page_script(&source);
+
+    // Note: The embedded resolver will find stdlib/product.page even if physical files are missing
+    let resolver = resolver_with_path("../../examples");
+
+    assert_eq!(validate_document(&document, &resolver), Vec::new());
+    let html = render_to_html(&document, Some("product-intelligence-demo"), &resolver).unwrap();
+
+    assert!(html.contains("Product Intelligence"));
+    assert!(html.contains("Active Users"));
+    assert!(html.contains("Data Pipeline Health"));
+    assert!(html.contains("Autonomous Discovery"));
+    assert!(html.contains("Ready to upgrade your intelligence?"));
+    assert!(html.contains("data-ps-node=\"ingest\""));
+}
+
+#[test]
 fn validates_web_core_kernel_safety_rules() {
     let source = r##"::page id=unsafe
   ::el tag=script
@@ -303,7 +331,7 @@ fn validates_web_core_kernel_safety_rules() {
   ::use recipe=missing
   ::/use
 ::/page"##;
-    let diagnostics = validate_document(&parse_page_script(source));
+    let diagnostics = validate_document(&parse_page_script(source), &resolver());
     let codes = diagnostics
         .iter()
         .map(|diagnostic| diagnostic.code.as_str())

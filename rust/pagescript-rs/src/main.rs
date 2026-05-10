@@ -1,8 +1,8 @@
 use std::{env, fs, process};
 
 use pagescript_rs::{
-    compile_page_ir, parse_page_script, render_to_html, to_intro_config, to_shepherd_config,
-    validate_document,
+    Resolver, compile_page_ir, parse_page_script, render_to_html, to_intro_config,
+    to_shepherd_config, validate_document,
 };
 
 #[derive(Default)]
@@ -42,8 +42,12 @@ fn run(args: Vec<String>) -> i32 {
             return 1;
         }
     };
+    let file_path = std::path::Path::new(file);
+    let base_path = file_path.parent().map(|p| p.to_path_buf());
+    let resolver = Resolver::new(base_path);
+
     let document = parse_page_script(&source);
-    let diagnostics = validate_document(&document);
+    let diagnostics = validate_document(&document, &resolver);
 
     if command == "validate" {
         if diagnostics.is_empty() {
@@ -64,7 +68,7 @@ fn run(args: Vec<String>) -> i32 {
     }
 
     if command == "ir" {
-        return match compile_page_ir(&document, options.page_id.as_deref()) {
+        return match compile_page_ir(&document, options.page_id.as_deref(), &resolver) {
             Ok(ir) => print_json(&ir),
             Err(error) => {
                 eprintln!("{error}");
@@ -74,7 +78,7 @@ fn run(args: Vec<String>) -> i32 {
     }
 
     if command == "render" {
-        return match render_to_html(&document, options.page_id.as_deref()) {
+        return match render_to_html(&document, options.page_id.as_deref(), &resolver) {
             Ok(html) => {
                 println!("{html}");
                 0

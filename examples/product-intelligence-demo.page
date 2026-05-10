@@ -1,0 +1,89 @@
+::page id=product-intelligence-demo title="Product Intelligence Demo"
+  ::import from="stdlib/product.page"
+  ::/import
+
+  ::import from="stdlib/data.page"
+  ::/import
+
+  ::import from="stdlib/layout.page"
+  ::/import
+
+  ::tokens
+    color.accent="#4f46e5"
+    color.bg="#f8fafc"
+    radius.lg=12
+  ::/tokens
+
+  ::use recipe=product-hero title="Product Intelligence" subtitle="Autonomous insights for modern engineering teams"
+    ::slot name=actions
+      ::el tag=a href="#demo" class="button primary"
+        ::text value="View Demo"
+        ::/text
+      ::/el
+      ::el tag=a href="#docs" class="button secondary"
+        ::text value="Read Docs"
+        ::/text
+      ::/el
+    ::/slot
+  ::/use
+
+  ::use recipe=metric-strip
+    ::use recipe=metric-card id=m1 label="Active Users" value="2.4k" tone=positive
+    ::/use
+    ::use recipe=metric-card id=m2 label="Avg Latency" value="45ms" tone=neutral
+    ::/use
+    ::use recipe=metric-card id=m3 label="Error Rate" value="0.02%" tone=positive
+    ::/use
+    ::use recipe=metric-card id=m4 label="Revenue" value="$1.2M" tone=positive
+    ::/use
+  ::/use
+
+  ::use recipe=split-section
+    ::slot name=left
+      ::stack
+        ::el tag=h2
+          ::text value="Data Pipeline Health"
+          ::/text
+        ::/el
+        ::el tag=p
+          ::text value="Monitor your entire data lifecycle from ingestion to intelligence."
+          ::/text
+        ::/el
+      ::/stack
+    ::/slot
+    ::slot name=right
+      ::use recipe=data-flow-panel id=pipeline-demo
+        ::node id=ingest label="Ingestion" x=50 y=100 status=active
+        ::/node
+        ::node id=process label="Processing" x=250 y=100 status=active effect=pulse
+        ::/node
+        ::node id=storage label="Storage" x=450 y=100 status=active
+        ::/node
+        ::node id=ai label="AI Engine" x=650 y=100 status=active effect=glow
+        ::/node
+
+        ::edge from=ingest to=process effect=flow
+        ::/edge
+        ::edge from=process to=storage effect=flow
+        ::/edge
+        ::edge from=storage to=ai effect=flow
+        ::/edge
+      ::/use
+    ::/slot
+  ::/use
+
+  ::use recipe=bento-grid
+    ::use recipe=feature-card title="Autonomous Discovery" body="Automatically map your entire service architecture."
+    ::/use
+    ::use recipe=feature-card title="Real-time Lineage" body="Track data transformations as they happen."
+    ::/use
+    ::use recipe=feature-card title="Smart Alerts" body="AI-driven anomaly detection for critical paths."
+    ::/use
+    ::use recipe=feature-card title="Cost Optimization" body="Identify inefficient queries and reduce spend."
+    ::/use
+  ::/use
+
+  ::use recipe=cta-band title="Ready to upgrade your intelligence?" label="Get Started" href="/signup"
+  ::/use
+
+::/page

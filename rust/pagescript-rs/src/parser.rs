@@ -37,6 +37,7 @@ const COMPONENT_DIRECTIVES: &[&str] = &[
     "use",
     "bind",
     "on",
+    "import",
 ];
 
 enum Context {
@@ -229,7 +230,10 @@ fn open_directive(
             });
         }
         name if COMPONENT_DIRECTIVES.contains(&name) => {
-            if parent_kind != "page" && parent_kind != "component" {
+            if parent_kind != "page"
+                && parent_kind != "component"
+                && !matches!(name, "recipe" | "import")
+            {
                 diagnostics.push(error(
                     "invalid_parent",
                     format!("A {name} block must be inside a page or component block."),

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Intelligence Demo</title>
+  <style>:root{color-scheme:light;--ps-bg:#f7f7f2;--ps-ink:#202124;--ps-muted:#62645f;--ps-line:#deded4;--ps-accent:#116149;--ps-accent-ink:#fff;--ps-panel:#fff;--ps-radius:12px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--ps-bg);color:var(--ps-ink);line-height:1.5}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.4rem,6vw,5rem);line-height:.98;max-width:11ch}h2{font-size:clamp(1.8rem,3vw,3rem);line-height:1.05}h3{font-size:1.1rem}.ps-container{width:min(1180px,calc(100% - 32px));margin:0 auto}.ps-hero{min-height:72vh;display:flex;align-items:center}.ps-hero-inner{display:grid;gap:24px}.ps-section{padding:72px 0}.ps-space-sm{padding-block:32px}.ps-space-md{padding-block:56px}.ps-space-lg{padding-block:88px}.ps-space-xl{padding-block:120px}.ps-density-compact{--ps-density-pad:16px;--ps-density-gap:12px}.ps-density-spacious{--ps-density-pad:32px;--ps-density-gap:24px}.ps-tone-dark{background:#16201d;color:#f7f7f2}.ps-tone-accent{background:#dcefe7}.ps-tone-muted{background:#ecece3}.ps-tone-good{background:#e3f8ee;color:#12382a}.ps-stack{display:grid}.ps-gap-sm{gap:12px}.ps-gap-md{gap:20px}.ps-gap-lg{gap:32px}.ps-grid{display:grid;grid-template-columns:repeat(var(--ps-columns),minmax(0,1fr));gap:24px}.ps-card,.ps-panel{background:var(--ps-panel);border:1px solid var(--ps-line);border-radius:var(--ps-radius);padding:var(--ps-density-pad,24px);display:grid;gap:var(--ps-density-gap,16px);box-shadow:0 1px 1px rgba(0,0,0,.04)}.ps-icon{font-size:1.4rem}.ps-button{width:max-content;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}.ps-button-primary{background:var(--ps-accent);color:var(--ps-accent-ink)}.ps-button-secondary{background:#fff;color:var(--ps-ink);border:1px solid var(--ps-line)}.ps-text{display:grid;gap:12px}.ps-image img{width:100%;height:auto;border-radius:var(--ps-radius)}.ps-modal{border:0;border-radius:16px;padding:28px;max-width:640px}.ps-modal::backdrop{background:rgba(0,0,0,.45)}.ps-modal-close{float:right}.ps-form{display:grid;gap:16px}.ps-field{display:grid;gap:6px}.ps-field input{font:inherit;padding:12px;border:1px solid var(--ps-line);border-radius:8px}.ps-scene{padding:88px 0;background:linear-gradient(135deg,#f8faf6,#e9f1ec)}.ps-scene-header{display:grid;gap:12px;margin-bottom:28px}.ps-scene-body{display:grid;gap:24px}.ps-scene-split .ps-scene-body{grid-template-columns:minmax(0,1.4fr) minmax(320px,.8fr);align-items:start}.ps-graph{width:100%;min-height:380px;overflow:visible}.ps-graph-edge{fill:none;stroke:#8aa89b;stroke-width:3;marker-end:url(#ps-arrow);stroke-linecap:round}.ps-graph-node{cursor:pointer}.ps-graph-node rect{fill:#fff;stroke:#b9cbc3;stroke-width:1.5;filter:drop-shadow(0 8px 16px rgba(17,97,73,.10))}.ps-graph-node text{font-size:13px;dominant-baseline:middle}.ps-graph-label{font-weight:700}.ps-graph-icon{font-size:16px}.ps-status-active rect{stroke:#116149}.ps-status-syncing rect{stroke:#3976d8}.ps-status-ready rect{stroke:#7b4fc5}.ps-status-warning rect{stroke:#b7791f}.ps-metric{display:grid;gap:4px;padding:16px;border:1px solid var(--ps-line);border-radius:12px;background:#fff}.ps-metric span{font-size:.82rem;color:var(--ps-muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}.ps-metric strong{font-size:1.7rem}.ps-log{display:grid;gap:8px;margin:0;padding:0;list-style:none}.ps-log li{display:flex;justify-content:space-between;gap:16px;padding:10px 12px;border:1px solid var(--ps-line);border-radius:10px;background:#fff}.ps-effect-flow{stroke-dasharray:10 10;animation:ps-flow 1.4s linear infinite}.ps-effect-pulse{animation:ps-pulse 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}.ps-graph-node.ps-effect-pulse{animation:ps-pulse-svg 1.6s ease-in-out infinite}.ps-effect-glow rect,.ps-effect-glow{filter:drop-shadow(0 0 12px rgba(17,97,73,.35))}.ps-effect-reveal{animation:ps-reveal .7s ease-out both}.ps-effect-count-up strong{animation:ps-pulse 1.2s ease-in-out 2}@keyframes ps-flow{to{stroke-dashoffset:-40}}@keyframes ps-pulse{50%{opacity:.62;filter:brightness(1.08)}}@keyframes ps-pulse-svg{50%{opacity:.64}}@keyframes ps-reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@media(max-width:860px){.ps-grid,.ps-scene-split .ps-scene-body{grid-template-columns:1fr}.ps-hero{min-height:auto}.ps-space-lg,.ps-space-xl{padding-block:56px}}
+:root{--ps-token-color-accent:#4f46e5;--ps-accent:#4f46e5;--ps-token-color-bg:#f8fafc;--ps-bg:#f8fafc;--ps-token-radius-lg:12px;}
+</style>
+</head>
+<body data-pagescript-page="product-intelligence-demo">
+<section class="ps-hero ps-tone-default ps-space-lg">
+  <div class="ps-container ps-hero-inner">
+    <div class="ps-stack ps-gap-md"><h1>Product Intelligence</h1>
+<p>Autonomous insights for modern engineering teams</p>
+<a href="#demo" class="button primary">View Demo</a>
+<a href="#docs" class="button secondary">Read Docs</a></div>
+  </div>
+</section>
+<section class="ps-section ps-tone-default ps-space-lg">
+  <div class="ps-container"><div class="ps-stack ps-gap-large"><article class="ps-card ps-tone-default">
+  <div class="ps-metric ps-tone-positive" id="m1" data-ps-metric><span>Active Users</span><strong>2.4k</strong></div>
+</article>
+<article class="ps-card ps-tone-default">
+  <div class="ps-metric ps-tone-neutral" id="m2" data-ps-metric><span>Avg Latency</span><strong>45ms</strong></div>
+</article>
+<article class="ps-card ps-tone-default">
+  <div class="ps-metric ps-tone-positive" id="m3" data-ps-metric><span>Error Rate</span><strong>0.02%</strong></div>
+</article>
+<article class="ps-card ps-tone-default">
+  <div class="ps-metric ps-tone-positive" id="m4" data-ps-metric><span>Revenue</span><strong>$1.2M</strong></div>
+</article></div></div>
+</section>
+<section class="ps-section ps-tone-default ps-space-lg">
+  <div class="ps-container"><div class="ps-grid ps-gap-large" style="--ps-columns:2"><div class="ps-stack ps-gap-md"><h2>Data Pipeline Health</h2>
+<p>Monitor your entire data lifecycle from ingestion to intelligence.</p></div>
+<article class="ps-panel ps-tone-default" id="pipeline-demo">
+  <header></header>
+  <svg class="ps-graph" viewBox="0 0 760 380" role="img" aria-label="Data lineage graph">
+  <defs><marker id="ps-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8aa89b" /></marker></defs>
+  <g class="ps-edges"><path class="ps-graph-edge ps-effect-flow" d="M 124 100 C 172 100, 128 100, 176 100" />
+<path class="ps-graph-edge ps-effect-flow" d="M 324 100 C 372 100, 328 100, 376 100" />
+<path class="ps-graph-edge ps-effect-flow" d="M 524 100 C 572 100, 528 100, 576 100" /></g>
+  <g class="ps-nodes"><g class="ps-graph-node ps-status-active" data-ps-node="ingest" data-ps-state-value="ingest" transform="translate(50, 100)" tabindex="0" role="button" aria-label="Ingestion"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5"></text><text class="ps-graph-label" x="-26" y="5">Ingestion</text><circle cx="62" cy="-19" r="5"/></g>
+<g class="ps-graph-node ps-status-active ps-effect-pulse" data-ps-node="process" data-ps-state-value="process" transform="translate(250, 100)" tabindex="0" role="button" aria-label="Processing"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5"></text><text class="ps-graph-label" x="-26" y="5">Processing</text><circle cx="62" cy="-19" r="5"/></g>
+<g class="ps-graph-node ps-status-active" data-ps-node="storage" data-ps-state-value="storage" transform="translate(450, 100)" tabindex="0" role="button" aria-label="Storage"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5"></text><text class="ps-graph-label" x="-26" y="5">Storage</text><circle cx="62" cy="-19" r="5"/></g>
+<g class="ps-graph-node ps-status-active ps-effect-glow" data-ps-node="ai" data-ps-state-value="ai" transform="translate(650, 100)" tabindex="0" role="button" aria-label="AI Engine"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5"></text><text class="ps-graph-label" x="-26" y="5">AI Engine</text><circle cx="62" cy="-19" r="5"/></g></g>
+</svg>
+</article></div></div>
+</section>
+<div class="ps-grid ps-gap-medium" style="--ps-columns:4"><article class="ps-card ps-tone-default">
+  <h3>Autonomous Discovery</h3>
+<p>Automatically map your entire service architecture.</p>
+</article>
+<article class="ps-card ps-tone-default">
+  <h3>Real-time Lineage</h3>
+<p>Track data transformations as they happen.</p>
+</article>
+<article class="ps-card ps-tone-default">
+  <h3>Smart Alerts</h3>
+<p>AI-driven anomaly detection for critical paths.</p>
+</article>
+<article class="ps-card ps-tone-default">
+  <h3>Cost Optimization</h3>
+<p>Identify inefficient queries and reduce spend.</p>
+</article></div>
+<section class="ps-section ps-tone-default ps-space-lg">
+  <div class="ps-container"><div class="ps-stack ps-gap-md"><h2>Ready to upgrade your intelligence?</h2>
+<a href="/signup" class="button">Get Started</a></div></div>
+</section>
+  <script type="application/json" id="ps-runtime-config">{"states":[],"events":[]}</script>
+  <script>(()=>{const cfg=JSON.parse(document.getElementById("ps-runtime-config")?.textContent||"{\"states\":[],\"events\":[]}");const state={};for(const item of cfg.states||[]){state[item.id]=item.default;document.body.dataset["state"+item.id.charAt(0).toUpperCase()+item.id.slice(1)]=item.default}function setState(id,value){state[id]=value;document.body.dataset["state"+id.charAt(0).toUpperCase()+id.slice(1)]=value;document.querySelectorAll("[data-ps-node]").forEach(node=>node.classList.toggle("is-selected",node.dataset.psStateValue===value))}document.addEventListener("click",(event)=>{const button=event.target.closest("[data-action]");if(button){const action=button.dataset.action;const target=button.dataset.target;if(action==="open-modal"&&target){document.getElementById(target)?.showModal?.()}if(action==="toggle"&&target){document.getElementById(target)?.toggleAttribute("hidden")}}const graphNode=event.target.closest("[data-ps-node]");if(graphNode){for(const rule of cfg.events||[]){if(rule.on==="node.click"){const value=rule.value==="$node.id"?graphNode.dataset.psStateValue:rule.value;setState(rule.set,value)}}}});for(const [id,value] of Object.entries(state)){setState(id,value)}})()</script>
+</body>
+</html>
+

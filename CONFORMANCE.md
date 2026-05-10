@@ -35,6 +35,7 @@ A conforming validator must report structured diagnostics for:
 - unsafe Web Core Kernel tags and attributes
 - duplicate scene, node, state, effect, and recipe names within a page
 - unknown recipe references
+- invalid `import` paths (absolute or containing `..`)
 - duplicate page IDs in a document
 - duplicate tour IDs in a document
 - duplicate step IDs within a tour
@@ -48,7 +49,7 @@ The `conformance/` directory is the compatibility contract:
 - `conformance/invalid/*.page` files must parse and return diagnostics.
 - `conformance/invalid/*.diagnostics.json` files define expected diagnostics.
 
-Implementations in other languages should pass the fixture suite before claiming Draft 0.5 support.
+Implementations in other languages should pass the fixture suite before claiming Draft 0.6 support.
 
 ## Compiler IR Requirements
 
@@ -57,6 +58,8 @@ A conforming compiler should normalize validated AST into PageScript IR before r
 - page ID and title
 - page-level design tokens
 - recipe definitions as the compile-time expansion contract
+- imported recipe resolution
+- named slot replacement during expansion
 - normalized component layout metadata
 - renderable component tree
 - Markdown content
@@ -76,11 +79,11 @@ The Rust implementation must pass the conformance fixtures before release. The T
 
 ## Render Requirements
 
-A conforming Draft 0.5 renderer must compile PageScript IR to standalone HTML/CSS/SVG and support:
+A conforming Draft 0.6 renderer must compile PageScript IR to standalone HTML/CSS/SVG and support:
 
 - scene, panel, metric, log, graph node, and graph edge primitives
-- Web Core Kernel `el`, `attr`, `text value`, `style-rule`, `recipe`, `template`, `use`, `slot`, `bind`, and `on`
-- compile-time recipe expansion before rendering
+- Web Core Kernel `el`, `attr`, `text value`, `style-rule`, `recipe`, `template`, `use`, `slot name`, `bind`, and `on`
+- compile-time recipe expansion before rendering, including recursive imports and named slot substitution
 - design token aliases for core colors and panel radius
 - layout metadata for scene mode, grid columns, gap, and density
 - `button action=open-modal target=<id>` for `modal id=<id>`

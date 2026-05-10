@@ -2,6 +2,7 @@ mod adapters;
 mod ir;
 mod parser;
 mod render;
+mod resolver;
 mod types;
 mod validator;
 
@@ -12,6 +13,7 @@ pub use ir::{
 };
 pub use parser::{parse_page_script, parse_tour_script};
 pub use render::render_to_html;
+pub use resolver::Resolver;
 pub use types::{
     AttributeValue, ComponentNode, Diagnostic, DocumentNode, IntroStep, IntroTourConfig,
     MarkdownNode, Node, PageNode, Severity, ShepherdStep, ShepherdTourConfig, SourcePosition,

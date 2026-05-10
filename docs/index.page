@@ -27,15 +27,15 @@
 
     ::grid columns=3 gap=md density=compact
       ::card class=docs-card icon="01" title="Specification"
-        body="Normative Draft 0.5 language model, compiler pipeline, tokens, recipes, Web Core Kernel, state, events, and renderable primitives. See SPEC.md."
+        body="Normative Draft 0.6 language model, compiler pipeline, tokens, recipes, Standard Library, named slots, and recursive imports. See SPEC.md."
       ::/card
 
       ::card class=docs-card icon="02" title="Conformance"
-        body="Parser, validator, IR, renderer, fixtures, schemas, and compatibility expectations for other implementations. See CONFORMANCE.md."
+        body="Parser, validator, IR, renderer, fixtures, schemas, and compatibility expectations for Draft 0.6. See CONFORMANCE.md."
       ::/card
 
-      ::card class=docs-card icon="03" title="Examples"
-        body="Product demos, interactive docs, guided tours, generated PageScript IR, and adapter snapshots. See examples/README.md."
+      ::card class=docs-card icon="03" title="Flagship Demo"
+        body="High-fidelity product demo using the standard library, named slots, and recursive imports. See examples/product-intelligence-demo.page."
       ::/card
     ::/grid
   ::/section
@@ -59,9 +59,9 @@
     ::/panel
 
     ::panel id=release-checks title="Release gates" tone=muted density=compact
-      ::metric id=tests label="Conformance tests" value="12" tone=good
+      ::metric id=tests label="Conformance tests" value="15" tone=good
       ::/metric
-      ::metric id=schemas label="Schemas" value="AST + IR + diagnostics" tone=accent
+      ::metric id=stdlib label="Standard Library" value="4 recipe packs" tone=accent
       ::/metric
       ::metric id=workflow label="Docs build" value=".page -> HTML" tone=good
       ::/metric

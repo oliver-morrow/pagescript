@@ -1,5 +1,17 @@
 # PageScript Examples
 
+## `product-intelligence-demo.page`
+
+The Draft 0.6 flagship. Demonstrates the PageScript standard library, named slots, and recursive imports. Composes a high-fidelity landing page with metrics and data flows using mostly imported recipes from `stdlib/`.
+
+Useful commands:
+
+```sh
+pagescript-rs validate examples/product-intelligence-demo.page
+pagescript-rs ir examples/product-intelligence-demo.page
+pagescript-rs render examples/product-intelligence-demo.page > demo.html
+```
+
 ## `data-lineage-demo.page`
 
 Shows the Draft 0.5 web composition target: a product demo page with scene, panels, SVG lineage graph, metrics, effects, state, events, design tokens, layout metadata, and scoped CSS.

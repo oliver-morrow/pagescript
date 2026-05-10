@@ -1,17 +1,25 @@
 use std::collections::HashSet;
 
+use crate::parser::parse_page_script;
+use crate::resolver::Resolver;
 use crate::types::{
     ComponentNode, Diagnostic, DocumentNode, Node, PageNode, StepNode, TourNode, TriggerNode, error,
 };
 
-pub fn validate_document(document: &DocumentNode) -> Vec<Diagnostic> {
+pub fn validate_document(document: &DocumentNode, resolver: &Resolver) -> Vec<Diagnostic> {
     let mut diagnostics = document.diagnostics.clone();
     let mut page_ids = HashSet::new();
     let mut tour_ids = HashSet::new();
 
     for child in &document.children {
         match child {
-            Node::Page(page) => validate_page(page, &mut diagnostics, &mut page_ids, &mut tour_ids),
+            Node::Page(page) => validate_page(
+                page,
+                &mut diagnostics,
+                &mut page_ids,
+                &mut tour_ids,
+                resolver,
+            ),
             Node::Tour(tour) => validate_tour(tour, &mut diagnostics, &mut tour_ids),
             _ => {}
         }
@@ -25,6 +33,7 @@ fn validate_page(
     diagnostics: &mut Vec<Diagnostic>,
     page_ids: &mut HashSet<String>,
     tour_ids: &mut HashSet<String>,
+    resolver: &Resolver,
 ) {
     match &page.id {
         Some(id) if page_ids.contains(id) => diagnostics.push(error(
@@ -45,7 +54,7 @@ fn validate_page(
     let mut ids = PageIds::default();
     for child in &page.children {
         if let Node::Component(component) = child {
-            collect_recipe_names(component, &mut ids.known_recipe_names);
+            collect_recipe_names(component, &mut ids.known_recipe_names, resolver);
         }
     }
 
@@ -94,6 +103,7 @@ fn validate_component(
         "use" => &["recipe"][..],
         "bind" => &["state"][..],
         "on" => &["event", "action"][..],
+        "import" => &["from"][..],
         _ => &[],
     };
 
@@ -237,11 +247,37 @@ fn validate_component_semantics(
                 ));
             }
         }
+        "import" => {
+            if let Some(from) = component
+                .attributes
+                .get("from")
+                .and_then(|value| value.as_str())
+            {
+                if from.starts_with('/') {
+                    diagnostics.push(error(
+                        "invalid_import_path",
+                        "Absolute import paths are not allowed.",
+                        component.source.line,
+                    ));
+                }
+                if from.contains("..") {
+                    diagnostics.push(error(
+                        "invalid_import_path",
+                        "Import paths containing \"..\" are not allowed.",
+                        component.source.line,
+                    ));
+                }
+            }
+        }
         _ => {}
     }
 }
 
-fn collect_recipe_names(component: &ComponentNode, names: &mut HashSet<String>) {
+fn collect_recipe_names(
+    component: &ComponentNode,
+    names: &mut HashSet<String>,
+    resolver: &Resolver,
+) {
     if component.name == "recipe"
         && let Some(name) = component
             .attributes
@@ -250,10 +286,48 @@ fn collect_recipe_names(component: &ComponentNode, names: &mut HashSet<String>) 
     {
         names.insert(name.to_string());
     }
+
+    if component.name == "import"
+        && let Some(from) = component
+            .attributes
+            .get("from")
+            .and_then(|value| value.as_str())
+        && let Ok(source) = resolver.resolve(from)
+    {
+        let imported_doc = parse_page_script(&source);
+        for child in &imported_doc.children {
+            collect_imported_recipe_names(child, names);
+        }
+    }
+
     for child in &component.children {
         if let Node::Component(component) = child {
-            collect_recipe_names(component, names);
+            collect_recipe_names(component, names, resolver);
         }
+    }
+}
+
+fn collect_imported_recipe_names(node: &Node, names: &mut HashSet<String>) {
+    match node {
+        Node::Page(page) => {
+            for child in &page.children {
+                collect_imported_recipe_names(child, names);
+            }
+        }
+        Node::Component(component) => {
+            if component.name == "recipe"
+                && let Some(name) = component
+                    .attributes
+                    .get("name")
+                    .and_then(|value| value.as_str())
+            {
+                names.insert(name.to_string());
+            }
+            for child in &component.children {
+                collect_imported_recipe_names(child, names);
+            }
+        }
+        _ => {}
     }
 }
 

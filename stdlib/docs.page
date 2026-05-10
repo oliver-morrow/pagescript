@@ -1,0 +1,72 @@
+::recipe name=doc-hero
+  ::template
+    ::hero
+      ::el tag=h1
+        ::text value=$title
+        ::/text
+      ::/el
+      ::el tag=p
+        ::text value=$subtitle
+        ::/text
+      ::/el
+    ::/hero
+  ::/template
+::/recipe
+
+::recipe name=api-method
+  ::template
+    ::section
+      ::el tag=h2
+        ::text value=$name
+        ::/text
+      ::/el
+      ::el tag=div class="method-meta"
+        ::el tag=span class="verb"
+          ::text value=$verb
+          ::/text
+        ::/el
+        ::el tag=code
+          ::text value=$path
+          ::/text
+        ::/el
+      ::/el
+      ::slot
+      ::/slot
+    ::/section
+  ::/template
+::/recipe
+
+::recipe name=callout
+  ::template
+    ::el tag=div class="callout" data-tone=$tone
+      ::el tag=h4
+        ::text value=$title
+        ::/text
+      ::/el
+      ::slot
+      ::/slot
+    ::/el
+  ::/template
+::/recipe
+
+::recipe name=step-list
+  ::template
+    ::el tag=ol class="step-list"
+      ::slot
+      ::/slot
+    ::/el
+  ::/template
+::/recipe
+
+::recipe name=example-code-panel
+  ::template
+    ::card
+      ::el tag=pre
+        ::el tag=code
+          ::text value=$code
+          ::/text
+        ::/el
+      ::/el
+    ::/card
+  ::/template
+::/recipe

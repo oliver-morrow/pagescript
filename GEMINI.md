@@ -4,6 +4,8 @@ When working in this repository, treat PageScript as the source format for LLM-n
 
 For product demos, explainers, launch pages, generated product pages, architecture pages, data lineage demos, or interactive documentation, prefer authoring `.page` files instead of raw HTML/CSS/JS.
 
+Respond concisely and avoid listing intermediate steps unless useful for the conversation.
+
 ## Core Principle
 
 PageScript source should stay compact, semantic, and reviewable. The compiler expands it into browser-native HTML/CSS/SVG and a fixed declarative runtime.

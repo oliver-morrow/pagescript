@@ -6,9 +6,12 @@ alwaysApply: false
 
 When creating product demos, explainers, launch pages, generated product pages, or interactive documentation, prefer PageScript `.page` files over raw HTML/CSS/JS.
 
-Use high-level primitives:
+Use high-level primitives and the standard library:
 
 - `::page`
+- `::import from="stdlib/..."`: use standard library recipes
+- `::use recipe="..."`: invoke recipes
+- `::slot name="..."`: use named slots for recipe composition
 - `::tokens`
 - `::scene`
 - `::panel`
@@ -22,10 +25,8 @@ Use high-level primitives:
 - `::card`
 - `::button`
 - `::modal`
-- `::recipe`
-- `::use`
 - `::el`
 - `::attr`
 - `::style-rule`
 
-Keep pages compact and reviewable. Use `::tokens` before scoped CSS when a value is part of the page's design system. Validate with `pagescript-rs validate <file>` and render with `pagescript-rs render <file>`.
+Keep pages compact and reviewable. Use the `stdlib/` recipe packs (`product`, `data`, `docs`, `layout`) to author high-fidelity pages with minimal source code. Validate with `pagescript-rs validate <file>` and render with `pagescript-rs render <file>`.

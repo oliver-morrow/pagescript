@@ -1,0 +1,70 @@
+::recipe name=product-hero
+  ::template
+    ::hero
+      ::stack align=center
+        ::el tag=h1
+          ::text value=$title
+          ::/text
+        ::/el
+        ::el tag=p
+          ::text value=$subtitle
+          ::/text
+        ::/el
+        ::slot name=actions
+        ::/slot
+      ::/stack
+    ::/hero
+  ::/template
+::/recipe
+
+::recipe name=feature-card
+  ::template
+    ::card
+      ::el tag=h3
+        ::text value=$title
+        ::/text
+      ::/el
+      ::el tag=p
+        ::text value=$body
+        ::/text
+      ::/el
+    ::/card
+  ::/template
+::/recipe
+
+::recipe name=feature-grid
+  ::template
+    ::grid columns=3
+      ::slot
+      ::/slot
+    ::/grid
+  ::/template
+::/recipe
+
+::recipe name=metric-strip
+  ::template
+    ::section
+      ::stack layout=horizontal gap=large align=center
+        ::slot
+        ::/slot
+      ::/stack
+    ::/section
+  ::/template
+::/recipe
+
+::recipe name=cta-band
+  ::template
+    ::section
+      ::stack align=center
+        ::el tag=h2
+          ::text value=$title
+          ::/text
+        ::/el
+        ::el tag=a href=$href class="button"
+          ::text value=$label
+          ::/text
+        ::/el
+      ::/stack
+    ::/section
+  ::/template
+::/recipe

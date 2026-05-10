@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Autonomous Revenue Command Center</title>
+  <style>:root{color-scheme:light;--ps-bg:#f7f7f2;--ps-ink:#202124;--ps-muted:#62645f;--ps-line:#deded4;--ps-accent:#116149;--ps-accent-ink:#fff;--ps-panel:#fff;--ps-radius:12px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--ps-bg);color:var(--ps-ink);line-height:1.5}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.4rem,6vw,5rem);line-height:.98;max-width:11ch}h2{font-size:clamp(1.8rem,3vw,3rem);line-height:1.05}h3{font-size:1.1rem}.ps-container{width:min(1180px,calc(100% - 32px));margin:0 auto}.ps-hero{min-height:72vh;display:flex;align-items:center}.ps-hero-inner{display:grid;gap:24px}.ps-section{padding:72px 0}.ps-space-sm{padding-block:32px}.ps-space-md{padding-block:56px}.ps-space-lg{padding-block:88px}.ps-space-xl{padding-block:120px}.ps-density-compact{--ps-density-pad:16px;--ps-density-gap:12px}.ps-density-spacious{--ps-density-pad:32px;--ps-density-gap:24px}.ps-tone-dark{background:#16201d;color:#f7f7f2}.ps-tone-accent{background:#dcefe7}.ps-tone-muted{background:#ecece3}.ps-tone-good{background:#e3f8ee;color:#12382a}.ps-stack{display:grid}.ps-gap-sm{gap:12px}.ps-gap-md{gap:20px}.ps-gap-lg{gap:32px}.ps-grid{display:grid;grid-template-columns:repeat(var(--ps-columns),minmax(0,1fr));gap:24px}.ps-card,.ps-panel{background:var(--ps-panel);border:1px solid var(--ps-line);border-radius:var(--ps-radius);padding:var(--ps-density-pad,24px);display:grid;gap:var(--ps-density-gap,16px);box-shadow:0 1px 1px rgba(0,0,0,.04)}.ps-icon{font-size:1.4rem}.ps-button{width:max-content;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}.ps-button-primary{background:var(--ps-accent);color:var(--ps-accent-ink)}.ps-button-secondary{background:#fff;color:var(--ps-ink);border:1px solid var(--ps-line)}.ps-text{display:grid;gap:12px}.ps-image img{width:100%;height:auto;border-radius:var(--ps-radius)}.ps-modal{border:0;border-radius:16px;padding:28px;max-width:640px}.ps-modal::backdrop{background:rgba(0,0,0,.45)}.ps-modal-close{float:right}.ps-form{display:grid;gap:16px}.ps-field{display:grid;gap:6px}.ps-field input{font:inherit;padding:12px;border:1px solid var(--ps-line);border-radius:8px}.ps-scene{padding:88px 0;background:linear-gradient(135deg,#f8faf6,#e9f1ec)}.ps-scene-header{display:grid;gap:12px;margin-bottom:28px}.ps-scene-body{display:grid;gap:24px}.ps-scene-split .ps-scene-body{grid-template-columns:minmax(0,1.4fr) minmax(320px,.8fr);align-items:start}.ps-graph{width:100%;min-height:380px;overflow:visible}.ps-graph-edge{fill:none;stroke:#8aa89b;stroke-width:3;marker-end:url(#ps-arrow);stroke-linecap:round}.ps-graph-node{cursor:pointer}.ps-graph-node rect{fill:#fff;stroke:#b9cbc3;stroke-width:1.5;filter:drop-shadow(0 8px 16px rgba(17,97,73,.10))}.ps-graph-node text{font-size:13px;dominant-baseline:middle}.ps-graph-label{font-weight:700}.ps-graph-icon{font-size:16px}.ps-status-active rect{stroke:#116149}.ps-status-syncing rect{stroke:#3976d8}.ps-status-ready rect{stroke:#7b4fc5}.ps-status-warning rect{stroke:#b7791f}.ps-metric{display:grid;gap:4px;padding:16px;border:1px solid var(--ps-line);border-radius:12px;background:#fff}.ps-metric span{font-size:.82rem;color:var(--ps-muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}.ps-metric strong{font-size:1.7rem}.ps-log{display:grid;gap:8px;margin:0;padding:0;list-style:none}.ps-log li{display:flex;justify-content:space-between;gap:16px;padding:10px 12px;border:1px solid var(--ps-line);border-radius:10px;background:#fff}.ps-effect-flow{stroke-dasharray:10 10;animation:ps-flow 1.4s linear infinite}.ps-effect-pulse{animation:ps-pulse 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}.ps-graph-node.ps-effect-pulse{animation:ps-pulse-svg 1.6s ease-in-out infinite}.ps-effect-glow rect,.ps-effect-glow{filter:drop-shadow(0 0 12px rgba(17,97,73,.35))}.ps-effect-reveal{animation:ps-reveal .7s ease-out both}.ps-effect-count-up strong{animation:ps-pulse 1.2s ease-in-out 2}@keyframes ps-flow{to{stroke-dashoffset:-40}}@keyframes ps-pulse{50%{opacity:.62;filter:brightness(1.08)}}@keyframes ps-pulse-svg{50%{opacity:.64}}@keyframes ps-reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@media(max-width:860px){.ps-grid,.ps-scene-split .ps-scene-body{grid-template-columns:1fr}.ps-hero{min-height:auto}.ps-space-lg,.ps-space-xl{padding-block:56px}}
+:root{--ps-token-color-bg:#080f0c;--ps-bg:#080f0c;--ps-token-color-ink:#f7fff9;--ps-ink:#f7fff9;--ps-token-color-accent:#4dd6a0;--ps-accent:#4dd6a0;--ps-token-color-panel:#ffffff;--ps-panel:#ffffff;--ps-token-color-line:#d7e6dc;--ps-line:#d7e6dc;--ps-token-radius-panel:14px;--ps-radius:14px;}
+    body { background: var(--ps-bg); }
+    .command-hero { background: radial-gradient(circle at 18% 18%, rgba(77, 214, 160, .34), transparent 28%), radial-gradient(circle at 82% 8%, rgba(118, 121, 255, .26), transparent 24%), #08110d; color: var(--ps-ink); }
+    .command-hero .ps-button { box-shadow: 0 18px 44px rgba(77, 214, 160, .28); }
+    .command-scene { background: linear-gradient(145deg, #08110d, #14231c 52%, #edf7ef 52%); }
+    .signal-panel { background: rgba(255,255,255,.92); backdrop-filter: blur(18px); }
+    .ps-panel.is-dark { background: #101a16; color: #f4fff7; border-color: rgba(255,255,255,.12); }
+    .ps-panel.is-dark .ps-metric { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); color: #f4fff7; }
+    .ps-panel.is-dark .ps-metric span { color: rgba(244,255,247,.62); }
+    .ps-panel.is-dark .ps-log li { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); color: #f4fff7; }
+    .ps-graph-node.is-selected rect { stroke-width: 3.5; stroke: #4dd6a0; filter: drop-shadow(0 0 22px rgba(77,214,160,.46)); }
+    .pipeline-note { color: #d7f8e8; max-width: 62ch; }
+    .score-card { border-color: rgba(17,97,73,.28); background: linear-gradient(180deg, #ffffff, #f1faf5); }
+</style>
+</head>
+<body data-pagescript-page="revenue-command-center">
+<section class="ps-hero ps-tone-default ps-space-xl command-hero">
+  <div class="ps-container ps-hero-inner">
+    <h1>Autonomous revenue operations, generated from your codebase</h1><p>PageScript can describe a polished product demo as semantic web composition: live signals, lineage, metrics, state, and effects without asking an LLM to hand-write fragile HTML, CSS, or JS.</p><button class="ps-button ps-button-primary" data-action="toggle" data-target="operating-model">Render the operating model</button>
+  </div>
+</section>
+<section class="ps-section ps-tone-dark ps-space-lg ps-effect-reveal" id="operating-model">
+  <div class="ps-container"><h2>What the page is proving</h2><p>An agent can inspect product concepts, data contracts, events, and workflows, then emit a compact .page file that compiles into an interactive executive demo.</p><div class="ps-grid ps-gap-md ps-density-compact" style="--ps-columns:3"><article class="ps-card ps-tone-default score-card">
+  <div class="ps-icon">01</div><h3>Signals</h3><p>Unify product events, CRM changes, usage thresholds, and billing movement into one explained flow.</p>
+</article>
+<article class="ps-card ps-tone-default score-card">
+  <div class="ps-icon">02</div><h3>Decisions</h3><p>Show which rules, models, and approvals convert raw data into recommended actions.</p>
+</article>
+<article class="ps-card ps-tone-default score-card">
+  <div class="ps-icon">03</div><h3>Outcomes</h3><p>Publish a page that shows impact, freshness, confidence, and next actions as a living demo.</p>
+</article></div></div>
+</section>
+<section class="ps-scene ps-scene-split command-scene" id="command-center">
+  <div class="ps-container">
+    <header class="ps-scene-header"><h2>A live system map, not a static screenshot</h2><p>The graph is declarative. Nodes and edges compile to SVG, effects compile to CSS, and clicks update state through the fixed runtime.</p></header>
+    <div class="ps-scene-body"><article class="ps-panel ps-tone-default signal-panel ps-density-spacious" id="system-map">
+  <header><h3>Signal to action graph</h3></header>
+  <svg class="ps-graph" viewBox="0 0 760 380" role="img" aria-label="Data lineage graph">
+  <defs><marker id="ps-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8aa89b" /></marker></defs>
+  <g class="ps-edges"><path class="ps-graph-edge ps-effect-flow" d="M 179 90 C 227 90, 143 190, 191 190" />
+<path class="ps-graph-edge ps-effect-flow" d="M 339 190 C 387 190, 353 90, 401 90" />
+<path class="ps-graph-edge ps-effect-flow" d="M 549 90 C 597 90, 503 205, 551 205" />
+<path class="ps-graph-edge ps-effect-flow" d="M 265 219 C 265 226, 385 269, 385 276" />
+<path class="ps-graph-edge ps-effect-flow" d="M 551 205 C 503 205, 507 305, 459 305" /></g>
+  <g class="ps-nodes"><g class="ps-graph-node ps-status-active ps-effect-glow" data-ps-node="signals" data-ps-state-value="signals" transform="translate(105, 90)" tabindex="0" role="button" aria-label="Product Signals"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5">P</text><text class="ps-graph-label" x="-26" y="5">Product Signals</text><circle cx="62" cy="-19" r="5"/></g>
+<g class="ps-graph-node ps-status-syncing ps-effect-pulse" data-ps-node="identity" data-ps-state-value="identity" transform="translate(265, 190)" tabindex="0" role="button" aria-label="Account Graph"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5">A</text><text class="ps-graph-label" x="-26" y="5">Account Graph</text><circle cx="62" cy="-19" r="5"/></g>
+<g class="ps-graph-node ps-status-ready" data-ps-node="scoring" data-ps-state-value="scoring" transform="translate(475, 90)" tabindex="0" role="button" aria-label="Fit Scoring"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5">S</text><text class="ps-graph-label" x="-26" y="5">Fit Scoring</text><circle cx="62" cy="-19" r="5"/></g>
+<g class="ps-graph-node ps-status-syncing ps-effect-pulse" data-ps-node="playbooks" data-ps-state-value="playbooks" transform="translate(625, 205)" tabindex="0" role="button" aria-label="Playbooks"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5">B</text><text class="ps-graph-label" x="-26" y="5">Playbooks</text><circle cx="62" cy="-19" r="5"/></g>
+<g class="ps-graph-node ps-status-ready ps-effect-glow" data-ps-node="exec" data-ps-state-value="exec" transform="translate(385, 305)" tabindex="0" role="button" aria-label="Executive View"><rect x="-74" y="-29" width="148" height="58" rx="16"/><text class="ps-graph-icon" x="-56" y="5">E</text><text class="ps-graph-label" x="-26" y="5">Executive View</text><circle cx="62" cy="-19" r="5"/></g></g>
+</svg>
+</article>
+<article class="ps-panel ps-tone-default is-dark ps-density-compact" id="live-intelligence">
+  <header><h3>Live intelligence</h3></header>
+  <div class="ps-metric ps-tone-good ps-effect-pulse" id="pipeline" data-ps-metric><span>Pipeline influenced</span><strong>$4.8M</strong></div>
+<div class="ps-metric ps-tone-accent ps-effect-glow" id="confidence" data-ps-metric><span>Model confidence</span><strong>92%</strong></div>
+<div class="ps-metric ps-tone-good" id="freshness" data-ps-metric><span>Signal freshness</span><strong>8s ago</strong></div>
+<div class="ps-metric ps-tone-muted" id="coverage" data-ps-metric><span>Accounts scored</span><strong>18,420</strong></div>
+<ol class="ps-log" data-source="agent-decisions"><li><span>agent-decisions</span><strong>event 1</strong></li><li><span>agent-decisions</span><strong>event 2</strong></li><li><span>agent-decisions</span><strong>event 3</strong></li><li><span>agent-decisions</span><strong>event 4</strong></li><li><span>agent-decisions</span><strong>event 5</strong></li></ol>
+</article></div>
+  </div>
+</section>
+<section class="ps-scene ps-scene-split" id="rollout">
+  <div class="ps-container">
+    <header class="ps-scene-header"><h2>A generated page can tell the rollout story</h2><p>The same source format can describe architecture, proof points, and guided product moments for buyers, internal teams, or onboarding.</p></header>
+    <div class="ps-scene-body"><article class="ps-panel ps-tone-default" id="rollout-plan">
+  <header><h3>90 minute generated demo</h3></header>
+  <div class="ps-stack ps-gap-md"><article class="ps-card ps-tone-default">
+  <div class="ps-icon">A</div><h3>Codebase scan</h3><p>Agent extracts routes, events, schemas, product objects, and workflows.</p>
+</article>
+<article class="ps-card ps-tone-default">
+  <div class="ps-icon">B</div><h3>PageScript draft</h3><p>Agent writes a compact semantic page instead of verbose frontend code.</p>
+</article>
+<article class="ps-card ps-tone-default">
+  <div class="ps-icon">C</div><h3>Compiler polish</h3><p>Renderer owns layout, SVG, responsive behavior, effects, and runtime safety.</p>
+</article></div>
+</article>
+<article class="ps-panel ps-tone-muted" id="proof">
+  <header><h3>Why this is different</h3></header>
+  <div class="ps-metric ps-tone-good" id="tokens" data-ps-metric><span>Source size</span><strong>Small enough for review</strong></div>
+<div class="ps-metric ps-tone-accent" id="runtime" data-ps-metric><span>Runtime policy</span><strong>Declarative only</strong></div>
+<div class="ps-metric ps-tone-good" id="output" data-ps-metric><span>Output</span><strong>Standalone HTML</strong></div>
+<div class="ps-text"><h3>Compiler contract</h3><p>LLMs describe the experience. PageScript validates it. The compiler produces the web implementation.</p></div>
+</article></div>
+  </div>
+</section>
+  <script type="application/json" id="ps-runtime-config">{"states":[{"id":"selectedNode","default":"signals"}],"events":[{"on":"node.click","set":"selectedNode","value":"$node.id"}]}</script>
+  <script>(()=>{const cfg=JSON.parse(document.getElementById("ps-runtime-config")?.textContent||"{\"states\":[],\"events\":[]}");const state={};for(const item of cfg.states||[]){state[item.id]=item.default;document.body.dataset["state"+item.id.charAt(0).toUpperCase()+item.id.slice(1)]=item.default}function setState(id,value){state[id]=value;document.body.dataset["state"+id.charAt(0).toUpperCase()+id.slice(1)]=value;document.querySelectorAll("[data-ps-node]").forEach(node=>node.classList.toggle("is-selected",node.dataset.psStateValue===value))}document.addEventListener("click",(event)=>{const button=event.target.closest("[data-action]");if(button){const action=button.dataset.action;const target=button.dataset.target;if(action==="open-modal"&&target){document.getElementById(target)?.showModal?.()}if(action==="toggle"&&target){document.getElementById(target)?.toggleAttribute("hidden")}}const graphNode=event.target.closest("[data-ps-node]");if(graphNode){for(const rule of cfg.events||[]){if(rule.on==="node.click"){const value=rule.value==="$node.id"?graphNode.dataset.psStateValue:rule.value;setState(rule.set,value)}}}});for(const [id,value] of Object.entries(state)){setState(id,value)}})()</script>
+</body>
+</html>
+
