@@ -99,7 +99,7 @@ jobs:
           cargo run -p pagescript-rs --locked -- ir examples/autonomous-revenue-command-center.page --page revenue-command-center > target/pagescript-smoke/revenue-command-center.ir.json
           jq -e '.tokens["color.accent"] == "#4dd6a0"' target/pagescript-smoke/revenue-command-center.ir.json
           jq -e '[.. | objects | select(has("graph")) | .graph.nodes | length] | any(. == 5)' target/pagescript-smoke/revenue-command-center.ir.json
-          jq -e '[.. | objects | select(has("layout")) | .layout.density] | any(. == "spacious")' target/pagescript-smoke/revenue-command-center.ir.json
+          jq -e '[.. | objects | select(has("layout")) | .layout | objects | .density] | any(. == "spacious")' target/pagescript-smoke/revenue-command-center.ir.json
 
       - name: Upload rendered smoke artifacts
         uses: actions/upload-artifact@v4
