@@ -59,8 +59,8 @@ jobs:
           cp -R schemas/. _site/schemas/
           cp -R conformance/. _site/conformance/
           cargo run -p pagescript-rs --locked -- render docs/index.page --page pagescript-docs > _site/index.html
-          rg 'PageScript' _site/index.html
-          rg 'ps-runtime-config' _site/index.html
+          grep -F 'PageScript' _site/index.html
+          grep -F 'ps-runtime-config' _site/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
