@@ -1,0 +1,61 @@
+# Data Lineage Product Demo
+
+::page id=lineage-demo title="Data Lineage Demo"
+  ::state id=selectedNode default=warehouse
+  ::/state
+
+  ::event on=node.click set=selectedNode value="$node.id"
+  ::/event
+
+  ::effect id=flow type=flow speed=medium
+  ::/effect
+
+  ::effect id=heartbeat type=pulse duration=1400
+  ::/effect
+
+  ::effect id=shine type=glow
+  ::/effect
+
+  ::style scope=page
+    .lineage-hero { background: radial-gradient(circle at 20% 20%, #dff8ef, transparent 28%), #f7f7f2; }
+    .ps-graph-node.is-selected rect { stroke-width: 3; filter: drop-shadow(0 0 18px rgba(17,97,73,.32)); }
+  ::/style
+
+  ::hero class=lineage-hero spacing=xl
+    heading="Watch product data move from events to decisions"
+    body="A compact PageScript demo generated from codebase context can explain lineage, freshness, and business impact without hand-written web code."
+  ::/hero
+
+  ::scene id=lineage layout=split title="Live Data Lineage"
+    heading="Lineage that moves"
+    body="Nodes, edges, metrics, and state are declarative. The compiler renders SVG, CSS animations, and a fixed runtime."
+
+    ::panel id=pipeline title="Pipeline graph"
+      ::node id=source label="Stripe Events" status=active icon="S" x=90 y=90 effect=shine
+      ::/node
+      ::node id=warehouse label="Snowflake" status=syncing icon="W" x=290 y=165 effect=heartbeat
+      ::/node
+      ::node id=transform label="dbt Model" status=syncing icon="T" x=500 y=95
+      ::/node
+      ::node id=dashboard label="Revenue Dashboard" status=ready icon="D" x=665 y=215
+      ::/node
+      ::edge from=source to=warehouse effect=flow
+      ::/edge
+      ::edge from=warehouse to=transform effect=flow
+      ::/edge
+      ::edge from=transform to=dashboard effect=flow
+      ::/edge
+    ::/panel
+
+    ::panel id=live title="Live updates" tone=muted
+      ::metric id=rows label="Rows synced" value="128,932" tone=good effect=heartbeat
+      ::/metric
+      ::metric id=freshness label="Freshness" value="12s ago" tone=accent effect=shine
+      ::/metric
+      ::metric id=tests label="Model tests passing" value="32 / 32" tone=good
+      ::/metric
+      ::log id=lineage-log source=lineage-events max=4
+      ::/log
+    ::/panel
+  ::/scene
+::/page

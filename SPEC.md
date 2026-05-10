@@ -1,0 +1,186 @@
+# PageScript LLM-Native Web Composition
+
+PageScript is a compact source language for LLM-native web composition. Agents and humans write `.page` files with semantic layout, design tokens, data, interaction, and effect primitives; the compiler emits polished standalone HTML/CSS/SVG with a fixed declarative runtime.
+
+Interactive documentation is one use case. The broader target is product demo pages, architecture explainers, launch pages, onboarding pages, generated product pages, and codebase-aware web experiences.
+
+## File Model
+
+- Canonical extension: `.page`
+- Encoding: UTF-8 text
+- Output target: standalone HTML through a normalized PageScript IR
+- Primary implementation: Rust compiler and CLI
+- Interaction model: declarative runtime only; source-authored JavaScript is not allowed
+- Design system: declarative tokens through `::tokens`
+- Advanced styling: scoped CSS through `::style scope=page|component`
+
+The canonical parser AST remains generic: `document`, `page`, `component`, `markdown`, and compatibility nodes for `tour`, `step`, and `trigger`.
+
+## Compiler Pipeline
+
+PageScript is not a collection of hardcoded demo templates. A conforming compiler should keep these stages separate:
+
+1. Parse `.page` source into the canonical AST.
+2. Validate source-level syntax, required attributes, and duplicate IDs.
+3. Normalize the AST into PageScript IR.
+4. Render the IR into a target such as standalone HTML/CSS/SVG.
+5. Attach only the fixed declarative runtime required by state, events, and effects.
+
+The IR is the compiler boundary. It contains normalized page metadata, design tokens, layout metadata, component nodes, graph nodes and edges, declared state, events, effects, and scoped CSS. Output renderers should consume IR rather than walking raw source syntax directly.
+
+## Core Web Composition Example
+
+```text
+::page id=lineage-demo title="Data Lineage Demo"
+  ::state id=selectedNode default=warehouse
+  ::/state
+
+  ::event on=node.click set=selectedNode value="$node.id"
+  ::/event
+
+  ::effect id=flow type=flow speed=medium
+  ::/effect
+
+  ::tokens
+    color.accent="#4dd6a0"
+    color.bg="#080f0c"
+    radius.panel=14
+  ::/tokens
+
+  ::scene id=lineage layout=split title="Live Data Lineage"
+    ::panel id=pipeline title="Pipeline graph"
+      ::node id=source label="Stripe Events" status=active x=90 y=90
+      ::/node
+      ::node id=warehouse label="Snowflake" status=syncing x=290 y=165
+      ::/node
+      ::edge from=source to=warehouse effect=flow
+      ::/edge
+    ::/panel
+
+    ::panel id=live title="Live updates"
+      ::metric id=rows label="Rows synced" value="128,932" tone=good
+      ::/metric
+      ::log id=lineage-log source=lineage-events max=4
+      ::/log
+    ::/panel
+  ::/scene
+::/page
+```
+
+## Syntax
+
+Directives begin with `::` and use explicit closing tags:
+
+```text
+::component key=value
+::/component
+```
+
+Directive headers and field lines use `key=value` attributes. Supported values are bare strings, quoted strings, booleans, numbers, and JSON object values.
+
+Attribute keys may contain letters, numbers, `_`, `-`, and `.`. Dotted keys are intended for token namespaces such as `color.accent` and `radius.panel`.
+
+## General Page Primitives
+
+- `::page`: root page
+- `::hero`: first viewport
+- `::section`: content band
+- `::stack`: vertical grouping
+- `::grid`: responsive grid
+- `::card`: content panel
+- `::button`: declarative action trigger
+- `::text`: text group
+- `::image`: image with alt text
+- `::modal`: declarative dialog
+- `::form` and `::input`: basic form primitives
+
+## Web Composition Primitives
+
+- `::scene id layout=split|full|canvas title`: visual demo section
+- `::panel id title tone`: bounded UI region inside a scene
+- `::node id label status icon x y`: graph or flow node
+- `::edge from to effect`: graph edge rendered with SVG
+- `::metric id label value tone effect`: live-style data display
+- `::log id source max`: event log placeholder
+- `::state id default`: declarative state slot
+- `::event on set value`: state transition rule
+- `::effect id type speed duration`: reusable visual effect
+- `::style scope=page|component`: scoped CSS escape hatch
+- `::tokens`: page-level design tokens
+
+Allowed effect types are `flow`, `pulse`, `glow`, `count-up`, and `reveal`.
+
+## Design Tokens
+
+Tokens are compiler-readable design inputs, not raw CSS. Renderers may map known tokens to CSS variables and preserve unknown tokens under implementation-specific names.
+
+```text
+::tokens
+  color.bg="#080f0c"
+  color.ink="#f7fff9"
+  color.accent="#4dd6a0"
+  radius.panel=14
+::/tokens
+```
+
+Draft 0.4 defines these common aliases:
+
+- `color.bg` -> page background
+- `color.ink` -> primary text
+- `color.muted` -> muted text
+- `color.line` -> borders
+- `color.accent` -> primary accent
+- `color.accent-ink` -> text on accent
+- `color.panel` -> panel background
+- `radius.panel` -> panel radius
+
+Numeric `radius.*` and `spacing.*` tokens are interpreted as pixels by the reference renderer.
+
+## Layout Metadata
+
+Renderable components may carry generic layout metadata:
+
+- `layout`: layout mode, such as `split`, `full`, or `canvas`
+- `density`: `compact`, default, or `spacious`
+- `gap`: `sm`, `md`, or `lg`
+- `columns`: grid column count
+- `align`: renderer-defined alignment hint
+
+The compiler normalizes these attributes into IR so future renderers can target HTML, React, Web Components, or native UI without re-parsing source syntax.
+
+## Declarative Runtime
+
+The compiler emits a fixed runtime that can:
+
+- open modals from `button action=open-modal target=<id>`
+- toggle elements from `button action=toggle target=<id>`
+- update declared state from events such as `event on=node.click set=selectedNode value="$node.id"`
+- activate CSS/SVG effects declared by `effect=<id>`
+
+`.page` files do not contain raw JavaScript.
+
+## Scoped CSS
+
+Scoped CSS is an advanced escape hatch:
+
+```text
+::style scope=page
+  .lineage-hero { background: radial-gradient(circle, #dff8ef, transparent 28%); }
+::/style
+```
+
+Renderers inject scoped style text into the compiled document. Validators must reject unsupported scopes.
+
+## Validation
+
+Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect IDs, invalid effect types, invalid style scopes, invalid token values, and compatibility-tour errors.
+
+## Org-Level Agent Workflow
+
+1. Cursor, Claude Code, Codex, or humans author `.page` files.
+2. Humans review semantic web composition instead of generated HTML/CSS/JS.
+3. CI runs `pagescript-rs validate`.
+4. CI or review can inspect `pagescript-rs ir`.
+5. Publishing runs `pagescript-rs render`.
+
+This creates a shared source format for LLM-generated product demos, explainers, interactive docs, and codebase-aware web pages.

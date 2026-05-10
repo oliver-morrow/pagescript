@@ -1,0 +1,39 @@
+# Interactive Documentation Page
+
+::page id=agent-docs url="/docs/agents"
+  title="Agent Workflow Docs"
+  audience="engineering teams using Cursor, Claude Code, and Codex"
+  goal="Give agents and humans one compact source for interactive documentation."
+  context="The page should explain the workflow, show adoption steps, and offer a reusable modal."
+
+  ::hero tone=dark spacing=xl
+    heading="Interactive docs your AI tools can write"
+    body="PageScript gives teams a compact page format that agents can generate, review, and compile to HTML."
+    ::button label="See workflow" action=open-modal target=workflow
+    ::/button
+  ::/hero
+
+  ::section spacing=lg
+    heading="Use it across your org"
+    body="Store .page files beside the code they document. Agents update the source, reviewers inspect intent, and CI compiles the result."
+
+    ::grid columns=3 gap=md
+      ::card icon="1" title="Author"
+        body="Cursor, Claude Code, Codex, or humans write concise PageScript primitives."
+      ::/card
+
+      ::card icon="2" title="Review"
+        body="Pull requests show intent, layout, copy, and interactions without HTML noise."
+      ::/card
+
+      ::card icon="3" title="Publish"
+        body="CI validates the file and renders standalone interactive documentation."
+      ::/card
+    ::/grid
+  ::/section
+
+  ::modal id=workflow
+    heading="Org workflow"
+    body="Define a PageScript rule once, ask agents to update .page files, and compile them to HTML during docs builds."
+  ::/modal
+::/page

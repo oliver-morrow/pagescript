@@ -1,0 +1,13 @@
+# Minimal Tour
+
+::tour id=minimal
+  title="Minimal tour"
+
+  ::trigger type=manual
+  ::/trigger
+
+  ::step id=start target="#start" position=bottom
+    title="Start here"
+    body="This is the first step."
+  ::/step
+::/tour

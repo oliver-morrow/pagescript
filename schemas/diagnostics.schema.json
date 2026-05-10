@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pagescript.org/schemas/diagnostics.schema.json",
+  "title": "PageScript Diagnostics",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["severity", "code", "message", "line", "column"],
+    "additionalProperties": false,
+    "properties": {
+      "severity": {
+        "enum": ["error", "warning"]
+      },
+      "code": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "line": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "column": {
+        "type": "integer",
+        "minimum": 1
+      }
+    }
+  }
+}

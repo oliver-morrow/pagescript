@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pagescript.org/schemas/page-ir.schema.json",
+  "title": "PageScript IR",
+  "type": "object",
+  "required": ["title", "tokens", "body", "effects", "states", "events", "scoped_css"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": ["string", "null"] },
+    "title": { "type": "string" },
+    "tokens": { "$ref": "#/$defs/attributes" },
+    "body": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/effect" }
+    },
+    "states": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/state" }
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    },
+    "scoped_css": { "type": "string" }
+  },
+  "$defs": {
+    "attributeValue": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "object" }
+      ]
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/attributeValue" }
+    },
+    "node": {
+      "anyOf": [
+        { "$ref": "#/$defs/markdown" },
+        { "$ref": "#/$defs/component" }
+      ]
+    },
+    "markdown": {
+      "type": "object",
+      "required": ["type", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "markdown" },
+        "value": { "type": "string" }
+      }
+    },
+    "component": {
+      "type": "object",
+      "required": ["type", "name", "attributes", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "component" },
+        "name": { "type": "string" },
+        "attributes": { "$ref": "#/$defs/attributes" },
+        "layout": { "$ref": "#/$defs/layout" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node" }
+        },
+        "graph": { "$ref": "#/$defs/graph" }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "type": ["string", "null"] },
+        "density": { "type": ["string", "null"] },
+        "gap": { "type": ["string", "null"] },
+        "columns": { "type": ["integer", "null"] },
+        "align": { "type": ["string", "null"] }
+      }
+    },
+    "graph": {
+      "type": "object",
+      "required": ["nodes", "edges"],
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/graphNode" }
+        },
+        "edges": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/graphEdge" }
+        }
+      }
+    },
+    "graphNode": {
+      "type": "object",
+      "required": ["id", "label", "status", "x", "y"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "status": { "type": "string" },
+        "icon": { "type": ["string", "null"] },
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "effect": { "type": ["string", "null"] }
+      }
+    },
+    "graphEdge": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "effect": { "type": ["string", "null"] }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "required": ["effect_type"],
+      "additionalProperties": false,
+      "properties": {
+        "effect_type": { "type": "string" }
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": ["id", "default_value"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "default_value": { "type": "string" }
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": ["on", "set", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "on": { "type": "string" },
+        "set": { "type": "string" },
+        "value": { "type": "string" }
+      }
+    }
+  }
+}

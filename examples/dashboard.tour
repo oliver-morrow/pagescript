@@ -1,0 +1,27 @@
+# Dashboard Onboarding
+
+Use this page context to introduce new users to core dashboard controls.
+
+::tour id=dashboard-onboarding library=shepherd
+  title="Dashboard Onboarding"
+  description="Guides new users through key metrics and filters."
+  options={"useModalOverlay":true}
+
+  ::trigger type=url pattern="/dashboard" autoStart=true
+  ::/trigger
+
+  ::step id=welcome target=".hero" position=bottom order=1
+    title="Welcome to your dashboard"
+    body="This is where you see your live metrics."
+  ::/step
+
+  ::step id=filters target="#filter-panel" position=right order=2 options={"scrollTo":true}
+    title="Filter your data"
+    body="Use these filters to narrow what you see."
+  ::/step
+
+  ::step id=export target="[data-tour='export']" position=left order=3
+    title="Share reports"
+    Export dashboard data as CSV when stakeholders need an offline copy.
+  ::/step
+::/tour

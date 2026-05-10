@@ -1,0 +1,18 @@
+# Basic Page
+
+::page id=basic url="/basic"
+  title="Basic Page"
+  audience="AI builders"
+  goal="Show a minimal page context."
+  context="Describe why this page exists."
+
+  ::tour id=basic-tour
+    ::trigger type=manual
+    ::/trigger
+
+    ::step id=hero target="#hero" position=bottom
+      title="Hero"
+      body="Start with the main message."
+    ::/step
+  ::/tour
+::/page

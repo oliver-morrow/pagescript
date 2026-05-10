@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pagescript.org/schemas/ast.schema.json",
+  "title": "PageScript AST",
+  "type": "object",
+  "required": ["type", "source", "children", "diagnostics"],
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "const": "document"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "children": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/page" },
+          { "$ref": "#/$defs/component" },
+          { "$ref": "#/$defs/tour" },
+          { "$ref": "#/$defs/markdown" }
+        ]
+      }
+    },
+    "diagnostics": {
+      "$ref": "./diagnostics.schema.json"
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["line", "column"],
+      "additionalProperties": false,
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "attributeValue": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "object" }
+      ]
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/attributeValue"
+      }
+    },
+    "markdown": {
+      "type": "object",
+      "required": ["type", "source", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "markdown" },
+        "source": { "$ref": "#/$defs/source" },
+        "value": { "type": "string" }
+      }
+    },
+    "page": {
+      "type": "object",
+      "required": ["type", "source", "attributes", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "page" },
+        "source": { "$ref": "#/$defs/source" },
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "audience": { "type": "string" },
+        "goal": { "type": "string" },
+        "context": { "type": "string" },
+        "url": { "type": "string" },
+        "options": { "type": "object" },
+        "attributes": { "$ref": "#/$defs/attributes" },
+        "children": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/tour" },
+              { "$ref": "#/$defs/component" },
+              { "$ref": "#/$defs/markdown" }
+            ]
+          }
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "required": ["type", "name", "source", "attributes", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "component" },
+        "name": {
+          "enum": [
+            "section",
+            "hero",
+            "stack",
+            "grid",
+            "card",
+            "button",
+            "text",
+            "image",
+            "modal",
+            "form",
+            "input",
+            "scene",
+            "panel",
+            "node",
+            "edge",
+            "metric",
+            "log",
+            "state",
+            "event",
+            "effect",
+            "style",
+            "tokens"
+          ]
+        },
+        "source": { "$ref": "#/$defs/source" },
+        "attributes": { "$ref": "#/$defs/attributes" },
+        "children": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/component" },
+              { "$ref": "#/$defs/markdown" }
+            ]
+          }
+        }
+      }
+    },
+    "tour": {
+      "type": "object",
+      "required": ["type", "source", "attributes", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "tour" },
+        "source": { "$ref": "#/$defs/source" },
+        "id": { "type": "string" },
+        "library": { "type": "string" },
+        "group": { "type": "string" },
+        "variant": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "options": { "type": "object" },
+        "attributes": { "$ref": "#/$defs/attributes" },
+        "children": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/step" },
+              { "$ref": "#/$defs/trigger" },
+              { "$ref": "#/$defs/markdown" }
+            ]
+          }
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["type", "source", "attributes"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "step" },
+        "source": { "$ref": "#/$defs/source" },
+        "id": { "type": "string" },
+        "target": { "type": "string" },
+        "position": { "type": "string" },
+        "order": { "type": "number" },
+        "when": { "type": "string" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "markdown": { "type": "string" },
+        "options": { "type": "object" },
+        "attributes": { "$ref": "#/$defs/attributes" }
+      }
+    },
+    "trigger": {
+      "type": "object",
+      "required": ["type", "source", "attributes"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "trigger" },
+        "source": { "$ref": "#/$defs/source" },
+        "triggerType": { "type": "string" },
+        "pattern": { "type": "string" },
+        "event": { "type": "string" },
+        "autoStart": { "type": "boolean" },
+        "options": { "type": "object" },
+        "attributes": { "$ref": "#/$defs/attributes" }
+      }
+    }
+  }
+}

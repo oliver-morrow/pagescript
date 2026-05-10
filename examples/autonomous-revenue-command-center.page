@@ -1,0 +1,144 @@
+# Autonomous Revenue Command Center
+
+::page id=revenue-command-center title="Autonomous Revenue Command Center"
+  ::state id=selectedNode default=signals
+  ::/state
+
+  ::event on=node.click set=selectedNode value="$node.id"
+  ::/event
+
+  ::effect id=flow type=flow speed=fast
+  ::/effect
+
+  ::effect id=pulse type=pulse duration=1200
+  ::/effect
+
+  ::effect id=glow type=glow
+  ::/effect
+
+  ::effect id=reveal type=reveal duration=700
+  ::/effect
+
+  ::tokens
+    color.bg="#080f0c"
+    color.ink="#f7fff9"
+    color.accent="#4dd6a0"
+    color.panel="#ffffff"
+    color.line="#d7e6dc"
+    radius.panel=14
+  ::/tokens
+
+  ::style scope=page
+    body { background: var(--ps-bg); }
+    .command-hero { background: radial-gradient(circle at 18% 18%, rgba(77, 214, 160, .34), transparent 28%), radial-gradient(circle at 82% 8%, rgba(118, 121, 255, .26), transparent 24%), #08110d; color: var(--ps-ink); }
+    .command-hero .ps-button { box-shadow: 0 18px 44px rgba(77, 214, 160, .28); }
+    .command-scene { background: linear-gradient(145deg, #08110d, #14231c 52%, #edf7ef 52%); }
+    .signal-panel { background: rgba(255,255,255,.92); backdrop-filter: blur(18px); }
+    .ps-panel.is-dark { background: #101a16; color: #f4fff7; border-color: rgba(255,255,255,.12); }
+    .ps-panel.is-dark .ps-metric { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); color: #f4fff7; }
+    .ps-panel.is-dark .ps-metric span { color: rgba(244,255,247,.62); }
+    .ps-panel.is-dark .ps-log li { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); color: #f4fff7; }
+    .ps-graph-node.is-selected rect { stroke-width: 3.5; stroke: #4dd6a0; filter: drop-shadow(0 0 22px rgba(77,214,160,.46)); }
+    .pipeline-note { color: #d7f8e8; max-width: 62ch; }
+    .score-card { border-color: rgba(17,97,73,.28); background: linear-gradient(180deg, #ffffff, #f1faf5); }
+  ::/style
+
+  ::hero class=command-hero spacing=xl
+    heading="Autonomous revenue operations, generated from your codebase"
+    body="PageScript can describe a polished product demo as semantic web composition: live signals, lineage, metrics, state, and effects without asking an LLM to hand-write fragile HTML, CSS, or JS."
+    ::button label="Render the operating model" action=toggle target=operating-model
+    ::/button
+  ::/hero
+
+  ::section id=operating-model spacing=lg tone=dark class=ps-effect-reveal
+    heading="What the page is proving"
+    body="An agent can inspect product concepts, data contracts, events, and workflows, then emit a compact .page file that compiles into an interactive executive demo."
+
+    ::grid columns=3 gap=md density=compact
+      ::card class=score-card icon="01" title="Signals"
+        body="Unify product events, CRM changes, usage thresholds, and billing movement into one explained flow."
+      ::/card
+
+      ::card class=score-card icon="02" title="Decisions"
+        body="Show which rules, models, and approvals convert raw data into recommended actions."
+      ::/card
+
+      ::card class=score-card icon="03" title="Outcomes"
+        body="Publish a page that shows impact, freshness, confidence, and next actions as a living demo."
+      ::/card
+    ::/grid
+  ::/section
+
+  ::scene id=command-center layout=split title="Revenue command center" class=command-scene
+    heading="A live system map, not a static screenshot"
+    body="The graph is declarative. Nodes and edges compile to SVG, effects compile to CSS, and clicks update state through the fixed runtime."
+
+    ::panel id=system-map title="Signal to action graph" class=signal-panel density=spacious
+      ::node id=signals label="Product Signals" status=active icon="P" x=105 y=90 effect=glow
+      ::/node
+      ::node id=identity label="Account Graph" status=syncing icon="A" x=265 y=190 effect=pulse
+      ::/node
+      ::node id=scoring label="Fit Scoring" status=ready icon="S" x=475 y=90
+      ::/node
+      ::node id=playbooks label="Playbooks" status=syncing icon="B" x=625 y=205 effect=pulse
+      ::/node
+      ::node id=exec label="Executive View" status=ready icon="E" x=385 y=305 effect=glow
+      ::/node
+
+      ::edge from=signals to=identity effect=flow
+      ::/edge
+      ::edge from=identity to=scoring effect=flow
+      ::/edge
+      ::edge from=scoring to=playbooks effect=flow
+      ::/edge
+      ::edge from=identity to=exec effect=flow
+      ::/edge
+      ::edge from=playbooks to=exec effect=flow
+      ::/edge
+    ::/panel
+
+    ::panel id=live-intelligence title="Live intelligence" class="is-dark" density=compact
+      ::metric id=pipeline label="Pipeline influenced" value="$4.8M" tone=good effect=pulse
+      ::/metric
+      ::metric id=confidence label="Model confidence" value="92%" tone=accent effect=glow
+      ::/metric
+      ::metric id=freshness label="Signal freshness" value="8s ago" tone=good
+      ::/metric
+      ::metric id=coverage label="Accounts scored" value="18,420" tone=muted
+      ::/metric
+      ::log id=decision-log source=agent-decisions max=5
+      ::/log
+    ::/panel
+  ::/scene
+
+  ::scene id=rollout layout=split title="Deployment narrative"
+    heading="A generated page can tell the rollout story"
+    body="The same source format can describe architecture, proof points, and guided product moments for buyers, internal teams, or onboarding."
+
+    ::panel id=rollout-plan title="90 minute generated demo"
+      ::stack gap=md
+        ::card icon="A" title="Codebase scan"
+          body="Agent extracts routes, events, schemas, product objects, and workflows."
+        ::/card
+        ::card icon="B" title="PageScript draft"
+          body="Agent writes a compact semantic page instead of verbose frontend code."
+        ::/card
+        ::card icon="C" title="Compiler polish"
+          body="Renderer owns layout, SVG, responsive behavior, effects, and runtime safety."
+        ::/card
+      ::/stack
+    ::/panel
+
+    ::panel id=proof title="Why this is different" tone=muted
+      ::metric id=tokens label="Source size" value="Small enough for review" tone=good
+      ::/metric
+      ::metric id=runtime label="Runtime policy" value="Declarative only" tone=accent
+      ::/metric
+      ::metric id=output label="Output" value="Standalone HTML" tone=good
+      ::/metric
+      ::text title="Compiler contract"
+        body="LLMs describe the experience. PageScript validates it. The compiler produces the web implementation."
+      ::/text
+    ::/panel
+  ::/scene
+::/page
