@@ -1,0 +1,21 @@
+[package]
+name = "pagescript-rs"
+version = "0.1.0"
+edition = "2024"
+description = "Rust reference implementation for the PageScript LLM-native web composition standard."
+license = "MIT"
+repository = "https://github.com/pagescript/pagescript"
+readme = "README.md"
+include = ["Cargo.toml", "README.md", "src/**/*.rs"]
+
+[lib]
+name = "pagescript_rs"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pagescript-rs"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
