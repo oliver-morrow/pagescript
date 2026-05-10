@@ -12,19 +12,19 @@ impl Resolver {
         let mut embedded = HashMap::new();
         embedded.insert(
             "stdlib/product.page".to_string(),
-            include_str!("../../../stdlib/product.page"),
+            include_str!("../stdlib/product.page"),
         );
         embedded.insert(
             "stdlib/data.page".to_string(),
-            include_str!("../../../stdlib/data.page"),
+            include_str!("../stdlib/data.page"),
         );
         embedded.insert(
             "stdlib/docs.page".to_string(),
-            include_str!("../../../stdlib/docs.page"),
+            include_str!("../stdlib/docs.page"),
         );
         embedded.insert(
             "stdlib/layout.page".to_string(),
-            include_str!("../../../stdlib/layout.page"),
+            include_str!("../stdlib/layout.page"),
         );
 
         Self {
