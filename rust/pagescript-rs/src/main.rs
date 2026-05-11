@@ -50,7 +50,7 @@ fn run(args: Vec<String>) -> i32 {
             print_usage();
             return 1;
         }
-        println!("{LLM_GUIDE}");
+        println!("{PAGESCRIPT_GUIDE}");
         return 0;
     }
     let Some(file) = options.file.as_deref() else {
@@ -291,7 +291,7 @@ fn print_usage() {
     );
 }
 
-const LLM_GUIDE: &str = r##"# PageScript LLM Generation Guide
+const PAGESCRIPT_GUIDE: &str = r##"# PageScript Generation Guide
 
 Use PageScript as a small semantic DSL, not as renamed HTML.
 
@@ -344,7 +344,6 @@ Repair loop:
 4. Repeat until diagnostics are `[]`.
 5. Run `pagescript render file.page --out index.html`.
 "##;
-
 const PRODUCT_TEMPLATE: &str = r##"::page id=product-demo title="Product Demo"
   ::tokens
     color.accent="#4dd6a0"
@@ -353,7 +352,7 @@ const PRODUCT_TEMPLATE: &str = r##"::page id=product-demo title="Product Demo"
 
   ::hero spacing=xl
     heading="Launch a useful page from one file"
-    body="PageScript turns compact semantic source into standalone HTML that AI tools and humans can both edit."
+    body="PageScript turns compact semantic source into standalone HTML that code generators and humans can both edit."
   ::/hero
 
   ::section spacing=lg
@@ -367,7 +366,7 @@ const PRODUCT_TEMPLATE: &str = r##"::page id=product-demo title="Product Demo"
       ::card icon="02" title="Standalone output"
         body="The renderer emits browser-native HTML and CSS with no application server required."
       ::/card
-      ::card icon="03" title="Agent friendly"
+      ::card icon="03" title="Tool friendly"
         body="Codex, Claude, and Cursor can review and modify PageScript without losing the page structure."
       ::/card
     ::/grid

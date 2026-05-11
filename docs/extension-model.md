@@ -17,7 +17,7 @@ Core features must:
 
 ### Standard library
 
-The standard library is the main velocity layer. New product sections, dashboards, docs layouts, marketing blocks, and interaction patterns should usually land as recipes built from core primitives.
+The standard library is the main iteration layer. New product sections, dashboards, docs layouts, marketing blocks, and interaction patterns should usually land as recipes built from core primitives.
 
 Recipes can move faster than the core language because they stay compile-time and deterministic.
 

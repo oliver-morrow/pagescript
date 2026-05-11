@@ -7,7 +7,7 @@ labels: spec
 
 ## Problem
 
-What page-context or AI-builder problem does this solve?
+What page-context or page-authoring problem does this solve?
 
 ## Proposal
 

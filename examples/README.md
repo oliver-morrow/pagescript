@@ -1,15 +1,15 @@
 # PageScript Examples
 
-## `product-intelligence-demo.page`
+## `product-metrics-demo.page`
 
-The Draft 0.6 flagship. Demonstrates the PageScript standard library, named slots, and recursive imports. Composes a high-fidelity landing page with metrics and data flows using mostly imported recipes from `stdlib/`.
+Draft 0.6 stdlib example. Demonstrates the PageScript standard library, named slots, and recursive imports. Composes a detailed landing page with metrics and data flows using mostly imported recipes from `stdlib/`.
 
 Useful commands:
 
 ```sh
-pagescript validate examples/product-intelligence-demo.page
-pagescript ir examples/product-intelligence-demo.page
-pagescript render examples/product-intelligence-demo.page --out demo.html
+pagescript validate examples/product-metrics-demo.page
+pagescript ir examples/product-metrics-demo.page
+pagescript render examples/product-metrics-demo.page --out demo.html
 ```
 
 ## `data-lineage-demo.page`
@@ -36,16 +36,16 @@ pagescript ir examples/web-core-kernel.page --page web-core-kernel
 pagescript render examples/web-core-kernel.page --out web-core-kernel.html
 ```
 
-## `autonomous-revenue-command-center.page`
+## `revenue-map-demo.page`
 
-A more ambitious product-demo example for the strategic wedge: codebase-aware generated webpages. It uses multiple scenes, SVG graph composition, metrics, logs, state, events, effects, design tokens, layout metadata, and scoped CSS.
+A larger example that maps product signals into a generated page. It uses multiple scenes, SVG graph composition, metrics, logs, state, events, effects, design tokens, layout metadata, and scoped CSS.
 
 Useful commands:
 
 ```sh
-pagescript validate examples/autonomous-revenue-command-center.page
-pagescript ir examples/autonomous-revenue-command-center.page --page revenue-command-center
-pagescript render examples/autonomous-revenue-command-center.page --out command-center.html
+pagescript validate examples/revenue-map-demo.page
+pagescript ir examples/revenue-map-demo.page --page revenue-map
+pagescript render examples/revenue-map-demo.page --out revenue-map.html
 ```
 
 ## `interactive-doc.page`

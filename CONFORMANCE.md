@@ -34,7 +34,7 @@ A conforming validator must report structured diagnostics for:
 - invalid effect types and style scopes
 - unsafe Web Core Kernel tags and attributes
 - deterministic-core escape hatches such as `raw` and `script`
-- actionable unknown-directive diagnostics with suggestions when a close directive spelling exists
+- useful unknown-directive diagnostics with suggestions when a close directive spelling exists
 - duplicate scene, node, state, effect, and recipe names within a page
 - unknown recipe references
 - invalid `import` paths (absolute or containing `..`)
@@ -75,7 +75,7 @@ The reference CLI exposes this boundary through `pagescript-rs ir <file> [--page
 
 ## Reference Implementations
 
-- Canonical: `rust/pagescript-rs`
+- Main: `rust/pagescript-rs`
 - Legacy: `legacy/typescript-reference`
 
 The Rust implementation must pass the conformance fixtures before release. The TypeScript implementation is archived and may lag behind.

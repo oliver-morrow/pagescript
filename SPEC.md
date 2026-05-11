@@ -1,12 +1,12 @@
-# PageScript LLM-Native Web Composition
+# PageScript code generator-Native Web Composition
 
-PageScript is a compact source language for LLM-native web composition. Agents and humans write `.page` files with semantic layout, design tokens, data, interaction, effect, and Web Core Kernel primitives; the compiler emits polished standalone HTML/CSS/SVG with a fixed declarative runtime.
+PageScript is a compact source language for pages written for code generators. Humans and code generators write `.page` files with semantic layout, design tokens, data, interaction, effect, and Web Core Kernel primitives; the compiler emits standalone HTML/CSS/SVG with a fixed declarative runtime.
 
 Interactive documentation is one use case. The broader target is product demo pages, architecture explainers, launch pages, onboarding pages, generated product pages, and codebase-aware web experiences.
 
 ## File Model
 
-- Canonical extension: `.page`
+- Main extension: `.page`
 - Encoding: UTF-8 text
 - Output target: standalone HTML through a normalized PageScript IR
 - Primary implementation: Rust compiler and CLI
@@ -14,13 +14,13 @@ Interactive documentation is one use case. The broader target is product demo pa
 - Design system: declarative tokens through `::tokens`
 - Advanced styling: scoped CSS through `::style scope=page|component` and focused `::style-rule`
 
-The canonical parser AST remains generic: `document`, `page`, `component`, `markdown`, and compatibility nodes for `tour`, `step`, and `trigger`.
+The main parser AST remains generic: `document`, `page`, `component`, `markdown`, and compatibility nodes for `tour`, `step`, and `trigger`.
 
 ## Compiler Pipeline
 
 PageScript is not a collection of hardcoded demo templates. A conforming compiler should keep these stages separate:
 
-1. Parse `.page` source into the canonical AST.
+1. Parse `.page` source into the main AST.
 2. Validate source-level syntax, required attributes, and duplicate IDs.
 3. Normalize the AST into PageScript IR.
 4. Render the IR into a target such as standalone HTML/CSS/SVG.
@@ -28,11 +28,11 @@ PageScript is not a collection of hardcoded demo templates. A conforming compile
 
 The IR is the compiler boundary. It contains normalized page metadata, design tokens, recipe definitions, layout metadata, component nodes, graph nodes and edges, declared state, events, effects, and scoped CSS. Output renderers should consume IR rather than walking raw source syntax directly.
 
-Draft 0.5 adds a Web Core Kernel. The intent is similar to compressed data transport: `.page` source stays small and semantic for LLM generation, while recipes and kernel primitives act as the decompression key that expands into browser-native HTML/CSS/SVG at render time.
+Draft 0.5 adds a Web Core Kernel. The intent is similar to compressed data transport: `.page` source stays small and semantic for generation, while recipes and kernel primitives act as the decompression key that expands into browser-native HTML/CSS/SVG at render time.
 
 ## Deterministic Extension Boundary
 
-PageScript keeps velocity by expanding what can be expressed with recipes and Web Core Kernel primitives, not by accepting arbitrary browser code in the core language.
+PageScript keeps iteration by expanding what can be expressed with recipes and Web Core Kernel primitives, not by accepting arbitrary browser code in the core language.
 
 Conforming implementations must preserve this deterministic contract:
 
@@ -45,7 +45,7 @@ Conforming implementations must preserve this deterministic contract:
 Extension tiers:
 
 - Core standard: deterministic primitives, declarative interactions, Web Core Kernel, validation, IR, and rendering.
-- Standard library: fast-moving recipes built from core primitives and imported at compile time.
+- Standard library: recipes built from core primitives and imported at compile time.
 - Escape hatches: raw HTML, source-authored scripts, remote runtime plugins, or renderer-specific extensions. These are outside the deterministic core and must be rejected by conforming validators unless an implementation explicitly offers a non-standard mode.
 
 ## Core Web Composition Example
@@ -288,11 +288,11 @@ Renderers inject scoped style text into the compiled document. Validators must r
 
 Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, deterministic-core escape hatches, unknown recipes, and compatibility-tour errors.
 
-Unknown directive diagnostics should be actionable for LLM repair loops. When a close match exists, validators should suggest the canonical directive spelling.
+Unknown directive diagnostics should be useful for code generator repair loops. When a close match exists, validators should suggest the correct directive spelling.
 
-## LLM Generation Contract
+## Generation Guide Contract
 
-`.page` is a small, validated semantic DSL. Generation flows should provide a compact syntax guide plus canonical examples before asking a model to produce source. The compiler is the source of truth:
+`.page` is a small, validated semantic DSL. Generation flows should provide a compact syntax guide plus small examples before asking a model to produce source. The compiler is the source of truth:
 
 1. Generate `.page`.
 2. Run `pagescript validate <file> --json`.
@@ -302,7 +302,7 @@ Unknown directive diagnostics should be actionable for LLM repair loops. When a 
 
 Success is measured by end-to-end generation cost: prompt examples, generated source, compiler diagnostics, repair turns, and final rendered output. Final file size alone is not enough.
 
-## Org-Level Agent Workflow
+## Project Workflow
 
 1. Cursor, Claude Code, Codex, or humans author `.page` files.
 2. Humans review semantic web composition instead of generated HTML/CSS/JS.
@@ -310,4 +310,4 @@ Success is measured by end-to-end generation cost: prompt examples, generated so
 4. CI or review can inspect `pagescript-rs ir`.
 5. Publishing runs `pagescript-rs render`.
 
-This creates a shared source format for LLM-generated product demos, explainers, interactive docs, and codebase-aware web pages.
+This creates a shared source format for code generator-generated product demos, explainers, interactive docs, and codebase-aware web pages.
