@@ -344,7 +344,6 @@ Repair loop:
 4. Repeat until diagnostics are `[]`.
 5. Run `pagescript render file.page --out index.html`.
 "##;
-
 const PRODUCT_TEMPLATE: &str = r##"::page id=product-demo title="Product Demo"
   ::tokens
     color.accent="#4dd6a0"
