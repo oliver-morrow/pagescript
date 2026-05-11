@@ -18,14 +18,14 @@
 
   ::hero class=docs-hero spacing=xl
     heading="PageScript"
-    body="A draft standard for LLM-native web composition: compact .page source, normalized compiler IR, standalone HTML output, and a fixed declarative runtime."
+    body="A draft standard for pages written for code generators: compact .page source, normalized compiler IR, standalone HTML output, and a fixed declarative runtime."
   ::/hero
 
   ::section spacing=lg
     heading="Start here"
     body="The docs homepage is itself authored in PageScript and rendered by the GitHub Pages workflow."
 
-    ::grid columns=3 gap=md density=compact
+    ::grid columns=4 gap=md density=compact
       ::card class=docs-card icon="01" title="Specification"
         body="Normative Draft 0.6 language model, compiler pipeline, tokens, recipes, Standard Library, named slots, and recursive imports. See SPEC.md."
       ::/card
@@ -34,20 +34,24 @@
         body="Parser, validator, IR, renderer, fixtures, schemas, and compatibility expectations for Draft 0.6. See CONFORMANCE.md."
       ::/card
 
-      ::card class=docs-card icon="03" title="Flagship Demo"
-        body="High-fidelity product demo using the standard library, named slots, and recursive imports. See examples/product-intelligence-demo.page."
+      ::card class=docs-card icon="03" title="Generation Guide"
+        body="Compact syntax guide, small examples, compiler repair loop, and audit question for generated .page files. See docs/generation-guide.md."
+      ::/card
+
+      ::card class=docs-card icon="04" title="Extension Model"
+        body="Deterministic core, recipe iteration, Web Core Kernel reach, and explicit non-standard escape boundaries. See docs/extension-model.md."
       ::/card
     ::/grid
   ::/section
 
   ::scene id=compiler-pipeline layout=split title="Compiler pipeline"
     heading="The standard is source-first, not renderer-first"
-    body="Agents write semantic composition. PageScript validates it, normalizes it into IR, and renders target output without source-authored JavaScript."
+    body="Code generators write semantic composition. PageScript validates it, normalizes it into IR, and renders target output without source-authored JavaScript."
 
     ::panel id=pipeline-steps title="Pipeline stages" density=spacious
       ::stack gap=md
         ::card icon="A" title=".page source"
-          body="Compact source optimized for LLM generation and human review."
+          body="Compact source optimized for generation and human review."
         ::/card
         ::card icon="B" title="PageScript IR"
           body="Normalized machine-readable representation for renderers and conformance tests."

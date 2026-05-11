@@ -168,6 +168,12 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
             heading(node, "h3"),
             body(node)
         ),
+        "nav" => render_nav(node, context),
+        "nav-item" => format!(
+            "<a class=\"ps-nav-item\" href=\"{}\">{}</a>",
+            escape_attr(string_attr(node, "href").unwrap_or("#")),
+            escape_html(string_attr(node, "label").unwrap_or("Link"))
+        ),
         "button" => format!(
             "<button class=\"{}\"{}{}>{}</button>",
             component_classes(node, &["ps-button", &variant(node)], context),
@@ -215,10 +221,115 @@ fn render_component(node: &ComponentIr, context: &RenderContext<'_>) -> String {
             escape_attr(string_attr(node, "kind").unwrap_or("text")),
             escape_attr(string_attr(node, "placeholder").unwrap_or(""))
         ),
+        "filter" => render_filter(node, context),
+        "table" => render_table(node, context),
+        "row" => render_row(node, context),
+        "cell" => render_cell(node, context),
+        "column" => String::new(),
+        "empty-state" => format!(
+            "<section class=\"{}\"{}>{}{}{children}</section>",
+            component_classes(node, &["ps-empty-state"], context),
+            id_attr(node),
+            icon(node),
+            heading(node, "h3")
+        ),
         "metric" => render_metric(node, context),
         "log" => render_log(node),
         _ => children,
     }
+}
+
+fn render_nav(node: &ComponentIr, context: &RenderContext<'_>) -> String {
+    let children = node
+        .children
+        .iter()
+        .map(|node| render_node(node, context))
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!(
+        "<nav class=\"{}\"{} aria-label=\"{}\"><div class=\"ps-container ps-nav-inner\">{children}</div></nav>",
+        component_classes(node, &["ps-nav"], context),
+        id_attr(node),
+        escape_attr(string_attr(node, "label").unwrap_or("Page navigation"))
+    )
+}
+
+fn render_filter(node: &ComponentIr, context: &RenderContext<'_>) -> String {
+    let kind = string_attr(node, "kind").unwrap_or("search");
+    format!(
+        "<label class=\"{}\"{}><span>{}</span><input name=\"{}\" type=\"{}\" placeholder=\"{}\"></label>",
+        component_classes(node, &["ps-filter"], context),
+        id_attr(node),
+        escape_html(string_attr(node, "label").unwrap_or("Filter")),
+        escape_attr(string_attr(node, "id").unwrap_or("filter")),
+        escape_attr(kind),
+        escape_attr(string_attr(node, "placeholder").unwrap_or("Filter"))
+    )
+}
+
+fn render_table(node: &ComponentIr, context: &RenderContext<'_>) -> String {
+    let header = node
+        .children
+        .iter()
+        .filter_map(|child| match child {
+            IrNode::Component(component) if component.name == "column" => Some(format!(
+                "<th scope=\"col\">{}</th>",
+                escape_html(string_attr(component, "label").unwrap_or(""))
+            )),
+            _ => None,
+        })
+        .collect::<Vec<_>>()
+        .join("");
+    let rows = node
+        .children
+        .iter()
+        .filter_map(|child| match child {
+            IrNode::Component(component) if component.name == "row" => {
+                Some(render_row(component, context))
+            }
+            _ => None,
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    let head = if header.is_empty() {
+        String::new()
+    } else {
+        format!("<thead><tr>{header}</tr></thead>")
+    };
+
+    format!(
+        "<div class=\"{}\"{}><table>{head}<tbody>{rows}</tbody></table></div>",
+        component_classes(node, &["ps-table"], context),
+        id_attr(node)
+    )
+}
+
+fn render_row(node: &ComponentIr, context: &RenderContext<'_>) -> String {
+    let cells = node
+        .children
+        .iter()
+        .filter_map(|child| match child {
+            IrNode::Component(component) if component.name == "cell" => {
+                Some(render_cell(component, context))
+            }
+            _ => None,
+        })
+        .collect::<Vec<_>>()
+        .join("");
+    format!("<tr>{cells}</tr>")
+}
+
+fn render_cell(node: &ComponentIr, context: &RenderContext<'_>) -> String {
+    let value = string_attr(node, "value")
+        .map(escape_html)
+        .unwrap_or_else(|| {
+            node.children
+                .iter()
+                .map(|child| render_node(child, context))
+                .collect::<Vec<_>>()
+                .join("\n")
+        });
+    format!("<td>{value}</td>")
 }
 
 fn render_el(node: &ComponentIr, context: &RenderContext<'_>) -> String {
@@ -747,7 +858,7 @@ fn is_safe_attr_name(value: &str) -> bool {
 
 fn base_css() -> &'static str {
     r#":root{color-scheme:light;--ps-bg:#f7f7f2;--ps-ink:#202124;--ps-muted:#62645f;--ps-line:#deded4;--ps-accent:#116149;--ps-accent-ink:#fff;--ps-panel:#fff;--ps-radius:12px;--ps-shadow:0 1px 2px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-html{scroll-behavior:smooth}*{box-sizing:border-box}body{margin:0;background:var(--ps-bg);color:var(--ps-ink);line-height:1.5}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.4rem,6vw,5rem);line-height:.98;max-width:11ch}h2{font-size:clamp(1.8rem,3vw,3rem);line-height:1.05}h3{font-size:1.1rem}.ps-container{width:min(1180px,calc(100% - 32px));margin:0 auto}.ps-hero{min-height:72vh;display:flex;align-items:center}.ps-hero-inner{display:grid;gap:24px}.ps-section{padding:72px 0}.ps-space-sm{padding-block:32px}.ps-space-md{padding-block:56px}.ps-space-lg{padding-block:88px}.ps-space-xl{padding-block:120px}.ps-density-compact{--ps-density-pad:16px;--ps-density-gap:12px}.ps-density-spacious{--ps-density-pad:32px;--ps-density-gap:24px}.ps-tone-dark{background:#16201d;color:#f7f7f2}.ps-tone-accent{background:#dcefe7}.ps-tone-muted{background:#ecece3}.ps-tone-good{background:#e3f8ee;color:#12382a}.ps-stack{display:grid}.ps-gap-sm{gap:12px}.ps-gap-md{gap:20px}.ps-gap-lg{gap:32px}.ps-grid{display:grid;grid-template-columns:repeat(var(--ps-columns),minmax(0,1fr));gap:24px}.ps-card,.ps-panel{background:var(--ps-panel);border:1px solid var(--ps-line);border-radius:var(--ps-radius);padding:var(--ps-density-pad,24px);display:grid;gap:var(--ps-density-gap,16px);box-shadow:var(--ps-shadow);transition:transform 0.2s ease, box-shadow 0.2s ease}.ps-card:hover{transform:translateY(-2px);box-shadow:0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)}.ps-icon{font-size:1.4rem}.ps-button{width:max-content;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;transition:filter 0.2s ease}.ps-button:active{filter:brightness(0.9)}.ps-button-primary{background:var(--ps-accent);color:var(--ps-accent-ink)}.ps-button-secondary{background:#fff;color:var(--ps-ink);border:1px solid var(--ps-line)}.ps-text{display:grid;gap:12px}.ps-image img{width:100%;height:auto;border-radius:var(--ps-radius)}.ps-modal{border:0;border-radius:16px;padding:28px;max-width:640px}.ps-modal::backdrop{background:rgba(0,0,0,.45)}.ps-modal-close{float:right}.ps-form{display:grid;gap:16px}.ps-field{display:grid;gap:6px}.ps-field input{font:inherit;padding:12px;border:1px solid var(--ps-line);border-radius:8px}.ps-scene{padding:88px 0;background:var(--ps-bg)}.ps-scene-inner{display:grid;gap:40px}.ps-scene-full .ps-scene-inner{grid-template-columns:1fr}.ps-scene-split .ps-scene-inner{grid-template-columns:1fr 1fr}.ps-metric{display:grid;gap:4px}.ps-metric-label{font-size:.85rem;font-weight:600;color:var(--ps-muted);text-transform:uppercase;letter-spacing:.05em}.ps-metric-value{font-size:2.2rem;font-weight:800;letter-spacing:-.02em}.ps-log{background:#000;color:#0f0;font-family:monospace;padding:16px;border-radius:8px;font-size:.9rem;min-height:140px}.ps-graph{width:100%;height:auto;overflow:visible}.ps-graph-node-rect{fill:#fff;stroke:var(--ps-line);stroke-width:1}.ps-status-active .ps-graph-node-rect{stroke:var(--ps-accent);stroke-width:2}.ps-graph-node-text{font-size:12px;font-weight:600;fill:var(--ps-ink)}.ps-graph-edge path{fill:none;stroke:var(--ps-line);stroke-width:2}.ps-effect-flow{stroke-dasharray:8 8;animation:ps-flow 1s linear infinite}@keyframes ps-flow{from{stroke-dashoffset:16}to{stroke-dashoffset:0}}.ps-effect-pulse,.ps-pulse-svg{animation:ps-pulse 2s ease-in-out infinite}@keyframes ps-pulse{0%,100%{opacity:1}50%{opacity:.4}}.ps-effect-glow{filter:drop-shadow(0 0 8px var(--ps-accent))}.ps-reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease-out, transform 0.6s ease-out}.ps-reveal-visible{opacity:1;transform:translateY(0)}"#
+html{scroll-behavior:smooth}*{box-sizing:border-box}body{margin:0;background:var(--ps-bg);color:var(--ps-ink);line-height:1.5}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.4rem,6vw,5rem);line-height:.98;max-width:11ch}h2{font-size:clamp(1.8rem,3vw,3rem);line-height:1.05}h3{font-size:1.1rem}.ps-container{width:min(1180px,calc(100% - 32px));margin:0 auto}.ps-hero{min-height:72vh;display:flex;align-items:center}.ps-hero-inner{display:grid;gap:24px}.ps-section{padding:72px 0}.ps-space-sm{padding-block:32px}.ps-space-md{padding-block:56px}.ps-space-lg{padding-block:88px}.ps-space-xl{padding-block:120px}.ps-density-compact{--ps-density-pad:16px;--ps-density-gap:12px}.ps-density-spacious{--ps-density-pad:32px;--ps-density-gap:24px}.ps-tone-dark{background:#16201d;color:#f7f7f2}.ps-tone-accent{background:#dcefe7}.ps-tone-muted{background:#ecece3}.ps-tone-good{background:#e3f8ee;color:#12382a}.ps-stack{display:grid}.ps-gap-sm{gap:12px}.ps-gap-md{gap:20px}.ps-gap-lg{gap:32px}.ps-grid{display:grid;grid-template-columns:repeat(var(--ps-columns),minmax(0,1fr));gap:24px}.ps-card,.ps-panel{background:var(--ps-panel);border:1px solid var(--ps-line);border-radius:var(--ps-radius);padding:var(--ps-density-pad,24px);display:grid;gap:var(--ps-density-gap,16px);box-shadow:var(--ps-shadow);transition:transform 0.2s ease, box-shadow 0.2s ease}.ps-card:hover{transform:translateY(-2px);box-shadow:0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)}.ps-icon{font-size:1.4rem}.ps-nav{padding:16px 0;border-bottom:1px solid var(--ps-line);background:var(--ps-panel)}.ps-nav-inner{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.ps-nav-item{color:var(--ps-ink);text-decoration:none;font-weight:700}.ps-button{width:max-content;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;transition:filter 0.2s ease}.ps-button:active{filter:brightness(0.9)}.ps-button-primary{background:var(--ps-accent);color:var(--ps-accent-ink)}.ps-button-secondary{background:#fff;color:var(--ps-ink);border:1px solid var(--ps-line)}.ps-text{display:grid;gap:12px}.ps-image img{width:100%;height:auto;border-radius:var(--ps-radius)}.ps-modal{border:0;border-radius:16px;padding:28px;max-width:640px}.ps-modal::backdrop{background:rgba(0,0,0,.45)}.ps-modal-close{float:right}.ps-form{display:grid;gap:16px}.ps-field,.ps-filter{display:grid;gap:6px}.ps-field input,.ps-filter input{font:inherit;padding:12px;border:1px solid var(--ps-line);border-radius:8px}.ps-filter span{font-weight:700}.ps-table{overflow:auto;border:1px solid var(--ps-line);border-radius:var(--ps-radius);background:var(--ps-panel)}.ps-table table{width:100%;border-collapse:collapse}.ps-table th,.ps-table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--ps-line)}.ps-table th{font-size:.82rem;text-transform:uppercase;color:var(--ps-muted)}.ps-empty-state{border:1px dashed var(--ps-line);border-radius:var(--ps-radius);padding:32px;display:grid;gap:12px;text-align:center;background:var(--ps-panel)}.ps-scene{padding:88px 0;background:var(--ps-bg)}.ps-scene-inner{display:grid;gap:40px}.ps-scene-full .ps-scene-inner{grid-template-columns:1fr}.ps-scene-split .ps-scene-inner{grid-template-columns:1fr 1fr}.ps-metric{display:grid;gap:4px}.ps-metric-label{font-size:.85rem;font-weight:600;color:var(--ps-muted);text-transform:uppercase;letter-spacing:.05em}.ps-metric-value{font-size:2.2rem;font-weight:800;letter-spacing:-.02em}.ps-log{background:#000;color:#0f0;font-family:monospace;padding:16px;border-radius:8px;font-size:.9rem;min-height:140px}.ps-graph{width:100%;height:auto;overflow:visible}.ps-graph-node-rect{fill:#fff;stroke:var(--ps-line);stroke-width:1}.ps-status-active .ps-graph-node-rect{stroke:var(--ps-accent);stroke-width:2}.ps-graph-node-text{font-size:12px;font-weight:600;fill:var(--ps-ink)}.ps-graph-edge path{fill:none;stroke:var(--ps-line);stroke-width:2}.ps-effect-flow{stroke-dasharray:8 8;animation:ps-flow 1s linear infinite}@keyframes ps-flow{from{stroke-dashoffset:16}to{stroke-dashoffset:0}}.ps-effect-pulse,.ps-pulse-svg{animation:ps-pulse 2s ease-in-out infinite}@keyframes ps-pulse{0%,100%{opacity:1}50%{opacity:.4}}.ps-effect-glow{filter:drop-shadow(0 0 8px var(--ps-accent))}.ps-reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease-out, transform 0.6s ease-out}.ps-reveal-visible{opacity:1;transform:translateY(0)}"#
 }
 
 fn base_js() -> &'static str {

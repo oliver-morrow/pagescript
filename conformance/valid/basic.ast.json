@@ -23,7 +23,7 @@
         "id": "basic",
         "url": "/basic",
         "title": "Basic Page",
-        "audience": "AI builders",
+        "audience": "tool builders",
         "goal": "Show a minimal page context.",
         "context": "Describe why this page exists."
       },
@@ -74,7 +74,7 @@
       ],
       "id": "basic",
       "title": "Basic Page",
-      "audience": "AI builders",
+      "audience": "tool builders",
       "goal": "Show a minimal page context.",
       "context": "Describe why this page exists.",
       "url": "/basic"

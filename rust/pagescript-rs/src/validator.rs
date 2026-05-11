@@ -83,9 +83,17 @@ fn validate_component(
     ids: &mut PageIds,
 ) {
     let required = match component.name.as_str() {
+        "nav" => &[][..],
+        "nav-item" => &["label", "href"][..],
         "button" => &["label"][..],
         "image" => &["src", "alt"][..],
         "input" => &["name", "label"][..],
+        "filter" => &["id", "label"][..],
+        "table" => &[][..],
+        "column" => &["label"][..],
+        "row" => &[][..],
+        "cell" => &[][..],
+        "empty-state" => &["title"][..],
         "scene" => &["id"][..],
         "panel" => &["id"][..],
         "node" => &["id", "label"][..],
@@ -104,6 +112,8 @@ fn validate_component(
         "bind" => &["state"][..],
         "on" => &["event", "action"][..],
         "import" => &["from"][..],
+        "raw" => &[][..],
+        "script" => &[][..],
         _ => &[],
     };
 
@@ -112,8 +122,8 @@ fn validate_component(
             diagnostics.push(error(
                 "missing_component_attribute",
                 format!(
-                    "Component \"{}\" is missing required attribute \"{}\".",
-                    component.name, key
+                    "Component \"{}\" is missing required attribute \"{}\". Add {}=... to the opening directive.",
+                    component.name, key, key
                 ),
                 component.source.line,
             ));
@@ -261,6 +271,14 @@ fn validate_component_semantics(
                 ));
             }
         }
+        "raw" | "script" => diagnostics.push(error(
+            "unsafe_escape_hatch",
+            format!(
+                "Component \"{}\" is outside the deterministic PageScript core.",
+                component.name
+            ),
+            component.source.line,
+        )),
         _ => {}
     }
 }

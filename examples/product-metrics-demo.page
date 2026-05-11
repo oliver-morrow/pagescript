@@ -1,4 +1,4 @@
-::page id=product-intelligence-demo title="Product Intelligence Demo"
+::page id=product-metrics-demo title="Product Metrics Demo"
   ::import from="stdlib/product.page"
   ::/import
 
@@ -14,7 +14,7 @@
     radius.lg=12
   ::/tokens
 
-  ::use recipe=product-hero title="Product Intelligence" subtitle="Autonomous insights for modern engineering teams"
+  ::use recipe=product-hero title="Product Metrics" subtitle="Product metrics from a compact source file"
     ::slot name=actions
       ::el tag=a href="#demo" class="button primary"
         ::text value="View Demo"
@@ -46,7 +46,7 @@
           ::/text
         ::/el
         ::el tag=p
-          ::text value="Monitor your entire data lifecycle from ingestion to intelligence."
+          ::text value="Track the data path from ingest to dashboard."
           ::/text
         ::/el
       ::/stack
@@ -59,7 +59,7 @@
         ::/node
         ::node id=storage label="Storage" x=450 y=100 status=active
         ::/node
-        ::node id=ai label="AI Engine" x=650 y=100 status=active effect=glow
+        ::node id=ai label="Rules Engine" x=650 y=100 status=active effect=glow
         ::/node
 
         ::edge from=ingest to=process effect=flow
@@ -73,17 +73,17 @@
   ::/use
 
   ::use recipe=bento-grid
-    ::use recipe=feature-card title="Autonomous Discovery" body="Automatically map your entire service architecture."
+    ::use recipe=feature-card title="Source Map" body="Map the services and data paths that matter."
     ::/use
     ::use recipe=feature-card title="Real-time Lineage" body="Track data transformations as they happen."
     ::/use
-    ::use recipe=feature-card title="Smart Alerts" body="AI-driven anomaly detection for critical paths."
+    ::use recipe=feature-card title="Smart Alerts" body="Rules-based checks for important paths."
     ::/use
     ::use recipe=feature-card title="Cost Optimization" body="Identify inefficient queries and reduce spend."
     ::/use
   ::/use
 
-  ::use recipe=cta-band title="Ready to upgrade your intelligence?" label="Get Started" href="/signup"
+  ::use recipe=cta-band title="Ready to build the page?" label="Get Started" href="/signup"
   ::/use
 
 ::/page

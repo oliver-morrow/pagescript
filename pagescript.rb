@@ -1,5 +1,5 @@
 class Pagescript < Formula
-  desc "LLM-native web composition compiler"
+  desc "Compile .page files to standalone HTML"
   homepage "https://github.com/oliver-morrow/pagescript"
   head "https://github.com/oliver-morrow/pagescript.git", branch: "main"
 

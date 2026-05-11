@@ -180,15 +180,73 @@ fn malformed_directive_reports_diagnostic() {
 }
 
 #[test]
+fn unknown_directive_reports_repair_suggestion() {
+    let document = parse_page_script(
+        r##"::page id=typo
+  ::sectoin
+  ::/sectoin
+::/page
+"##,
+    );
+
+    assert_eq!(document.diagnostics[0].code, "unknown_directive");
+    assert!(
+        document.diagnostics[0]
+            .message
+            .contains("Did you mean \"section\"?")
+    );
+}
+
+#[test]
+fn renders_semantic_ui_primitives_without_raw_html() {
+    let document = parse_page_script(
+        r##"::page id=semantic title="Semantic UI"
+  ::nav label="Primary"
+    ::nav-item label="Overview" href="#overview"
+    ::/nav-item
+  ::/nav
+  ::section id=overview heading="Accounts"
+    ::filter id=account-search label="Search accounts" placeholder="Company or owner"
+    ::/filter
+    ::table id=accounts
+      ::column label="Account"
+      ::/column
+      ::column label="Status"
+      ::/column
+      ::row
+        ::cell value="Acme"
+        ::/cell
+        ::cell value="Healthy"
+        ::/cell
+      ::/row
+    ::/table
+    ::empty-state title="No accounts" body="Adjust filters to widen the result set."
+    ::/empty-state
+  ::/section
+::/page
+"##,
+    );
+
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
+    let html = render_to_html(&document, Some("semantic"), &resolver()).unwrap();
+
+    assert!(html.contains("ps-nav"));
+    assert!(html.contains("Search accounts"));
+    assert!(html.contains("<th scope=\"col\">Account</th>"));
+    assert!(html.contains("<td>Healthy</td>"));
+    assert!(html.contains("ps-empty-state"));
+}
+
+#[test]
 fn parses_and_renders_interactive_page_components() {
     let source = fs::read_to_string("../../examples/interactive-doc.page").unwrap();
     let document = parse_page_script(&source);
 
     assert_eq!(validate_document(&document, &resolver()), Vec::new());
-    let html = render_to_html(&document, Some("agent-docs"), &resolver()).unwrap();
+    let html = render_to_html(&document, Some("tool-docs"), &resolver()).unwrap();
 
     assert!(html.contains("<!doctype html>"));
-    assert!(html.contains("Interactive docs your AI tools can write"));
+    assert!(html.contains("Interactive docs your code generation tools can write"));
     assert!(html.contains("data-action=\"open-modal\""));
     assert!(html.contains("<dialog class=\"ps-modal\" id=\"workflow\">"));
 }
@@ -213,13 +271,12 @@ fn parses_and_renders_data_lineage_demo() {
 }
 
 #[test]
-fn renders_revenue_command_center_without_svg_animation_drift() {
-    let source =
-        fs::read_to_string("../../examples/autonomous-revenue-command-center.page").unwrap();
+fn renders_revenue_map_without_svg_animation_drift() {
+    let source = fs::read_to_string("../../examples/revenue-map-demo.page").unwrap();
     let document = parse_page_script(&source);
 
     assert_eq!(validate_document(&document, &resolver()), Vec::new());
-    let html = render_to_html(&document, Some("revenue-command-center"), &resolver()).unwrap();
+    let html = render_to_html(&document, Some("revenue-map"), &resolver()).unwrap();
 
     assert!(html.contains("data-ps-node=\"identity\""));
     assert!(html.contains("ps-effect-pulse"));
@@ -230,13 +287,12 @@ fn renders_revenue_command_center_without_svg_animation_drift() {
 }
 
 #[test]
-fn compiles_revenue_command_center_to_generic_page_ir() {
-    let source =
-        fs::read_to_string("../../examples/autonomous-revenue-command-center.page").unwrap();
+fn compiles_revenue_map_to_generic_page_ir() {
+    let source = fs::read_to_string("../../examples/revenue-map-demo.page").unwrap();
     let document = parse_page_script(&source);
 
     assert_eq!(validate_document(&document, &resolver()), Vec::new());
-    let ir = compile_page_ir(&document, Some("revenue-command-center"), &resolver()).unwrap();
+    let ir = compile_page_ir(&document, Some("revenue-map"), &resolver()).unwrap();
     let first_scene = ir
         .body
         .iter()
@@ -258,7 +314,7 @@ fn compiles_revenue_command_center_to_generic_page_ir() {
         .next()
         .unwrap();
 
-    assert_eq!(ir.title, "Autonomous Revenue Command Center");
+    assert_eq!(ir.title, "Revenue Map Demo");
     assert_eq!(ir.tokens["color.accent"], Value::String("#4dd6a0".into()));
     assert_eq!(ir.states[0].id, "selectedNode");
     let first_panel = match &first_scene.children[0] {
@@ -317,10 +373,9 @@ fn renders_tokens_and_generic_layout_metadata() {
 
 #[test]
 fn visual_sanity_checks_guard_graph_alignment_regressions() {
-    let source =
-        fs::read_to_string("../../examples/autonomous-revenue-command-center.page").unwrap();
+    let source = fs::read_to_string("../../examples/revenue-map-demo.page").unwrap();
     let document = parse_page_script(&source);
-    let html = render_to_html(&document, Some("revenue-command-center"), &resolver()).unwrap();
+    let html = render_to_html(&document, Some("revenue-map"), &resolver()).unwrap();
 
     assert!(html.contains("transform=\"translate(265, 190)\""));
     assert!(html.contains("d=\"M 179 90 C 227 90, 143 190, 191 190\""));
@@ -377,7 +432,7 @@ fn renders_web_core_kernel_recipe_expansion() {
             "<a class=\"kernel-card\" href=\"#semantic\" aria-label=\"Semantic Source\">"
         )
     );
-    assert!(html.contains("Semantic components stay efficient for LLMs"));
+    assert!(html.contains("Semantic components stay efficient for code generators"));
     assert!(html.contains(".kernel-card:hover"));
     assert!(html.contains("Draft 0.5 Web Core Kernel"));
     assert!(!html.contains("<use"));
@@ -386,21 +441,21 @@ fn renders_web_core_kernel_recipe_expansion() {
 }
 
 #[test]
-fn renders_product_intelligence_demo_with_stdlib_imports() {
-    let source = fs::read_to_string("../../examples/product-intelligence-demo.page").unwrap();
+fn renders_product_metrics_demo_with_stdlib_imports() {
+    let source = fs::read_to_string("../../examples/product-metrics-demo.page").unwrap();
     let document = parse_page_script(&source);
 
     // Note: The embedded resolver will find stdlib/product.page even if physical files are missing
     let resolver = resolver_with_path("../../examples");
 
     assert_eq!(validate_document(&document, &resolver), Vec::new());
-    let html = render_to_html(&document, Some("product-intelligence-demo"), &resolver).unwrap();
+    let html = render_to_html(&document, Some("product-metrics-demo"), &resolver).unwrap();
 
-    assert!(html.contains("Product Intelligence"));
+    assert!(html.contains("Product Metrics"));
     assert!(html.contains("Active Users"));
     assert!(html.contains("Data Pipeline Health"));
-    assert!(html.contains("Autonomous Discovery"));
-    assert!(html.contains("Ready to upgrade your intelligence?"));
+    assert!(html.contains("Source Map"));
+    assert!(html.contains("Ready to build the page?"));
     assert!(html.contains("data-ps-node=\"ingest\""));
 }
 

@@ -21,4 +21,8 @@
   ::/attr
   ::import from="../secret.page"
   ::/import
+  ::raw
+  ::/raw
+  ::script src="./widget.js"
+  ::/script
 ::/page

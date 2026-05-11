@@ -33,6 +33,8 @@ A conforming validator must report structured diagnostics for:
 - invalid token values
 - invalid effect types and style scopes
 - unsafe Web Core Kernel tags and attributes
+- deterministic-core escape hatches such as `raw` and `script`
+- useful unknown-directive diagnostics with suggestions when a close directive spelling exists
 - duplicate scene, node, state, effect, and recipe names within a page
 - unknown recipe references
 - invalid `import` paths (absolute or containing `..`)
@@ -73,7 +75,7 @@ The reference CLI exposes this boundary through `pagescript-rs ir <file> [--page
 
 ## Reference Implementations
 
-- Canonical: `rust/pagescript-rs`
+- Main: `rust/pagescript-rs`
 - Legacy: `legacy/typescript-reference`
 
 The Rust implementation must pass the conformance fixtures before release. The TypeScript implementation is archived and may lag behind.
@@ -83,6 +85,7 @@ The Rust implementation must pass the conformance fixtures before release. The T
 A conforming Draft 0.6 renderer must compile PageScript IR to standalone HTML/CSS/SVG and support:
 
 - scene, panel, metric, log, graph node, and graph edge primitives
+- semantic UI primitives for navigation, filters, tables, and empty states
 - Web Core Kernel `el`, `attr`, `text value`, `style-rule`, `recipe`, `template`, `use`, `slot name`, `bind`, and `on`
 - compile-time recipe expansion before rendering, including recursive imports and named slot substitution
 - design token aliases for core colors and panel radius
@@ -91,3 +94,9 @@ A conforming Draft 0.6 renderer must compile PageScript IR to standalone HTML/CS
 - `button action=toggle target=<id>`
 - `event on=node.click set=<state> value="$node.id"`
 - fixed runtime JavaScript emitted by the compiler, with no source-authored JavaScript in `.page` files
+
+## Determinism Requirements
+
+For the same source tree and compiler version, conforming implementations must produce stable AST, diagnostics, IR, and rendered output. Compilers must not perform network access during parse, validation, IR compilation, or rendering.
+
+Velocity belongs at the recipe boundary. Raw HTML blocks, source-authored scripts, remote runtime plugins, or renderer-specific extension components are outside Draft 0.6 conformance unless an implementation clearly labels a separate non-standard mode.

@@ -1,10 +1,10 @@
-# PageScript for Agent Workflows
+# PageScript for Tool Workflows
 
-PageScript is intended to be an org-level standard for LLM-native web composition authored by AI coding tools and humans.
+PageScript is intended to be a project-level standard for pages written by humans and code generation tools.
 
 ## Why It Fits Cursor, Claude Code, and Codex
 
-- Agents can write concise composition primitives instead of verbose HTML/CSS/JS.
+- Code generators can write concise composition primitives instead of verbose HTML/CSS/JS.
 - Humans can review page intent, structure, copy, and interactions in one small file.
 - CI can validate `.page` files, inspect compiler IR, and render standalone HTML.
 - The same source works across tools because the standard is file-based, not editor-specific.
@@ -20,15 +20,17 @@ docs/
 
 Each `.page` file should live next to the feature or docs area it explains. Generated HTML should be treated as build output unless the publishing system requires checked-in artifacts.
 
-## Agent Instruction
+## Tool Instruction
 
-Tell agents:
+Tell tools:
 
 ```text
 When creating product demos, explainers, launch pages, or interactive documentation, write PageScript `.page` files.
+Start by reading `pagescript guide` or docs/generation-guide.md.
 Use high-level primitives like ::tokens, ::scene, ::panel, ::node, ::edge, ::metric, ::effect, ::hero, ::grid, and ::card.
-Do not hand-write raw HTML/CSS/JS unless the PageScript compiler cannot express the needed page.
-Run `pagescript-rs validate`, inspect `pagescript-rs ir` for complex pages, and run `pagescript-rs render` before finishing.
+Prefer stdlib recipes and Web Core Kernel primitives when the page needs new structure.
+Do not hand-write raw HTML or JavaScript in conforming PageScript; propose a recipe or typed declarative primitive instead.
+Run `pagescript validate --json`, inspect `pagescript ir` for complex pages, and run `pagescript render --out` before finishing.
 ```
 
 ## CI Gate

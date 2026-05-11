@@ -1,12 +1,12 @@
-# PageScript LLM-Native Web Composition
+# PageScript code generator-Native Web Composition
 
-PageScript is a compact source language for LLM-native web composition. Agents and humans write `.page` files with semantic layout, design tokens, data, interaction, effect, and Web Core Kernel primitives; the compiler emits polished standalone HTML/CSS/SVG with a fixed declarative runtime.
+PageScript is a compact source language for pages written for code generators. Humans and code generators write `.page` files with semantic layout, design tokens, data, interaction, effect, and Web Core Kernel primitives; the compiler emits standalone HTML/CSS/SVG with a fixed declarative runtime.
 
 Interactive documentation is one use case. The broader target is product demo pages, architecture explainers, launch pages, onboarding pages, generated product pages, and codebase-aware web experiences.
 
 ## File Model
 
-- Canonical extension: `.page`
+- Main extension: `.page`
 - Encoding: UTF-8 text
 - Output target: standalone HTML through a normalized PageScript IR
 - Primary implementation: Rust compiler and CLI
@@ -14,13 +14,13 @@ Interactive documentation is one use case. The broader target is product demo pa
 - Design system: declarative tokens through `::tokens`
 - Advanced styling: scoped CSS through `::style scope=page|component` and focused `::style-rule`
 
-The canonical parser AST remains generic: `document`, `page`, `component`, `markdown`, and compatibility nodes for `tour`, `step`, and `trigger`.
+The main parser AST remains generic: `document`, `page`, `component`, `markdown`, and compatibility nodes for `tour`, `step`, and `trigger`.
 
 ## Compiler Pipeline
 
 PageScript is not a collection of hardcoded demo templates. A conforming compiler should keep these stages separate:
 
-1. Parse `.page` source into the canonical AST.
+1. Parse `.page` source into the main AST.
 2. Validate source-level syntax, required attributes, and duplicate IDs.
 3. Normalize the AST into PageScript IR.
 4. Render the IR into a target such as standalone HTML/CSS/SVG.
@@ -28,7 +28,25 @@ PageScript is not a collection of hardcoded demo templates. A conforming compile
 
 The IR is the compiler boundary. It contains normalized page metadata, design tokens, recipe definitions, layout metadata, component nodes, graph nodes and edges, declared state, events, effects, and scoped CSS. Output renderers should consume IR rather than walking raw source syntax directly.
 
-Draft 0.5 adds a Web Core Kernel. The intent is similar to compressed data transport: `.page` source stays small and semantic for LLM generation, while recipes and kernel primitives act as the decompression key that expands into browser-native HTML/CSS/SVG at render time.
+Draft 0.5 adds a Web Core Kernel. The intent is similar to compressed data transport: `.page` source stays small and semantic for generation, while recipes and kernel primitives act as the decompression key that expands into browser-native HTML/CSS/SVG at render time.
+
+## Deterministic Extension Boundary
+
+PageScript keeps iteration by expanding what can be expressed with recipes and Web Core Kernel primitives, not by accepting arbitrary browser code in the core language.
+
+Conforming implementations must preserve this deterministic contract:
+
+- same source, compiler version, and imported recipe versions produce the same AST, diagnostics, IR, and rendered output
+- compilers must not perform network access during parse, validation, IR compilation, or rendering
+- generated IDs, ordering, diagnostics, and emitted runtime hooks must be stable
+- source-authored JavaScript is not part of Draft 0.6
+- every conforming feature must lower into typed IR before rendering
+
+Extension tiers:
+
+- Core standard: deterministic primitives, declarative interactions, Web Core Kernel, validation, IR, and rendering.
+- Standard library: recipes built from core primitives and imported at compile time.
+- Escape hatches: raw HTML, source-authored scripts, remote runtime plugins, or renderer-specific extensions. These are outside the deterministic core and must be rejected by conforming validators unless an implementation explicitly offers a non-standard mode.
 
 ## Core Web Composition Example
 
@@ -90,11 +108,15 @@ Attribute keys may contain letters, numbers, `_`, `-`, and `.`. Dotted keys are 
 - `::stack`: vertical grouping
 - `::grid`: responsive grid
 - `::card`: content panel
+- `::nav` and `::nav-item`: page navigation
 - `::button`: declarative action trigger
 - `::text`: text group
 - `::image`: image with alt text
 - `::modal`: declarative dialog
 - `::form` and `::input`: basic form primitives
+- `::filter`: labeled search/filter control
+- `::table`, `::column`, `::row`, and `::cell`: structured tabular data
+- `::empty-state`: fallback state for empty results or unfinished workflows
 
 ## Web Composition Primitives
 
@@ -199,6 +221,8 @@ Compiler behavior:
 
 Validators must reject unsafe element tags such as `script`, `iframe`, `object`, and `embed`, and unsafe attributes such as `onclick` and `srcdoc`.
 
+`::raw` and `::script` are reserved escape-hatch names. They are intentionally outside the Draft 0.6 deterministic core and must produce a validation diagnostic in conformance mode.
+
 ## Design Tokens
 
 Tokens are compiler-readable design inputs, not raw CSS. Renderers may map known tokens to CSS variables and preserve unknown tokens under implementation-specific names.
@@ -262,9 +286,23 @@ Renderers inject scoped style text into the compiled document. Validators must r
 
 ## Validation
 
-Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, unknown recipes, and compatibility-tour errors.
+Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, deterministic-core escape hatches, unknown recipes, and compatibility-tour errors.
 
-## Org-Level Agent Workflow
+Unknown directive diagnostics should be useful for code generator repair loops. When a close match exists, validators should suggest the correct directive spelling.
+
+## Generation Guide Contract
+
+`.page` is a small, validated semantic DSL. Generation flows should provide a compact syntax guide plus small examples before asking a model to produce source. The compiler is the source of truth:
+
+1. Generate `.page`.
+2. Run `pagescript validate <file> --json`.
+3. Repair the first line-specific diagnostic.
+4. Repeat until diagnostics are empty.
+5. Render deterministic output with `pagescript render <file> --out <html>`.
+
+Success is measured by end-to-end generation cost: prompt examples, generated source, compiler diagnostics, repair turns, and final rendered output. Final file size alone is not enough.
+
+## Project Workflow
 
 1. Cursor, Claude Code, Codex, or humans author `.page` files.
 2. Humans review semantic web composition instead of generated HTML/CSS/JS.
@@ -272,4 +310,4 @@ Conforming validators report structured diagnostics for malformed directives, un
 4. CI or review can inspect `pagescript-rs ir`.
 5. Publishing runs `pagescript-rs render`.
 
-This creates a shared source format for LLM-generated product demos, explainers, interactive docs, and codebase-aware web pages.
+This creates a shared source format for code generator-generated product demos, explainers, interactive docs, and codebase-aware web pages.

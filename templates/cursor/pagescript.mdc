@@ -1,5 +1,5 @@
 ---
-description: Use PageScript for LLM-native web composition.
+description: Use PageScript for pages written for code generators.
 globs: ["*.page", "docs/**/*.page"]
 alwaysApply: false
 ---
@@ -29,4 +29,4 @@ Use high-level primitives and the standard library:
 - `::attr`
 - `::style-rule`
 
-Keep pages compact and reviewable. Use the `stdlib/` recipe packs (`product`, `data`, `docs`, `layout`) to author high-fidelity pages with minimal source code. Validate with `pagescript-rs validate <file>` and render with `pagescript-rs render <file>`.
+Keep pages compact and reviewable. Use the `stdlib/` recipe packs (`product`, `data`, `docs`, `layout`) to author detailed pages with minimal source code. Validate with `pagescript-rs validate <file>` and render with `pagescript-rs render <file>`.

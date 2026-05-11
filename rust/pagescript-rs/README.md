@@ -1,6 +1,6 @@
 # pagescript-rs
 
-Rust reference implementation for the PageScript Draft 0.6 LLM-native web composition standard.
+Rust reference implementation for the PageScript Draft 0.6 pages written for code generators standard.
 
 This crate provides:
 
@@ -16,10 +16,11 @@ This crate provides:
 ## CLI
 
 ```sh
+cargo run --bin pagescript -- guide
 cargo run --bin pagescript -- new demo.page
 cargo run --bin pagescript -- render demo.page --out index.html
-cargo run --bin pagescript -- validate ../../examples/autonomous-revenue-command-center.page --json
-cargo run --bin pagescript -- ir ../../examples/autonomous-revenue-command-center.page --page revenue-command-center
+cargo run --bin pagescript -- validate ../../examples/revenue-map-demo.page --json
+cargo run --bin pagescript -- ir ../../examples/revenue-map-demo.page --page revenue-map
 cargo run --bin pagescript -- convert ../../examples/dashboard.page --target shepherd --tour dashboard-onboarding
 ```
 
