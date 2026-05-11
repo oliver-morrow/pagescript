@@ -69,7 +69,7 @@ jobs:
         run: |
           set -euo pipefail
           cargo run -p pagescript-rs --locked -- validate examples/data-lineage-demo.page
-          cargo run -p pagescript-rs --locked -- validate examples/autonomous-revenue-command-center.page
+          cargo run -p pagescript-rs --locked -- validate examples/revenue-map-demo.page
           cargo run -p pagescript-rs --locked -- validate examples/interactive-doc.page
           cargo run -p pagescript-rs --locked -- validate examples/dashboard.page
           cargo run -p pagescript-rs --locked -- validate examples/dashboard.tour
@@ -82,8 +82,8 @@ jobs:
           set -euo pipefail
           mkdir -p target/pagescript-smoke
           cargo run -p pagescript-rs --locked -- render examples/data-lineage-demo.page --page lineage-demo > target/pagescript-smoke/lineage-demo.html
-          cargo run -p pagescript-rs --locked -- render examples/autonomous-revenue-command-center.page --page revenue-command-center > target/pagescript-smoke/revenue-command-center.html
-          cargo run -p pagescript-rs --locked -- render examples/interactive-doc.page --page agent-docs > target/pagescript-smoke/interactive-doc.html
+          cargo run -p pagescript-rs --locked -- render examples/revenue-map-demo.page --page revenue-map > target/pagescript-smoke/revenue-map.html
+          cargo run -p pagescript-rs --locked -- render examples/interactive-doc.page --page tool-docs > target/pagescript-smoke/interactive-doc.html
           cargo run -p pagescript-rs --locked -- render conformance/valid/release-hardening.page --page release-hardening > target/pagescript-smoke/release-hardening.html
           cargo run -p pagescript-rs --locked -- render docs/index.page --page pagescript-docs > target/pagescript-smoke/docs-index.html
 
@@ -92,19 +92,19 @@ jobs:
           grep -F 'Local Override' target/pagescript-smoke/release-hardening.html
           grep -F 'Base recipe resolved' target/pagescript-smoke/release-hardening.html
           grep -F 'Open details' target/pagescript-smoke/release-hardening.html
-          grep -F 'data-ps-node="identity"' target/pagescript-smoke/revenue-command-center.html
-          grep -F 'ps-runtime-config' target/pagescript-smoke/revenue-command-center.html
-          grep -F -- '--ps-token-color-accent' target/pagescript-smoke/revenue-command-center.html
+          grep -F 'data-ps-node="identity"' target/pagescript-smoke/revenue-map.html
+          grep -F 'ps-runtime-config' target/pagescript-smoke/revenue-map.html
+          grep -F -- '--ps-token-color-accent' target/pagescript-smoke/revenue-map.html
           ! grep -F 'transform:scale' target/pagescript-smoke/*.html
           ! grep -F '<script' examples/*.page
 
       - name: Inspect normalized IR
         run: |
           set -euo pipefail
-          cargo run -p pagescript-rs --locked -- ir examples/autonomous-revenue-command-center.page --page revenue-command-center > target/pagescript-smoke/revenue-command-center.ir.json
-          jq -e '.tokens["color.accent"] == "#4dd6a0"' target/pagescript-smoke/revenue-command-center.ir.json
-          jq -e '[.. | objects | select(has("graph")) | .graph.nodes | length] | any(. == 5)' target/pagescript-smoke/revenue-command-center.ir.json
-          jq -e '[.. | objects | select(has("layout")) | .layout | objects | .density] | any(. == "spacious")' target/pagescript-smoke/revenue-command-center.ir.json
+          cargo run -p pagescript-rs --locked -- ir examples/revenue-map-demo.page --page revenue-map > target/pagescript-smoke/revenue-map.ir.json
+          jq -e '.tokens["color.accent"] == "#4dd6a0"' target/pagescript-smoke/revenue-map.ir.json
+          jq -e '[.. | objects | select(has("graph")) | .graph.nodes | length] | any(. == 5)' target/pagescript-smoke/revenue-map.ir.json
+          jq -e '[.. | objects | select(has("layout")) | .layout | objects | .density] | any(. == "spacious")' target/pagescript-smoke/revenue-map.ir.json
 
       - name: Upload rendered smoke artifacts
         uses: actions/upload-artifact@v4

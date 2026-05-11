@@ -1,6 +1,6 @@
-# LLM Generation Guide
+# Generation Guide
 
-PageScript works for LLM generation only if the model gets local examples and compiler feedback. Do not assume the model knows `.page` syntax from training data.
+PageScript works for generation only if the model gets local examples and compiler feedback. Do not assume the model knows `.page` syntax from training data.
 
 Use this compact guide in generation prompts or run `pagescript guide`.
 
@@ -14,7 +14,7 @@ Use this compact guide in generation prompts or run `pagescript guide`.
 - Use `el`, `attr`, and `text` only for generic browser shapes that do not deserve a semantic primitive yet.
 - Do not emit raw HTML or JavaScript. `raw` and `script` are rejected in conformance mode.
 
-## Canonical Examples
+## Main Examples
 
 Minimal page:
 

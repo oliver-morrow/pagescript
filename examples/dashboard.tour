@@ -22,6 +22,6 @@ Use this page context to introduce new users to core dashboard controls.
 
   ::step id=export target="[data-tour='export']" position=left order=3
     title="Share reports"
-    Export dashboard data as CSV when stakeholders need an offline copy.
+    Export dashboard data as CSV when teammates need an offline copy.
   ::/step
 ::/tour

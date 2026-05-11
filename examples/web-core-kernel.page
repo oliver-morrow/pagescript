@@ -101,12 +101,12 @@
         ::/text
       ::/el
       ::el tag=p class="kernel-lede"
-        ::text value="Semantic components stay efficient for LLMs, while kernel primitives act like the decompression key: recipes, elements, attributes, and style rules expand into real web UI."
+        ::text value="Semantic components stay efficient for code generators, while kernel primitives act like the decompression key: recipes, elements, attributes, and style rules expand into real web UI."
         ::/text
       ::/el
 
       ::el tag=div class="kernel-grid"
-        ::use recipe=kernel-card index="01" title="Semantic Source" body="Agents write compact declarations instead of verbose nested HTML." href="#semantic"
+        ::use recipe=kernel-card index="01" title="Semantic Source" body="Code generators write compact declarations instead of verbose nested HTML." href="#semantic"
         ::/use
         ::use recipe=kernel-card index="02" title="Recipe Expansion" body="The compiler expands reusable recipes into stable Web IR before rendering." href="#recipes"
         ::/use

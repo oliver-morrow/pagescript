@@ -49,7 +49,7 @@
     {
       "element": "[data-tour='export']",
       "title": "Share reports",
-      "intro": "Export dashboard data as CSV when stakeholders need an offline copy.",
+      "intro": "Export dashboard data as CSV when teammates need an offline copy.",
       "position": "left",
       "meta": {
         "id": "export",

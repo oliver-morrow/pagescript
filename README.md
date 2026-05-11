@@ -3,9 +3,9 @@
 [![Spec](https://img.shields.io/badge/spec-Draft%200.6-blue)](./SPEC.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-PageScript is a draft open standard and CLI for LLM-native web composition. It lets AI coding tools and humans write compact `.page` files using semantic layout, design tokens, data, interaction, graph, effect, and Web Core Kernel primitives, then compile them into standalone HTML.
+PageScript is a small language and CLI for writing web pages as compact `.page` files. It keeps the source readable for humans and code generators, then compiles it to standalone HTML.
 
-The canonical implementation is Rust:
+The main implementation is Rust:
 
 - `rust/pagescript-rs`: active parser, validator, IR compiler, HTML renderer, adapters, and native CLI.
 - `legacy/typescript-reference`: archived TypeScript reference retained for historical/npm-web context.
@@ -13,7 +13,7 @@ The canonical implementation is Rust:
 ## Status
 
 - Standard status: Draft 0.6
-- Canonical implementation: Rust
+- Main implementation: Rust
 - TypeScript implementation: legacy
 
 ## Quick Start
@@ -69,7 +69,7 @@ Draft 0.5 introduced the generic Web Core Kernel, and Draft 0.6 adds the Standar
 ::import from="stdlib/product.page"
 ::/import
 
-::use recipe=product-hero title="PageScript" subtitle="LLM-native web composition"
+::use recipe=product-hero title="PageScript" subtitle="pages written for code generators"
   ::slot name=actions
     ::button label="Get Started" action=toggle target=signup
     ::/button
@@ -115,13 +115,13 @@ pagescript convert examples/dashboard.page --target shepherd --tour dashboard-on
 ## Standard Documents
 
 - [SPEC.md](./SPEC.md): normative draft standard
-- [RATIONALE.md](./RATIONALE.md): why LLM-native page authoring matters
+- [RATIONALE.md](./RATIONALE.md): why page authoring for code generators matters
 - [CONFORMANCE.md](./CONFORMANCE.md): parser and validator compatibility expectations
 - [schemas/](./schemas): machine-readable AST, IR, and diagnostic schemas
 - [conformance/](./conformance): compatibility fixtures
-- [docs/agent-workflows.md](./docs/agent-workflows.md): using PageScript as a Cursor/Claude Code/Codex org standard
-- [docs/llm-generation.md](./docs/llm-generation.md): compact syntax guide, canonical examples, and repair-loop workflow for LLM generation
-- [docs/extension-model.md](./docs/extension-model.md): deterministic core, recipe velocity, and escape-hatch policy
+- [docs/tool-workflows.md](./docs/tool-workflows.md): using PageScript from Cursor, Claude Code, or Codex
+- [docs/generation-guide.md](./docs/generation-guide.md): compact syntax guide, small examples, and repair-loop workflow for generation
+- [docs/extension-model.md](./docs/extension-model.md): deterministic core, recipe iteration, and escape-hatch policy
 
 ## Development
 

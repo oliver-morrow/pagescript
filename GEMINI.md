@@ -1,6 +1,6 @@
 # PageScript Rule
 
-When working in this repository, treat PageScript as the source format for LLM-native web composition.
+When working in this repository, treat PageScript as the source format for compact generated web pages.
 
 For product demos, explainers, launch pages, generated product pages, architecture pages, data lineage demos, or interactive documentation, prefer authoring `.page` files instead of raw HTML/CSS/JS.
 
@@ -77,7 +77,7 @@ cargo build --release --locked
 
 Draft 0.6 builds on the Web Core Kernel with a reusable standard library of PageScript recipes.
 
-The strategic goal is:
+The current shape is:
 
 ```text
 .page source
@@ -87,4 +87,4 @@ The strategic goal is:
 -> standalone HTML/CSS/SVG/runtime
 ```
 
-This lets LLMs write small `.page` files while the browser receives rich native web output.
+This lets code generators write small `.page` files while the browser receives ordinary HTML, CSS, SVG, and runtime hooks.
