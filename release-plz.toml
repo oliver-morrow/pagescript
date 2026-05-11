@@ -5,3 +5,4 @@ git_release_name = "v{{ version }}"
 [[package]]
 name = "pagescript-rs"
 changelog_path = "CHANGELOG.md"
+publish = false
