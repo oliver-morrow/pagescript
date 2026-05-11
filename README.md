@@ -3,7 +3,7 @@
 [![Spec](https://img.shields.io/badge/spec-Draft%200.6-blue)](./SPEC.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-PageScript is a draft open standard for LLM-native web composition. It lets AI coding tools and humans write compact `.page` files using semantic layout, design tokens, data, interaction, graph, effect, and Web Core Kernel primitives, then compile them into standalone HTML.
+PageScript is a draft open standard and CLI for LLM-native web composition. It lets AI coding tools and humans write compact `.page` files using semantic layout, design tokens, data, interaction, graph, effect, and Web Core Kernel primitives, then compile them into standalone HTML.
 
 The canonical implementation is Rust:
 
@@ -16,17 +16,20 @@ The canonical implementation is Rust:
 - Canonical implementation: Rust
 - TypeScript implementation: legacy
 
-## Install
+## Quick Start
 
 ```sh
 cargo install --path rust/pagescript-rs
+pagescript new demo.page
+pagescript render demo.page --out index.html
+# Open index.html in your browser.
 ```
 
 During local development:
 
 ```sh
-cargo run -p pagescript-rs -- validate examples/product-intelligence-demo.page
-cargo run -p pagescript-rs -- render examples/product-intelligence-demo.page > demo.html
+cargo run -p pagescript-rs -- new demo.page --force
+cargo run -p pagescript-rs -- render demo.page --out index.html
 ```
 
 ## Example
@@ -86,23 +89,26 @@ PageScript includes a built-in standard library of reusable recipes in `stdlib/`
 ## Rust API
 
 ```rust
-use pagescript_rs::{compile_page_ir, parse_page_script, render_to_html, validate_document};
+use pagescript_rs::{Resolver, compile_page_ir, parse_page_script, render_to_html, validate_document};
 
 let document = parse_page_script(source);
-let diagnostics = validate_document(&document, Some(base_path));
-let ir = compile_page_ir(&document, None, Some(base_path))?;
-let html = render_to_html(&document, None, Some(base_path))?;
+let resolver = Resolver::new(Some(base_path.into()));
+let diagnostics = validate_document(&document, &resolver);
+let ir = compile_page_ir(&document, None, &resolver)?;
+let html = render_to_html(&document, None, &resolver)?;
 ```
 
 ## CLI
 
 ```sh
-pagescript-rs validate examples/data-lineage-demo.page
-pagescript-rs ast examples/data-lineage-demo.page
-pagescript-rs ir examples/data-lineage-demo.page
-pagescript-rs render examples/data-lineage-demo.page > lineage-demo.html
-pagescript-rs render examples/web-core-kernel.page > web-core-kernel.html
-pagescript-rs convert examples/dashboard.page --target shepherd --tour dashboard-onboarding
+pagescript new demo.page --template product
+pagescript validate demo.page
+pagescript validate demo.page --json
+pagescript ast examples/data-lineage-demo.page
+pagescript ir examples/data-lineage-demo.page
+pagescript render demo.page --out index.html
+pagescript render examples/web-core-kernel.page > web-core-kernel.html
+pagescript convert examples/dashboard.page --target shepherd --tour dashboard-onboarding
 ```
 
 ## Standard Documents

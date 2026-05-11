@@ -42,6 +42,11 @@ jobs:
       - name: Smoke test installed CLI
         run: |
           set -euo pipefail
+          pagescript --version
+          pagescript-rs --version
+          pagescript new "$RUNNER_TEMP/demo.page"
+          pagescript validate "$RUNNER_TEMP/demo.page"
+          pagescript render "$RUNNER_TEMP/demo.page" --out "$RUNNER_TEMP/demo.html"
           pagescript-rs validate examples/autonomous-revenue-command-center.page
           pagescript-rs ast examples/dashboard.page > "$RUNNER_TEMP/dashboard.ast.json"
           pagescript-rs ir examples/autonomous-revenue-command-center.page --page revenue-command-center > "$RUNNER_TEMP/revenue.ir.json"

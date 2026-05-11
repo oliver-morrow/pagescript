@@ -10,16 +10,17 @@ This crate provides:
 - IR compiler: `compile_page_ir`
 - renderer: `render_to_html`
 - adapters: `to_shepherd_config`, `to_intro_config`
-- native CLI: `pagescript-rs`
+- native CLI: `pagescript` with `pagescript-rs` compatibility alias
 - embedded Draft 0.6 standard library recipes under `stdlib/`
 
 ## CLI
 
 ```sh
-cargo run -- validate ../../examples/autonomous-revenue-command-center.page
-cargo run -- ir ../../examples/autonomous-revenue-command-center.page --page revenue-command-center
-cargo run -- render ../../examples/autonomous-revenue-command-center.page --page revenue-command-center
-cargo run -- convert ../../examples/dashboard.page --target shepherd --tour dashboard-onboarding
+cargo run --bin pagescript -- new demo.page
+cargo run --bin pagescript -- render demo.page --out index.html
+cargo run --bin pagescript -- validate ../../examples/autonomous-revenue-command-center.page --json
+cargo run --bin pagescript -- ir ../../examples/autonomous-revenue-command-center.page --page revenue-command-center
+cargo run --bin pagescript -- convert ../../examples/dashboard.page --target shepherd --tour dashboard-onboarding
 ```
 
 ## Verification

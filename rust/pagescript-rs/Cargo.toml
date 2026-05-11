@@ -2,9 +2,14 @@
 name = "pagescript-rs"
 version = "0.1.0"
 edition = "2024"
+default-run = "pagescript-rs"
 description = "Rust reference implementation for the PageScript LLM-native web composition standard."
 license = "MIT"
-repository = "https://github.com/pagescript/pagescript"
+repository = "https://github.com/oliver-morrow/pagescript"
+homepage = "https://oliver-morrow.github.io/pagescript/"
+documentation = "https://docs.rs/pagescript-rs"
+keywords = ["pagescript", "html", "compiler", "llm", "static-site"]
+categories = ["command-line-utilities", "compilers", "template-engine"]
 readme = "README.md"
 include = ["Cargo.toml", "README.md", "src/**/*.rs", "stdlib/**/*.page"]
 
@@ -13,8 +18,8 @@ name = "pagescript_rs"
 path = "src/lib.rs"
 
 [[bin]]
-name = "pagescript-rs"
-path = "src/main.rs"
+name = "pagescript"
+path = "src/bin/pagescript.rs"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
