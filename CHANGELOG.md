@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.0](https://github.com/oliver-morrow/pagescript/releases/tag/v1.0.0) - 2026-05-11
+
+### Added
+
+- add Rust PageScript compiler and CLI
+
+### Fixed
+
+- fix/release version ([#7](https://github.com/oliver-morrow/pagescript/pull/7))
+
+### Other
+
+- Feature/deterministic extension boundaries ([#5](https://github.com/oliver-morrow/pagescript/pull/5))
+- Codex/peer useful cli mvp ([#4](https://github.com/oliver-morrow/pagescript/pull/4))
+- Harden Draft 0.6 release gates ([#3](https://github.com/oliver-morrow/pagescript/pull/3))
+- Pagescript draft 06 standard library ([#2](https://github.com/oliver-morrow/pagescript/pull/2))
+
 ## 0.1.0
 
 - Draft 0.1 PageScript standard.
