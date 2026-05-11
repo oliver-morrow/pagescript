@@ -180,6 +180,64 @@ fn malformed_directive_reports_diagnostic() {
 }
 
 #[test]
+fn unknown_directive_reports_repair_suggestion() {
+    let document = parse_page_script(
+        r##"::page id=typo
+  ::sectoin
+  ::/sectoin
+::/page
+"##,
+    );
+
+    assert_eq!(document.diagnostics[0].code, "unknown_directive");
+    assert!(
+        document.diagnostics[0]
+            .message
+            .contains("Did you mean \"section\"?")
+    );
+}
+
+#[test]
+fn renders_semantic_ui_primitives_without_raw_html() {
+    let document = parse_page_script(
+        r##"::page id=semantic title="Semantic UI"
+  ::nav label="Primary"
+    ::nav-item label="Overview" href="#overview"
+    ::/nav-item
+  ::/nav
+  ::section id=overview heading="Accounts"
+    ::filter id=account-search label="Search accounts" placeholder="Company or owner"
+    ::/filter
+    ::table id=accounts
+      ::column label="Account"
+      ::/column
+      ::column label="Status"
+      ::/column
+      ::row
+        ::cell value="Acme"
+        ::/cell
+        ::cell value="Healthy"
+        ::/cell
+      ::/row
+    ::/table
+    ::empty-state title="No accounts" body="Adjust filters to widen the result set."
+    ::/empty-state
+  ::/section
+::/page
+"##,
+    );
+
+    assert_eq!(validate_document(&document, &resolver()), Vec::new());
+    let html = render_to_html(&document, Some("semantic"), &resolver()).unwrap();
+
+    assert!(html.contains("ps-nav"));
+    assert!(html.contains("Search accounts"));
+    assert!(html.contains("<th scope=\"col\">Account</th>"));
+    assert!(html.contains("<td>Healthy</td>"));
+    assert!(html.contains("ps-empty-state"));
+}
+
+#[test]
 fn parses_and_renders_interactive_page_components() {
     let source = fs::read_to_string("../../examples/interactive-doc.page").unwrap();
     let document = parse_page_script(&source);

@@ -108,11 +108,15 @@ Attribute keys may contain letters, numbers, `_`, `-`, and `.`. Dotted keys are 
 - `::stack`: vertical grouping
 - `::grid`: responsive grid
 - `::card`: content panel
+- `::nav` and `::nav-item`: page navigation
 - `::button`: declarative action trigger
 - `::text`: text group
 - `::image`: image with alt text
 - `::modal`: declarative dialog
 - `::form` and `::input`: basic form primitives
+- `::filter`: labeled search/filter control
+- `::table`, `::column`, `::row`, and `::cell`: structured tabular data
+- `::empty-state`: fallback state for empty results or unfinished workflows
 
 ## Web Composition Primitives
 
@@ -283,6 +287,20 @@ Renderers inject scoped style text into the compiled document. Validators must r
 ## Validation
 
 Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, deterministic-core escape hatches, unknown recipes, and compatibility-tour errors.
+
+Unknown directive diagnostics should be actionable for LLM repair loops. When a close match exists, validators should suggest the canonical directive spelling.
+
+## LLM Generation Contract
+
+`.page` is a small, validated semantic DSL. Generation flows should provide a compact syntax guide plus canonical examples before asking a model to produce source. The compiler is the source of truth:
+
+1. Generate `.page`.
+2. Run `pagescript validate <file> --json`.
+3. Repair the first line-specific diagnostic.
+4. Repeat until diagnostics are empty.
+5. Render deterministic output with `pagescript render <file> --out <html>`.
+
+Success is measured by end-to-end generation cost: prompt examples, generated source, compiler diagnostics, repair turns, and final rendered output. Final file size alone is not enough.
 
 ## Org-Level Agent Workflow
 

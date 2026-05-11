@@ -34,8 +34,8 @@
         body="Parser, validator, IR, renderer, fixtures, schemas, and compatibility expectations for Draft 0.6. See CONFORMANCE.md."
       ::/card
 
-      ::card class=docs-card icon="03" title="Flagship Demo"
-        body="High-fidelity product demo using the standard library, named slots, and recursive imports. See examples/product-intelligence-demo.page."
+      ::card class=docs-card icon="03" title="LLM Generation"
+        body="Compact syntax guide, canonical examples, compiler repair loop, and audit question for model-generated .page files. See docs/llm-generation.md."
       ::/card
 
       ::card class=docs-card icon="04" title="Extension Model"

@@ -16,6 +16,7 @@ This crate provides:
 ## CLI
 
 ```sh
+cargo run --bin pagescript -- guide
 cargo run --bin pagescript -- new demo.page
 cargo run --bin pagescript -- render demo.page --out index.html
 cargo run --bin pagescript -- validate ../../examples/autonomous-revenue-command-center.page --json

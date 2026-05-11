@@ -34,6 +34,7 @@ A conforming validator must report structured diagnostics for:
 - invalid effect types and style scopes
 - unsafe Web Core Kernel tags and attributes
 - deterministic-core escape hatches such as `raw` and `script`
+- actionable unknown-directive diagnostics with suggestions when a close directive spelling exists
 - duplicate scene, node, state, effect, and recipe names within a page
 - unknown recipe references
 - invalid `import` paths (absolute or containing `..`)
@@ -84,6 +85,7 @@ The Rust implementation must pass the conformance fixtures before release. The T
 A conforming Draft 0.6 renderer must compile PageScript IR to standalone HTML/CSS/SVG and support:
 
 - scene, panel, metric, log, graph node, and graph edge primitives
+- semantic UI primitives for navigation, filters, tables, and empty states
 - Web Core Kernel `el`, `attr`, `text value`, `style-rule`, `recipe`, `template`, `use`, `slot name`, `bind`, and `on`
 - compile-time recipe expansion before rendering, including recursive imports and named slot substitution
 - design token aliases for core colors and panel radius

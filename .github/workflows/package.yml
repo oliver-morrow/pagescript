@@ -44,6 +44,7 @@ jobs:
           set -euo pipefail
           pagescript --version
           pagescript-rs --version
+          pagescript guide | grep -F 'PageScript LLM Generation Guide'
           pagescript new "$RUNNER_TEMP/demo.page"
           pagescript validate "$RUNNER_TEMP/demo.page"
           pagescript render "$RUNNER_TEMP/demo.page" --out "$RUNNER_TEMP/demo.html"

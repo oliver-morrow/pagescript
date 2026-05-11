@@ -11,12 +11,20 @@ const COMPONENT_DIRECTIVES: &[&str] = &[
     "stack",
     "grid",
     "card",
+    "nav",
+    "nav-item",
     "button",
     "text",
     "image",
     "modal",
     "form",
     "input",
+    "filter",
+    "table",
+    "column",
+    "row",
+    "cell",
+    "empty-state",
     "scene",
     "panel",
     "node",
@@ -307,10 +315,50 @@ fn open_directive(
         }
         unknown => diagnostics.push(error(
             "unknown_directive",
-            format!("Unknown directive \"{unknown}\"."),
+            unknown_directive_message(unknown),
             line,
         )),
     }
+}
+
+fn unknown_directive_message(unknown: &str) -> String {
+    directive_suggestion(unknown).map_or_else(
+        || format!("Unknown directive \"{unknown}\"."),
+        |suggestion| format!("Unknown directive \"{unknown}\". Did you mean \"{suggestion}\"?"),
+    )
+}
+
+fn directive_suggestion(unknown: &str) -> Option<&'static str> {
+    let candidates = COMPONENT_DIRECTIVES
+        .iter()
+        .chain(["page", "tour", "step", "trigger"].iter());
+    candidates
+        .filter_map(|candidate| {
+            let distance = edit_distance(unknown, candidate);
+            (distance <= 2).then_some((*candidate, distance))
+        })
+        .min_by_key(|(_, distance)| *distance)
+        .map(|(candidate, _)| candidate)
+}
+
+fn edit_distance(left: &str, right: &str) -> usize {
+    let left = left.as_bytes();
+    let right = right.as_bytes();
+    let mut previous = (0..=right.len()).collect::<Vec<_>>();
+    let mut current = vec![0; right.len() + 1];
+
+    for (left_index, left_byte) in left.iter().enumerate() {
+        current[0] = left_index + 1;
+        for (right_index, right_byte) in right.iter().enumerate() {
+            let substitution_cost = usize::from(left_byte != right_byte);
+            current[right_index + 1] = (previous[right_index + 1] + 1)
+                .min(current[right_index] + 1)
+                .min(previous[right_index] + substitution_cost);
+        }
+        std::mem::swap(&mut previous, &mut current);
+    }
+
+    previous[right.len()]
 }
 
 fn close_directive(

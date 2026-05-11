@@ -101,6 +101,7 @@ let html = render_to_html(&document, None, &resolver)?;
 ## CLI
 
 ```sh
+pagescript guide
 pagescript new demo.page --template product
 pagescript validate demo.page
 pagescript validate demo.page --json
@@ -119,6 +120,7 @@ pagescript convert examples/dashboard.page --target shepherd --tour dashboard-on
 - [schemas/](./schemas): machine-readable AST, IR, and diagnostic schemas
 - [conformance/](./conformance): compatibility fixtures
 - [docs/agent-workflows.md](./docs/agent-workflows.md): using PageScript as a Cursor/Claude Code/Codex org standard
+- [docs/llm-generation.md](./docs/llm-generation.md): compact syntax guide, canonical examples, and repair-loop workflow for LLM generation
 - [docs/extension-model.md](./docs/extension-model.md): deterministic core, recipe velocity, and escape-hatch policy
 
 ## Development

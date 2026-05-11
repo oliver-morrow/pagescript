@@ -26,10 +26,11 @@ Tell agents:
 
 ```text
 When creating product demos, explainers, launch pages, or interactive documentation, write PageScript `.page` files.
+Start by reading `pagescript guide` or docs/llm-generation.md.
 Use high-level primitives like ::tokens, ::scene, ::panel, ::node, ::edge, ::metric, ::effect, ::hero, ::grid, and ::card.
 Prefer stdlib recipes and Web Core Kernel primitives when the page needs new structure.
 Do not hand-write raw HTML or JavaScript in conforming PageScript; propose a recipe or typed declarative primitive instead.
-Run `pagescript-rs validate`, inspect `pagescript-rs ir` for complex pages, and run `pagescript-rs render` before finishing.
+Run `pagescript validate --json`, inspect `pagescript ir` for complex pages, and run `pagescript render --out` before finishing.
 ```
 
 ## CI Gate

@@ -44,6 +44,15 @@ fn run(args: Vec<String>) -> i32 {
         print_usage();
         return 1;
     };
+    if command == "guide" {
+        if options.file.is_some() {
+            eprintln!("guide does not accept a file argument.");
+            print_usage();
+            return 1;
+        }
+        println!("{LLM_GUIDE}");
+        return 0;
+    }
     let Some(file) = options.file.as_deref() else {
         print_usage();
         return 1;
@@ -278,9 +287,63 @@ fn cli_name() -> &'static str {
 fn print_usage() {
     let name = cli_name();
     eprintln!(
-        "PageScript Draft 0.6\nUsage:\n  {name} --version\n  {name} new <file.page> [--template product|dashboard|docs] [--force]\n  {name} validate <file> [--json]\n  {name} ast <file>\n  {name} ir <file> [--page id]\n  {name} render <file> [--page id] [--out output.html]\n  {name} convert <file> --target shepherd|intro [--tour id]"
+        "PageScript Draft 0.6\nUsage:\n  {name} --version\n  {name} guide\n  {name} new <file.page> [--template product|dashboard|docs] [--force]\n  {name} validate <file> [--json]\n  {name} ast <file>\n  {name} ir <file> [--page id]\n  {name} render <file> [--page id] [--out output.html]\n  {name} convert <file> --target shepherd|intro [--tour id]"
     );
 }
+
+const LLM_GUIDE: &str = r##"# PageScript LLM Generation Guide
+
+Use PageScript as a small semantic DSL, not as renamed HTML.
+
+Grammar:
+- Every block starts with `::name key=value` and ends with `::/name`.
+- Attributes are strings, quoted strings, booleans, numbers, or JSON objects.
+- Prefer semantic blocks: hero, section, nav, card, form, filter, table, empty-state, scene, panel, metric.
+- Use recipes and Web Core Kernel only when semantic primitives are not enough.
+- Do not use raw HTML or JavaScript. `raw` and `script` are rejected in conformance mode.
+
+Minimal page:
+```text
+::page id=demo title="Demo"
+  ::hero heading="Useful page" body="Compact source, deterministic HTML."
+  ::/hero
+::/page
+```
+
+Dashboard/table pattern:
+```text
+::page id=ops title="Ops"
+  ::nav label="Primary"
+    ::nav-item label="Overview" href="#overview"
+    ::/nav-item
+  ::/nav
+
+  ::section id=overview heading="Accounts"
+    ::filter id=account-search label="Search accounts" placeholder="Company or owner"
+    ::/filter
+    ::table id=accounts
+      ::column label="Account"
+      ::/column
+      ::column label="Status"
+      ::/column
+      ::row
+        ::cell value="Acme"
+        ::/cell
+        ::cell value="Healthy"
+        ::/cell
+      ::/row
+    ::/table
+  ::/section
+::/page
+```
+
+Repair loop:
+1. Generate `.page`.
+2. Run `pagescript validate file.page --json`.
+3. Fix the first diagnostic by line number.
+4. Repeat until diagnostics are `[]`.
+5. Run `pagescript render file.page --out index.html`.
+"##;
 
 const PRODUCT_TEMPLATE: &str = r##"::page id=product-demo title="Product Demo"
   ::tokens
@@ -332,6 +395,8 @@ const DASHBOARD_TEMPLATE: &str = r##"::page id=dashboard title="Dashboard"
     ::/panel
 
     ::panel id=actions title="Next actions" density=spacious
+      ::filter id=account-search label="Search accounts" placeholder="Company or owner"
+      ::/filter
       ::stack gap=md
         ::card icon="A" title="Review account drift"
           body="Find accounts where usage dropped after onboarding and assign follow-up owners."
@@ -340,6 +405,18 @@ const DASHBOARD_TEMPLATE: &str = r##"::page id=dashboard title="Dashboard"
           body="Render the latest dashboard and share the standalone HTML with peers."
         ::/card
       ::/stack
+      ::table id=accounts
+        ::column label="Account"
+        ::/column
+        ::column label="Status"
+        ::/column
+        ::row
+          ::cell value="Acme"
+          ::/cell
+          ::cell value="Healthy"
+          ::/cell
+        ::/row
+      ::/table
     ::/panel
   ::/scene
 ::/page
@@ -413,6 +490,16 @@ mod tests {
     #[test]
     fn version_returns_zero_without_file() {
         assert_eq!(run(vec!["--version".into()]), 0);
+    }
+
+    #[test]
+    fn guide_returns_zero_without_file() {
+        assert_eq!(run(vec!["guide".into()]), 0);
+    }
+
+    #[test]
+    fn guide_rejects_file_argument() {
+        assert_eq!(run(vec!["guide".into(), "demo.page".into()]), 1);
     }
 
     #[test]
