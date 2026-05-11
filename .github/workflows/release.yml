@@ -56,19 +56,19 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             archive: tar.gz
-            binary: pagescript-rs
+            binary_suffix: ""
           - os: macos-latest
             target: x86_64-apple-darwin
             archive: tar.gz
-            binary: pagescript-rs
+            binary_suffix: ""
           - os: macos-latest
             target: aarch64-apple-darwin
             archive: tar.gz
-            binary: pagescript-rs
+            binary_suffix: ""
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             archive: zip
-            binary: pagescript-rs.exe
+            binary_suffix: ".exe"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -83,7 +83,7 @@ jobs:
           cache: true
 
       - name: Build release binary
-        run: cargo build -p pagescript-rs --release --locked --target ${{ matrix.target }}
+        run: cargo build -p pagescript-rs --bins --release --locked --target ${{ matrix.target }}
 
       - name: Package binary
         shell: bash
@@ -95,7 +95,8 @@ jobs:
           fi
           package="pagescript-rs-${version}-${{ matrix.target }}"
           mkdir -p "dist/${package}"
-          cp "target/${{ matrix.target }}/release/${{ matrix.binary }}" "dist/${package}/"
+          cp "target/${{ matrix.target }}/release/pagescript${{ matrix.binary_suffix }}" "dist/${package}/"
+          cp "target/${{ matrix.target }}/release/pagescript-rs${{ matrix.binary_suffix }}" "dist/${package}/"
           cp README.md LICENSE CHANGELOG.md "dist/${package}/"
           if [ "${{ matrix.archive }}" = "zip" ]; then
             (cd dist && 7z a "${package}.zip" "${package}")
@@ -166,4 +167,3 @@ jobs:
       - name: Skip crates.io publish
         if: env.CARGO_REGISTRY_TOKEN == ''
         run: echo "CARGO_REGISTRY_TOKEN is not configured; skipping crates.io publish."
-
