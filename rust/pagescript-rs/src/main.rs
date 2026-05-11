@@ -12,6 +12,7 @@ struct CliOptions {
     target: Option<String>,
     tour_id: Option<String>,
     page_id: Option<String>,
+    version: bool,
 }
 
 fn main() {
@@ -19,7 +20,18 @@ fn main() {
 }
 
 fn run(args: Vec<String>) -> i32 {
-    let options = parse_args(args);
+    let options = match parse_args(args) {
+        Ok(options) => options,
+        Err(error) => {
+            eprintln!("{error}");
+            print_usage();
+            return 1;
+        }
+    };
+    if options.version {
+        println!("pagescript-rs {}", env!("CARGO_PKG_VERSION"));
+        return 0;
+    }
     let Some(command) = options.command.as_deref() else {
         print_usage();
         return 1;
@@ -111,22 +123,38 @@ fn run(args: Vec<String>) -> i32 {
     }
 }
 
-fn parse_args(args: Vec<String>) -> CliOptions {
+fn parse_args(args: Vec<String>) -> Result<CliOptions, String> {
     let mut options = CliOptions::default();
     let mut iter = args.into_iter();
     options.command = iter.next();
+    if options.command.as_deref() == Some("--version") {
+        options.version = true;
+        if iter.next().is_some() {
+            return Err("--version does not accept extra arguments.".to_string());
+        }
+        return Ok(options);
+    }
     options.file = iter.next();
 
     while let Some(arg) = iter.next() {
         match arg.as_str() {
-            "--target" => options.target = iter.next(),
-            "--tour" => options.tour_id = iter.next(),
-            "--page" => options.page_id = iter.next(),
-            _ => {}
+            "--target" => options.target = Some(next_flag_value(&mut iter, "--target")?),
+            "--tour" => options.tour_id = Some(next_flag_value(&mut iter, "--tour")?),
+            "--page" => options.page_id = Some(next_flag_value(&mut iter, "--page")?),
+            _ if arg.starts_with('-') => return Err(format!("Unknown flag: {arg}")),
+            _ => return Err(format!("Unexpected argument: {arg}")),
         }
     }
 
-    options
+    Ok(options)
+}
+
+fn next_flag_value(iter: &mut impl Iterator<Item = String>, flag: &str) -> Result<String, String> {
+    match iter.next() {
+        Some(value) if !value.starts_with('-') => Ok(value),
+        Some(value) => Err(format!("Missing value for {flag}; found {value}.")),
+        None => Err(format!("Missing value for {flag}.")),
+    }
 }
 
 fn print_diagnostics(diagnostics: &[pagescript_rs::Diagnostic]) {
@@ -157,7 +185,7 @@ fn print_json<T: serde::Serialize>(value: &T) -> i32 {
 
 fn print_usage() {
     eprintln!(
-        "Usage:\n  pagescript-rs validate <file>\n  pagescript-rs ast <file>\n  pagescript-rs ir <file> [--page id]\n  pagescript-rs render <file> [--page id]\n  pagescript-rs convert <file> --target shepherd|intro [--tour id]"
+        "PageScript Draft 0.6\nUsage:\n  pagescript-rs --version\n  pagescript-rs validate <file>\n  pagescript-rs ast <file>\n  pagescript-rs ir <file> [--page id]\n  pagescript-rs render <file> [--page id]\n  pagescript-rs convert <file> --target shepherd|intro [--tour id]"
     );
 }
 
@@ -182,5 +210,83 @@ mod tests {
         .unwrap();
 
         assert_eq!(run(vec!["validate".into(), path.display().to_string()]), 0);
+    }
+
+    #[test]
+    fn version_returns_zero_without_file() {
+        assert_eq!(run(vec!["--version".into()]), 0);
+    }
+
+    #[test]
+    fn unknown_command_returns_error() {
+        assert_eq!(run(vec!["nope".into(), "file.page".into()]), 1);
+    }
+
+    #[test]
+    fn unknown_flag_returns_error() {
+        assert_eq!(
+            run(vec![
+                "validate".into(),
+                "file.page".into(),
+                "--bogus".into()
+            ]),
+            1
+        );
+    }
+
+    #[test]
+    fn missing_flag_value_returns_error() {
+        assert_eq!(
+            run(vec!["render".into(), "file.page".into(), "--page".into()]),
+            1
+        );
+    }
+
+    #[test]
+    fn missing_selected_page_returns_error() {
+        let path = env::temp_dir().join("pagescript-rs-page-selection.page");
+        fs::write(
+            &path,
+            r##"::page id=actual
+::/page
+"##,
+        )
+        .unwrap();
+
+        assert_eq!(
+            run(vec![
+                "ir".into(),
+                path.display().to_string(),
+                "--page".into(),
+                "missing".into()
+            ]),
+            1
+        );
+    }
+
+    #[test]
+    fn missing_selected_tour_returns_error() {
+        let path = env::temp_dir().join("pagescript-rs-tour-selection.page");
+        fs::write(
+            &path,
+            r##"::tour id=actual
+  ::step id=one target="#one"
+  ::/step
+::/tour
+"##,
+        )
+        .unwrap();
+
+        assert_eq!(
+            run(vec![
+                "convert".into(),
+                path.display().to_string(),
+                "--target".into(),
+                "shepherd".into(),
+                "--tour".into(),
+                "missing".into()
+            ]),
+            1
+        );
     }
 }

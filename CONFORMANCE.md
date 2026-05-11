@@ -46,6 +46,7 @@ The `conformance/` directory is the compatibility contract:
 
 - `conformance/valid/*.page` files must parse and validate without diagnostics.
 - `conformance/valid/*.ast.json` files define expected AST output.
+- `conformance/valid/*.ir.json` files define expected normalized PageScript IR output where present.
 - `conformance/invalid/*.page` files must parse and return diagnostics.
 - `conformance/invalid/*.diagnostics.json` files define expected diagnostics.
 
@@ -66,7 +67,7 @@ A conforming compiler should normalize validated AST into PageScript IR before r
 - graph nodes and edges as data, not pre-rendered SVG strings
 - declared state, events, effects, and scoped CSS
 
-The reference CLI exposes this boundary through `pagescript-rs ir <file> [--page id]`. Future conformance fixtures may include expected IR snapshots alongside AST and diagnostic snapshots.
+The reference CLI exposes this boundary through `pagescript-rs ir <file> [--page id]`. IR snapshots in `conformance/valid/*.ir.json` are part of the Draft 0.6 compatibility contract where present.
 
 `schemas/page-ir.schema.json` defines the current machine-readable IR shape.
 

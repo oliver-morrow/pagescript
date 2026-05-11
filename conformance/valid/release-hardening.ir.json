@@ -1,0 +1,145 @@
+{
+  "id": "release-hardening",
+  "title": "Release Hardening",
+  "tokens": {},
+  "recipes": {
+    "metric-strip": {
+      "name": "metric-strip",
+      "attributes": {
+        "name": "metric-strip"
+      }
+    },
+    "feature-grid": {
+      "name": "feature-grid",
+      "attributes": {
+        "name": "feature-grid"
+      }
+    },
+    "feature-card": {
+      "name": "feature-card",
+      "attributes": {
+        "name": "feature-card"
+      }
+    },
+    "nested-card": {
+      "name": "nested-card",
+      "attributes": {
+        "name": "nested-card"
+      }
+    },
+    "base-callout": {
+      "name": "base-callout",
+      "attributes": {
+        "name": "base-callout"
+      }
+    },
+    "cta-band": {
+      "name": "cta-band",
+      "attributes": {
+        "name": "cta-band"
+      }
+    },
+    "product-hero": {
+      "name": "product-hero",
+      "attributes": {
+        "name": "product-hero"
+      }
+    }
+  },
+  "body": [
+    {
+      "type": "component",
+      "name": "hero",
+      "attributes": {},
+      "children": [
+        {
+          "type": "component",
+          "name": "stack",
+          "attributes": {
+            "align": "center"
+          },
+          "layout": {
+            "align": "center"
+          },
+          "children": [
+            {
+              "type": "component",
+              "name": "el",
+              "attributes": {
+                "tag": "h1"
+              },
+              "children": [
+                {
+                  "type": "component",
+                  "name": "text",
+                  "attributes": {
+                    "value": "Draft 0.6"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "component",
+              "name": "el",
+              "attributes": {
+                "tag": "p"
+              },
+              "children": [
+                {
+                  "type": "component",
+                  "name": "text",
+                  "attributes": {
+                    "value": "Release candidate surface"
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "type": "component",
+              "name": "button",
+              "attributes": {
+                "label": "Open details",
+                "action": "toggle",
+                "target": "details"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "component",
+      "name": "card",
+      "attributes": {
+        "title": "Local Override",
+        "body": "Local recipe wins"
+      },
+      "children": []
+    },
+    {
+      "type": "component",
+      "name": "card",
+      "attributes": {
+        "title": "Recursive import",
+        "body": "Base recipe resolved"
+      },
+      "children": []
+    },
+    {
+      "type": "component",
+      "name": "card",
+      "attributes": {
+        "title": "Nested import",
+        "body": "Nested recipe resolved"
+      },
+      "children": []
+    }
+  ],
+  "effects": {},
+  "states": [],
+  "events": [],
+  "scoped_css": ""
+}

@@ -10,3 +10,6 @@
 - Renderable PageScript components and standalone HTML rendering.
 - TypeScript implementation moved to `legacy/typescript-reference`; Rust is canonical.
 - Draft 0.5 Web Core Kernel with generic elements, attributes, style rules, recipe expansion, safety validation, and a rendered kernel example.
+- Draft 0.6 standard library with embedded product, data, docs, and layout recipe packs.
+- Named recipe slots, recursive imports, local recipe override semantics, and IR snapshot conformance coverage.
+- Release hardening for public schemas, CLI argument diagnostics, import path safety, and stdlib-heavy rendered smoke tests.

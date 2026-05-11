@@ -1,6 +1,6 @@
 # pagescript-rs
 
-Rust reference implementation for the PageScript Draft 0.5 LLM-native web composition standard.
+Rust reference implementation for the PageScript Draft 0.6 LLM-native web composition standard.
 
 This crate provides:
 
@@ -11,6 +11,7 @@ This crate provides:
 - renderer: `render_to_html`
 - adapters: `to_shepherd_config`, `to_intro_config`
 - native CLI: `pagescript-rs`
+- embedded Draft 0.6 standard library recipes under `stdlib/`
 
 ## CLI
 

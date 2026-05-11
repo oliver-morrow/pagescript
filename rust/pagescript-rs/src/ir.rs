@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
@@ -121,6 +121,7 @@ pub fn compile_page_ir(
         states: Vec::new(),
         events: Vec::new(),
         scoped_css: String::new(),
+        seen_imports: HashSet::new(),
     };
     for child in &page.children {
         collect_head_data(child, &mut context);
@@ -168,6 +169,7 @@ struct IrContext<'a> {
     states: Vec<StateIr>,
     events: Vec<EventIr>,
     scoped_css: String,
+    seen_imports: HashSet<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -246,6 +248,7 @@ fn collect_head_data(node: &Node, context: &mut IrContext) {
         }
         "import" => {
             if let Some(from) = string_attr(component, "from")
+                && context.seen_imports.insert(from.to_string())
                 && let Ok(source) = context.resolver.resolve(from)
             {
                 let imported_doc = parse_page_script(&source);
@@ -270,6 +273,16 @@ fn collect_imported_recipes(node: &Node, context: &mut IrContext) {
             }
         }
         Node::Component(component) => {
+            if component.name == "import"
+                && let Some(from) = string_attr(component, "from")
+                && context.seen_imports.insert(from.to_string())
+                && let Ok(source) = context.resolver.resolve(from)
+            {
+                let imported_doc = parse_page_script(&source);
+                for child in &imported_doc.children {
+                    collect_imported_recipes(child, context);
+                }
+            }
             if component.name == "recipe"
                 && let Some(name) = string_attr(component, "name")
                 && !context.recipes.contains_key(name)

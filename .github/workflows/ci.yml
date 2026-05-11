@@ -74,6 +74,7 @@ jobs:
           cargo run -p pagescript-rs --locked -- validate examples/dashboard.page
           cargo run -p pagescript-rs --locked -- validate examples/dashboard.tour
           cargo run -p pagescript-rs --locked -- validate examples/minimal.tour
+          cargo run -p pagescript-rs --locked -- validate conformance/valid/release-hardening.page
           cargo run -p pagescript-rs --locked -- validate docs/index.page
 
       - name: Render and inspect examples
@@ -83,10 +84,14 @@ jobs:
           cargo run -p pagescript-rs --locked -- render examples/data-lineage-demo.page --page lineage-demo > target/pagescript-smoke/lineage-demo.html
           cargo run -p pagescript-rs --locked -- render examples/autonomous-revenue-command-center.page --page revenue-command-center > target/pagescript-smoke/revenue-command-center.html
           cargo run -p pagescript-rs --locked -- render examples/interactive-doc.page --page agent-docs > target/pagescript-smoke/interactive-doc.html
+          cargo run -p pagescript-rs --locked -- render conformance/valid/release-hardening.page --page release-hardening > target/pagescript-smoke/release-hardening.html
           cargo run -p pagescript-rs --locked -- render docs/index.page --page pagescript-docs > target/pagescript-smoke/docs-index.html
 
           grep -F '<svg class="ps-graph"' target/pagescript-smoke/lineage-demo.html
           grep -F 'PageScript Documentation' target/pagescript-smoke/docs-index.html
+          grep -F 'Local Override' target/pagescript-smoke/release-hardening.html
+          grep -F 'Base recipe resolved' target/pagescript-smoke/release-hardening.html
+          grep -F 'Open details' target/pagescript-smoke/release-hardening.html
           grep -F 'data-ps-node="identity"' target/pagescript-smoke/revenue-command-center.html
           grep -F 'ps-runtime-config' target/pagescript-smoke/revenue-command-center.html
           grep -F -- '--ps-token-color-accent' target/pagescript-smoke/revenue-command-center.html
