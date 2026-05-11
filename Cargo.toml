@@ -1,4 +1,3 @@
 [workspace]
 members = ["rust/pagescript-rs"]
 resolver = "3"
-
