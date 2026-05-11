@@ -134,4 +134,16 @@ cargo build --release
 GitHub Actions workflows cover Rust verification, conformance smoke tests, crate packaging, docs deployment, tagged releases, and dependency auditing under `.github/workflows/`.
 The GitHub Pages homepage is authored in [docs/index.page](./docs/index.page) and rendered by the docs workflow.
 
+## Releases
+
+Release automation is split across two workflows:
+
+- `Release-plz` runs on pushes to `main`, opens or updates a release PR with the next crate version and changelog, then publishes the crate and creates the GitHub release when that release PR is merged.
+- `Release` builds and uploads Linux, macOS, and Windows binary archives to the GitHub release.
+
+Repository setup required:
+
+- Enable GitHub Actions workflow permissions that allow Actions to create pull requests.
+- Configure `CARGO_REGISTRY_TOKEN` with crates.io publish permissions before expecting automated crate publishing.
+
 The TypeScript implementation is preserved under `legacy/typescript-reference` and is not part of the active release gate.
