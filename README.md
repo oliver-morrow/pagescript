@@ -119,6 +119,7 @@ pagescript convert examples/dashboard.page --target shepherd --tour dashboard-on
 - [schemas/](./schemas): machine-readable AST, IR, and diagnostic schemas
 - [conformance/](./conformance): compatibility fixtures
 - [docs/agent-workflows.md](./docs/agent-workflows.md): using PageScript as a Cursor/Claude Code/Codex org standard
+- [docs/extension-model.md](./docs/extension-model.md): deterministic core, recipe velocity, and escape-hatch policy
 
 ## Development
 

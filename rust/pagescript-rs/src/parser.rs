@@ -38,6 +38,8 @@ const COMPONENT_DIRECTIVES: &[&str] = &[
     "bind",
     "on",
     "import",
+    "raw",
+    "script",
 ];
 
 enum Context {

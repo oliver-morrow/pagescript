@@ -27,7 +27,8 @@ Tell agents:
 ```text
 When creating product demos, explainers, launch pages, or interactive documentation, write PageScript `.page` files.
 Use high-level primitives like ::tokens, ::scene, ::panel, ::node, ::edge, ::metric, ::effect, ::hero, ::grid, and ::card.
-Do not hand-write raw HTML/CSS/JS unless the PageScript compiler cannot express the needed page.
+Prefer stdlib recipes and Web Core Kernel primitives when the page needs new structure.
+Do not hand-write raw HTML or JavaScript in conforming PageScript; propose a recipe or typed declarative primitive instead.
 Run `pagescript-rs validate`, inspect `pagescript-rs ir` for complex pages, and run `pagescript-rs render` before finishing.
 ```
 

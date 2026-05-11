@@ -9,6 +9,7 @@ Start here:
 - [Specification](../SPEC.md)
 - [Rationale](../RATIONALE.md)
 - [Conformance](../CONFORMANCE.md)
+- [Extension model](./extension-model.md)
 - [Examples](../examples/README.md)
 - [Agent workflows](./agent-workflows.md)
 

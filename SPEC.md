@@ -30,6 +30,24 @@ The IR is the compiler boundary. It contains normalized page metadata, design to
 
 Draft 0.5 adds a Web Core Kernel. The intent is similar to compressed data transport: `.page` source stays small and semantic for LLM generation, while recipes and kernel primitives act as the decompression key that expands into browser-native HTML/CSS/SVG at render time.
 
+## Deterministic Extension Boundary
+
+PageScript keeps velocity by expanding what can be expressed with recipes and Web Core Kernel primitives, not by accepting arbitrary browser code in the core language.
+
+Conforming implementations must preserve this deterministic contract:
+
+- same source, compiler version, and imported recipe versions produce the same AST, diagnostics, IR, and rendered output
+- compilers must not perform network access during parse, validation, IR compilation, or rendering
+- generated IDs, ordering, diagnostics, and emitted runtime hooks must be stable
+- source-authored JavaScript is not part of Draft 0.6
+- every conforming feature must lower into typed IR before rendering
+
+Extension tiers:
+
+- Core standard: deterministic primitives, declarative interactions, Web Core Kernel, validation, IR, and rendering.
+- Standard library: fast-moving recipes built from core primitives and imported at compile time.
+- Escape hatches: raw HTML, source-authored scripts, remote runtime plugins, or renderer-specific extensions. These are outside the deterministic core and must be rejected by conforming validators unless an implementation explicitly offers a non-standard mode.
+
 ## Core Web Composition Example
 
 ```text
@@ -199,6 +217,8 @@ Compiler behavior:
 
 Validators must reject unsafe element tags such as `script`, `iframe`, `object`, and `embed`, and unsafe attributes such as `onclick` and `srcdoc`.
 
+`::raw` and `::script` are reserved escape-hatch names. They are intentionally outside the Draft 0.6 deterministic core and must produce a validation diagnostic in conformance mode.
+
 ## Design Tokens
 
 Tokens are compiler-readable design inputs, not raw CSS. Renderers may map known tokens to CSS variables and preserve unknown tokens under implementation-specific names.
@@ -262,7 +282,7 @@ Renderers inject scoped style text into the compiled document. Validators must r
 
 ## Validation
 
-Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, unknown recipes, and compatibility-tour errors.
+Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, deterministic-core escape hatches, unknown recipes, and compatibility-tour errors.
 
 ## Org-Level Agent Workflow
 

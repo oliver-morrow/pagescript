@@ -104,6 +104,8 @@ fn validate_component(
         "bind" => &["state"][..],
         "on" => &["event", "action"][..],
         "import" => &["from"][..],
+        "raw" => &[][..],
+        "script" => &[][..],
         _ => &[],
     };
 
@@ -261,6 +263,14 @@ fn validate_component_semantics(
                 ));
             }
         }
+        "raw" | "script" => diagnostics.push(error(
+            "unsafe_escape_hatch",
+            format!(
+                "Component \"{}\" is outside the deterministic PageScript core.",
+                component.name
+            ),
+            component.source.line,
+        )),
         _ => {}
     }
 }
