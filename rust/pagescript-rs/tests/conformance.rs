@@ -1,5 +1,6 @@
 use std::fs;
 
+use jsonschema::JSONSchema;
 use pagescript_rs::{
     Resolver, compile_page_ir, parse_page_script, render_to_html, to_intro_config,
     to_shepherd_config, validate_document,
@@ -38,6 +39,90 @@ fn invalid_fixture_matches_expected_diagnostics() {
     let diagnostics = validate_document(&document, &resolver());
 
     assert_eq!(serde_json::to_value(&diagnostics).unwrap(), expected);
+}
+
+#[test]
+fn release_hardening_fixture_matches_expected_ast_and_ir() {
+    let source = fs::read_to_string("../../conformance/valid/release-hardening.page").unwrap();
+    let expected_ast: Value = serde_json::from_str(
+        &fs::read_to_string("../../conformance/valid/release-hardening.ast.json").unwrap(),
+    )
+    .unwrap();
+    let expected_ir: Value = serde_json::from_str(
+        &fs::read_to_string("../../conformance/valid/release-hardening.ir.json").unwrap(),
+    )
+    .unwrap();
+    let resolver = resolver_with_path("../../conformance/valid");
+    let document = parse_page_script(&source);
+
+    assert_eq!(validate_document(&document, &resolver), Vec::new());
+    assert_eq!(serde_json::to_value(&document).unwrap(), expected_ast);
+    assert_eq!(
+        serde_json::to_value(
+            compile_page_ir(&document, Some("release-hardening"), &resolver).unwrap()
+        )
+        .unwrap(),
+        expected_ir
+    );
+}
+
+#[test]
+fn release_hardening_invalid_fixture_matches_expected_diagnostics() {
+    let source = fs::read_to_string("../../conformance/invalid/release-hardening.page").unwrap();
+    let expected: Value = serde_json::from_str(
+        &fs::read_to_string("../../conformance/invalid/release-hardening.diagnostics.json")
+            .unwrap(),
+    )
+    .unwrap();
+    let document = parse_page_script(&source);
+    let diagnostics =
+        validate_document(&document, &resolver_with_path("../../conformance/invalid"));
+
+    assert_eq!(serde_json::to_value(&diagnostics).unwrap(), expected);
+}
+
+#[test]
+fn real_ast_and_ir_outputs_validate_against_public_schemas() {
+    let ast_schema: Value =
+        serde_json::from_str(&fs::read_to_string("../../schemas/ast.schema.json").unwrap())
+            .unwrap();
+    let diagnostics_schema: Value =
+        serde_json::from_str(&fs::read_to_string("../../schemas/diagnostics.schema.json").unwrap())
+            .unwrap();
+    let ir_schema: Value =
+        serde_json::from_str(&fs::read_to_string("../../schemas/page-ir.schema.json").unwrap())
+            .unwrap();
+    let ast_validator = JSONSchema::options()
+        .with_document(
+            "https://pagescript.org/schemas/diagnostics.schema.json".to_string(),
+            diagnostics_schema,
+        )
+        .compile(&ast_schema)
+        .unwrap();
+    let ir_validator = JSONSchema::compile(&ir_schema).unwrap();
+    let source = fs::read_to_string("../../conformance/valid/release-hardening.page").unwrap();
+    let resolver = resolver_with_path("../../conformance/valid");
+    let document = parse_page_script(&source);
+    let ast_json = serde_json::to_value(&document).unwrap();
+    let ir_json = serde_json::to_value(
+        compile_page_ir(&document, Some("release-hardening"), &resolver).unwrap(),
+    )
+    .unwrap();
+
+    assert_schema_valid(&ast_validator, &ast_json);
+    assert_schema_valid(&ir_validator, &ir_json);
+}
+
+fn assert_schema_valid(schema: &JSONSchema, value: &Value) {
+    if let Err(errors) = schema.validate(value) {
+        panic!(
+            "schema validation failed: {}",
+            errors
+                .map(|error| error.to_string())
+                .collect::<Vec<_>>()
+                .join("; ")
+        );
+    }
 }
 
 #[test]
@@ -340,4 +425,29 @@ fn validates_web_core_kernel_safety_rules() {
     assert!(codes.contains(&"unsafe_element_tag"));
     assert!(codes.contains(&"unsafe_attribute_name"));
     assert!(codes.contains(&"unknown_recipe"));
+}
+
+#[test]
+fn validates_and_renders_recursive_imports_and_local_recipe_overrides() {
+    let source = fs::read_to_string("../../conformance/valid/release-hardening.page").unwrap();
+    let resolver = resolver_with_path("../../conformance/valid");
+    let document = parse_page_script(&source);
+
+    assert_eq!(validate_document(&document, &resolver), Vec::new());
+    let html = render_to_html(&document, Some("release-hardening"), &resolver).unwrap();
+
+    assert!(html.contains("Draft 0.6"));
+    assert!(html.contains("Open details"));
+    assert!(html.contains("Local Override"));
+    assert!(html.contains("Base recipe resolved"));
+    assert!(html.contains("Nested recipe resolved"));
+    assert!(!html.contains("<script src="));
+}
+
+#[test]
+fn rejects_invalid_import_paths_at_resolver_boundary() {
+    let resolver = resolver_with_path("../../conformance/valid");
+
+    assert!(resolver.resolve("../Cargo.toml").is_err());
+    assert!(resolver.resolve("/tmp/secret.page").is_err());
 }

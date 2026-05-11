@@ -1,0 +1,168 @@
+{
+  "type": "document",
+  "source": {
+    "line": 1,
+    "column": 1
+  },
+  "children": [
+    {
+      "type": "page",
+      "source": {
+        "line": 1,
+        "column": 1
+      },
+      "attributes": {
+        "id": "release-hardening",
+        "title": "Release Hardening"
+      },
+      "children": [
+        {
+          "type": "component",
+          "name": "import",
+          "source": {
+            "line": 2,
+            "column": 1
+          },
+          "attributes": {
+            "from": "stdlib/product.page"
+          },
+          "children": []
+        },
+        {
+          "type": "component",
+          "name": "import",
+          "source": {
+            "line": 4,
+            "column": 1
+          },
+          "attributes": {
+            "from": "nested-recipes.page"
+          },
+          "children": []
+        },
+        {
+          "type": "component",
+          "name": "recipe",
+          "source": {
+            "line": 7,
+            "column": 1
+          },
+          "attributes": {
+            "name": "feature-card"
+          },
+          "children": [
+            {
+              "type": "component",
+              "name": "template",
+              "source": {
+                "line": 8,
+                "column": 1
+              },
+              "attributes": {},
+              "children": [
+                {
+                  "type": "component",
+                  "name": "card",
+                  "source": {
+                    "line": 9,
+                    "column": 1
+                  },
+                  "attributes": {
+                    "title": "Local $title",
+                    "body": "$body"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "component",
+          "name": "use",
+          "source": {
+            "line": 14,
+            "column": 1
+          },
+          "attributes": {
+            "recipe": "product-hero",
+            "title": "Draft 0.6",
+            "subtitle": "Release candidate surface"
+          },
+          "children": [
+            {
+              "type": "component",
+              "name": "slot",
+              "source": {
+                "line": 15,
+                "column": 1
+              },
+              "attributes": {
+                "name": "actions"
+              },
+              "children": [
+                {
+                  "type": "component",
+                  "name": "button",
+                  "source": {
+                    "line": 16,
+                    "column": 1
+                  },
+                  "attributes": {
+                    "label": "Open details",
+                    "action": "toggle",
+                    "target": "details"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "component",
+          "name": "use",
+          "source": {
+            "line": 21,
+            "column": 1
+          },
+          "attributes": {
+            "recipe": "feature-card",
+            "title": "Override",
+            "body": "Local recipe wins"
+          },
+          "children": []
+        },
+        {
+          "type": "component",
+          "name": "use",
+          "source": {
+            "line": 23,
+            "column": 1
+          },
+          "attributes": {
+            "recipe": "base-callout",
+            "title": "Recursive import"
+          },
+          "children": []
+        },
+        {
+          "type": "component",
+          "name": "use",
+          "source": {
+            "line": 25,
+            "column": 1
+          },
+          "attributes": {
+            "recipe": "nested-card",
+            "title": "Nested import"
+          },
+          "children": []
+        }
+      ],
+      "id": "release-hardening",
+      "title": "Release Hardening"
+    }
+  ],
+  "diagnostics": []
+}

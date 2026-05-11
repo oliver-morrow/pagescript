@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 pub struct Resolver {
     base_path: Option<PathBuf>,
@@ -34,6 +34,10 @@ impl Resolver {
     }
 
     pub fn resolve(&self, path_str: &str) -> Result<String, String> {
+        if !is_valid_import_path(path_str) {
+            return Err(format!("Invalid import path: {path_str}"));
+        }
+
         // 1. Try embedded first if it starts with stdlib/
         if let Some(content) = self.embedded.get(path_str) {
             return Ok(content.to_string());
@@ -58,4 +62,12 @@ impl Resolver {
     pub fn base_path(&self) -> Option<&Path> {
         self.base_path.as_deref()
     }
+}
+
+pub fn is_valid_import_path(path_str: &str) -> bool {
+    !path_str.contains("..")
+        && !Path::new(path_str).is_absolute()
+        && !Path::new(path_str)
+            .components()
+            .any(|component| matches!(component, Component::ParentDir))
 }

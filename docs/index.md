@@ -1,6 +1,6 @@
 # PageScript Draft
 
-PageScript is a draft standard for LLM-native web composition. Draft 0.5 adds the Web Core Kernel so compact `.page` files can expand into browser-native HTML/CSS through recipes, generic elements, attributes, and style rules.
+PageScript is a Draft 0.6 standard for LLM-native web composition. It combines the Web Core Kernel with embedded standard-library recipes so compact `.page` files can expand into browser-native HTML/CSS through recipes, generic elements, attributes, style rules, and named slots.
 
 The published docs homepage is generated from `docs/index.page` with `pagescript-rs render`.
 

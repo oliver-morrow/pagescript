@@ -1,0 +1,27 @@
+::page id=release-hardening title="Release Hardening"
+  ::import from="stdlib/product.page"
+  ::/import
+  ::import from="nested-recipes.page"
+  ::/import
+
+  ::recipe name=feature-card
+    ::template
+      ::card title="Local $title" body=$body
+      ::/card
+    ::/template
+  ::/recipe
+
+  ::use recipe=product-hero title="Draft 0.6" subtitle="Release candidate surface"
+    ::slot name=actions
+      ::button label="Open details" action=toggle target=details
+      ::/button
+    ::/slot
+  ::/use
+
+  ::use recipe=feature-card title="Override" body="Local recipe wins"
+  ::/use
+  ::use recipe=base-callout title="Recursive import"
+  ::/use
+  ::use recipe=nested-card title="Nested import"
+  ::/use
+::/page

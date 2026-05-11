@@ -1,0 +1,24 @@
+::bad!
+
+::page id=bad
+  ::scene id=dup
+  ::/scene
+  ::scene id=dup
+  ::/scene
+  ::node id=dup label="One"
+  ::/node
+  ::node id=dup label="Two"
+  ::/node
+  ::effect id=spin type=spin
+  ::/effect
+  ::style scope=global
+  ::/style
+  ::tokens palette={"nested":true}
+  ::/tokens
+  ::el tag=script
+  ::/el
+  ::attr name=onclick value="bad()"
+  ::/attr
+  ::import from="../secret.page"
+  ::/import
+::/page

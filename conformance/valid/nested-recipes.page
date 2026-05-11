@@ -1,0 +1,9 @@
+::import from="base-recipes.page"
+::/import
+
+::recipe name=nested-card
+  ::template
+    ::card title=$title body="Nested recipe resolved"
+    ::/card
+  ::/template
+::/recipe

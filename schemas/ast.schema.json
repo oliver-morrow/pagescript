@@ -127,7 +127,8 @@
             "template",
             "use",
             "bind",
-            "on"
+            "on",
+            "import"
           ]
         },
         "source": { "$ref": "#/$defs/source" },

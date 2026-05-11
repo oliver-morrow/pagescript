@@ -1,6 +1,6 @@
-# PageScript Standard Library
+# PageScript Draft 0.6 Standard Library
 
-This directory contains reusable PageScript recipe packs.
+This directory contains reusable PageScript recipe packs embedded into the Rust reference implementation.
 
 ## Usage
 
@@ -24,3 +24,5 @@ Then use the recipes:
 - `data.page`: Data visualization and dashboard components.
 - `docs.page`: Documentation and API reference components.
 - `layout.page`: Layout and grid systems.
+
+Imports are compile-time only. Local recipes override imported recipes with the same name, and imported files may recursively import other safe relative paths.

@@ -75,7 +75,7 @@ cargo build --release --locked
 
 ## Current Direction
 
-Draft 0.5 introduced the Web Core Kernel. The next major direction is Draft 0.6: a reusable standard library of PageScript recipes.
+Draft 0.6 builds on the Web Core Kernel with a reusable standard library of PageScript recipes.
 
 The strategic goal is:
 
