@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "subject": {
+    "kind": "repository",
+    "name": "invalid-fixture",
+    "root": ".",
+    "revision": "0123456789abcdef"
+  },
+  "sources": [],
+  "entities": [
+    {
+      "id": "module:main",
+      "kind": "module",
+      "label": "Main module"
+    }
+  ],
+  "relationships": []
+}

@@ -1,9 +1,11 @@
-use std::fs;
+use std::{collections::BTreeSet, fs, process::Command};
 
 use jsonschema::JSONSchema;
 use pagescript_rs::{
-    Resolver, compile_page_ir, parse_page_script, render_to_html, to_intro_config,
-    to_shepherd_config, validate_document,
+    Resolver, bundle_digest, compile_page_ir, measure_token_savings, parse_evidence_bundle,
+    parse_explainer_spec, parse_page_script, project_explainer_ir, render_explainer_to_html,
+    render_to_html, to_intro_config, to_shepherd_config, validate_document,
+    validate_evidence_bundle, validate_explainer_spec,
 };
 use serde_json::Value;
 
@@ -111,6 +113,142 @@ fn real_ast_and_ir_outputs_validate_against_public_schemas() {
 
     assert_schema_valid(&ast_validator, &ast_json);
     assert_schema_valid(&ir_validator, &ir_json);
+}
+
+#[test]
+fn evidence_and_explainer_fixtures_validate_against_public_schemas() {
+    let evidence_schema: Value = serde_json::from_str(
+        &fs::read_to_string("../../schemas/evidence-bundle.schema.json").unwrap(),
+    )
+    .unwrap();
+    let explainer_schema: Value = serde_json::from_str(
+        &fs::read_to_string("../../schemas/explainer-spec.schema.json").unwrap(),
+    )
+    .unwrap();
+    let evidence_validator = JSONSchema::compile(&evidence_schema).unwrap();
+    let explainer_validator = JSONSchema::compile(&explainer_schema).unwrap();
+    let evidence: Value = serde_json::from_str(
+        &fs::read_to_string("../../conformance/evidence/valid/minimal.evidence.json").unwrap(),
+    )
+    .unwrap();
+    let invalid_evidence: Value = serde_json::from_str(
+        &fs::read_to_string("../../conformance/evidence/invalid/missing-provenance.evidence.json")
+            .unwrap(),
+    )
+    .unwrap();
+    let explainer: Value = serde_json::from_str(
+        &fs::read_to_string("../../conformance/explainer/valid/minimal.explainer.json").unwrap(),
+    )
+    .unwrap();
+
+    assert_schema_valid(&evidence_validator, &evidence);
+    assert!(evidence_validator.validate(&invalid_evidence).is_err());
+    assert_schema_valid(&explainer_validator, &explainer);
+}
+
+#[test]
+fn projects_a_validated_evidence_bundle_into_deterministic_explainer_ir() {
+    let bundle = parse_evidence_bundle(
+        &fs::read_to_string("../../conformance/evidence/valid/minimal.evidence.json").unwrap(),
+    )
+    .unwrap();
+    let spec = parse_explainer_spec(
+        &fs::read_to_string("../../conformance/explainer/valid/minimal.explainer.json").unwrap(),
+    )
+    .unwrap();
+
+    assert!(validate_evidence_bundle(&bundle).is_empty());
+    assert_eq!(spec.bundle_digest, bundle_digest(&bundle).unwrap());
+    assert!(validate_explainer_spec(&spec, &bundle).is_empty());
+
+    let ir = project_explainer_ir(&bundle, &spec).unwrap();
+
+    assert_eq!(ir.views.len(), 1);
+    assert_eq!(ir.views[0].entities.len(), 2);
+    assert_eq!(ir.views[0].relationships.len(), 1);
+    assert_eq!(
+        serde_json::to_vec(&ir).unwrap(),
+        serde_json::to_vec(&ir).unwrap()
+    );
+}
+
+#[test]
+fn explainer_renderer_emits_source_cited_standalone_html_without_network_assets() {
+    let bundle = parse_evidence_bundle(
+        &fs::read_to_string("../../conformance/evidence/valid/minimal.evidence.json").unwrap(),
+    )
+    .unwrap();
+    let spec = parse_explainer_spec(
+        &fs::read_to_string("../../conformance/explainer/valid/minimal.explainer.json").unwrap(),
+    )
+    .unwrap();
+    let ir = project_explainer_ir(&bundle, &spec).unwrap();
+    let html = render_explainer_to_html(&ir);
+
+    assert!(html.contains("Fixture architecture"));
+    assert!(html.contains("src/main.rs:1-4"));
+    assert!(html.contains("Rendered locally with no external requests."));
+    assert!(!html.contains("<script"));
+    assert!(!html.contains("https://"));
+}
+
+#[test]
+fn evidence_validation_rejects_invalid_citation_ranges_and_stale_spec_digests() {
+    let mut bundle = parse_evidence_bundle(
+        &fs::read_to_string("../../conformance/evidence/valid/minimal.evidence.json").unwrap(),
+    )
+    .unwrap();
+    let mut spec = parse_explainer_spec(
+        &fs::read_to_string("../../conformance/explainer/valid/minimal.explainer.json").unwrap(),
+    )
+    .unwrap();
+    bundle.entities[0].provenance.evidence[0].start_line = Some(0);
+    spec.bundle_digest =
+        "sha256:0000000000000000000000000000000000000000000000000000000000000000".to_string();
+
+    assert!(
+        validate_evidence_bundle(&bundle)
+            .iter()
+            .any(|diagnostic| diagnostic.code == "invalid_citation_line")
+    );
+    assert!(
+        validate_explainer_spec(&spec, &bundle)
+            .iter()
+            .any(|diagnostic| diagnostic.code == "bundle_digest_mismatch")
+    );
+}
+
+#[test]
+fn reports_reproducible_o200k_token_savings_for_authored_pagescript_source() {
+    let source = fs::read_to_string("../../examples/revenue-map-demo.page").unwrap();
+    let resolver = resolver_with_path("../../examples");
+    let document = parse_page_script(&source);
+    let html = render_to_html(&document, Some("revenue-map"), &resolver).unwrap();
+
+    let report = measure_token_savings(&source, &html).unwrap();
+    let expected: Value = serde_json::from_str(
+        &fs::read_to_string("../../conformance/stats/revenue-map.o200k.json").unwrap(),
+    )
+    .unwrap();
+    let schema: Value = serde_json::from_str(
+        &fs::read_to_string("../../schemas/token-savings.schema.json").unwrap(),
+    )
+    .unwrap();
+
+    assert_eq!(report.tokenizer, "o200k_base");
+    assert_eq!(
+        report.comparison,
+        "authored PageScript source vs generated standalone HTML"
+    );
+    assert!(report.authored_source.tokens < report.generated_html.tokens);
+    assert!(report.authored_source_token_reduction_percent > 0.0);
+    assert!(report.methodology.contains("excludes prompts"));
+    assert_eq!(serde_json::to_value(&report).unwrap(), expected);
+    assert_schema_valid(&JSONSchema::compile(&schema).unwrap(), &expected);
+
+    let lf_source = source.replace("\r\n", "\n").replace('\r', "\n");
+    let crlf_source = lf_source.replace('\n', "\r\n");
+    assert_eq!(measure_token_savings(&crlf_source, &html).unwrap(), report);
 }
 
 fn assert_schema_valid(schema: &JSONSchema, value: &Value) {
@@ -417,6 +555,75 @@ fn validates_draft_04_primitive_rules() {
 }
 
 #[test]
+fn rejects_style_content_that_can_terminate_the_output_style_tag() {
+    let source = r##"::page id=unsafe-style
+  ::style scope=page
+    body { color: red; }
+    </StYlE><script>globalThis.pagescriptXss = true</script><style>
+  ::/style
+::/page"##;
+    let document = parse_page_script(source);
+    let diagnostics = validate_document(&document, &resolver());
+
+    assert!(
+        diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "unsafe_style_content")
+    );
+    assert!(render_to_html(&document, Some("unsafe-style"), &resolver()).is_err());
+}
+
+#[test]
+fn emits_byte_identical_ir_across_fresh_processes() {
+    let executable = env!("CARGO_BIN_EXE_pagescript");
+    let mut outputs = BTreeSet::new();
+
+    for _ in 0..10 {
+        let output = Command::new(executable)
+            .args([
+                "ir",
+                "../../examples/product-metrics-demo.page",
+                "--page",
+                "product-metrics-demo",
+            ])
+            .output()
+            .unwrap();
+
+        assert!(
+            output.status.success(),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        outputs.insert(output.stdout);
+    }
+
+    assert_eq!(outputs.len(), 1, "IR output changed across fresh processes");
+}
+
+#[test]
+fn rejects_executable_url_schemes_in_page_and_web_core_attributes() {
+    let source = r##"::page id=unsafe-urls
+  ::nav-item label="Unsafe link" href="javascript:alert(1)"
+  ::/nav-item
+  ::form action="javascript:alert(2)"
+  ::/form
+  ::el tag=a href="javascript:alert(3)"
+    ::attr name=href value="javascript:alert(4)"
+    ::/attr
+  ::/el
+::/page"##;
+    let document = parse_page_script(source);
+    let diagnostics = validate_document(&document, &resolver());
+
+    assert!(
+        diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "unsafe_url_scheme")
+    );
+    assert!(render_to_html(&document, Some("unsafe-urls"), &resolver()).is_err());
+}
+
+#[test]
 fn renders_web_core_kernel_recipe_expansion() {
     let source = fs::read_to_string("../../examples/web-core-kernel.page").unwrap();
     let document = parse_page_script(&source);
@@ -505,4 +712,77 @@ fn rejects_invalid_import_paths_at_resolver_boundary() {
 
     assert!(resolver.resolve("../Cargo.toml").is_err());
     assert!(resolver.resolve("/tmp/secret.page").is_err());
+}
+
+#[test]
+fn resolver_requires_an_explicit_root_for_nonstdlib_imports() {
+    assert!(resolver().resolve("Cargo.toml").is_err());
+}
+
+#[test]
+fn rejects_unresolvable_imports_before_ir_or_html_generation() {
+    let source = r##"::page id=missing-import
+  ::import from="does-not-exist.page"
+  ::/import
+::/page"##;
+    let document = parse_page_script(source);
+    let diagnostics = validate_document(&document, &resolver());
+
+    assert!(
+        diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "unresolved_import")
+    );
+    assert!(compile_page_ir(&document, Some("missing-import"), &resolver()).is_err());
+    assert!(render_to_html(&document, Some("missing-import"), &resolver()).is_err());
+}
+
+#[test]
+fn rejects_recursive_recipe_expansion_before_ir_or_html_generation() {
+    let source = r##"::page id=recursive-recipe
+  ::recipe name=loop
+    ::template
+      ::use recipe=loop
+      ::/use
+    ::/template
+  ::/recipe
+  ::use recipe=loop
+  ::/use
+::/page"##;
+    let document = parse_page_script(source);
+    let diagnostics = validate_document(&document, &resolver());
+
+    assert!(
+        diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "recursive_recipe")
+    );
+    assert!(compile_page_ir(&document, Some("recursive-recipe"), &resolver()).is_err());
+    assert!(render_to_html(&document, Some("recursive-recipe"), &resolver()).is_err());
+}
+
+#[test]
+fn preserves_typed_state_and_event_values_in_ir_and_runtime_config() {
+    let source = r##"::page id=typed-runtime
+  ::state id=retry_count default=3
+  ::/state
+  ::event on=button.click set=enabled value=true
+  ::/event
+::/page"##;
+    let document = parse_page_script(source);
+
+    let ir = compile_page_ir(&document, Some("typed-runtime"), &resolver()).unwrap();
+    let html = render_to_html(&document, Some("typed-runtime"), &resolver()).unwrap();
+    let ir_schema: Value =
+        serde_json::from_str(&fs::read_to_string("../../schemas/page-ir.schema.json").unwrap())
+            .unwrap();
+
+    assert_eq!(ir.states[0].default_value, Value::from(3));
+    assert_eq!(ir.events[0].value, Value::Bool(true));
+    assert_schema_valid(
+        &JSONSchema::compile(&ir_schema).unwrap(),
+        &serde_json::to_value(&ir).unwrap(),
+    );
+    assert!(html.contains(r#""default":3"#));
+    assert!(html.contains(r#""value":true"#));
 }

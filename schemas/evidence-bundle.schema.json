@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pagescript.org/schemas/evidence-bundle.schema.json",
+  "title": "PageScript Evidence Bundle",
+  "type": "object",
+  "required": ["schema_version", "subject", "sources", "entities", "relationships"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "subject": {"$ref": "#/$defs/subject"},
+    "sources": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/source"}
+    },
+    "entities": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/entity"}
+    },
+    "relationships": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/relationship"}
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9:_-]*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "subject": {
+      "type": "object",
+      "required": ["kind", "name", "root", "revision"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"enum": ["repository", "dbt", "generic"]},
+        "name": {"type": "string", "minLength": 1},
+        "root": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1}
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["id", "path", "digest"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "path": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "citation": {
+      "type": "object",
+      "required": ["source"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {"$ref": "#/$defs/id"},
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "symbol": {"type": "string", "minLength": 1},
+        "json_pointer": {"type": "string", "pattern": "^/"}
+      },
+      "anyOf": [
+        {"required": ["start_line", "end_line"]},
+        {"required": ["symbol"]},
+        {"required": ["json_pointer"]}
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["confidence", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {"enum": ["extracted", "inferred", "declared"]},
+        "rationale": {"type": "string", "minLength": 1},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/citation"}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"confidence": {"const": "inferred"}}},
+          "then": {"required": ["rationale"]}
+        }
+      ]
+    },
+    "entity": {
+      "type": "object",
+      "required": ["id", "kind", "label", "provenance"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {
+          "enum": [
+            "module",
+            "package",
+            "service",
+            "database",
+            "dataset",
+            "model",
+            "source",
+            "test",
+            "exposure",
+            "file",
+            "symbol",
+            "external",
+            "group"
+          ]
+        },
+        "label": {"type": "string", "minLength": 1},
+        "description": {"type": "string"},
+        "group": {"$ref": "#/$defs/id"},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "required": ["id", "kind", "from", "to", "provenance"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {
+          "enum": [
+            "contains",
+            "imports",
+            "depends_on",
+            "calls",
+            "reads",
+            "writes",
+            "produces",
+            "consumes",
+            "tests",
+            "documents",
+            "custom"
+          ]
+        },
+        "from": {"$ref": "#/$defs/id"},
+        "to": {"$ref": "#/$defs/id"},
+        "label": {"type": "string", "minLength": 1},
+        "provenance": {"$ref": "#/$defs/provenance"}
+      }
+    }
+  }
+}

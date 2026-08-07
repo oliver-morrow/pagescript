@@ -139,7 +139,7 @@
       "additionalProperties": false,
       "properties": {
         "id": { "type": "string" },
-        "default_value": { "type": "string" }
+        "default_value": { "$ref": "#/$defs/attributeValue" }
       }
     },
     "event": {
@@ -149,7 +149,7 @@
       "properties": {
         "on": { "type": "string" },
         "set": { "type": "string" },
-        "value": { "type": "string" }
+        "value": { "$ref": "#/$defs/attributeValue" }
       }
     },
     "recipe": {

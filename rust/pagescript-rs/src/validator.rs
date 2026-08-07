@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 
 use crate::parser::parse_page_script;
 use crate::resolver::{Resolver, is_valid_import_path};
@@ -57,11 +57,14 @@ fn validate_page(
             collect_recipe_names(component, &mut ids.known_recipe_names, resolver);
         }
     }
+    validate_recipe_expansion_cycles(page, diagnostics, resolver);
 
     for child in &page.children {
         match child {
             Node::Tour(tour) => validate_tour(tour, diagnostics, tour_ids),
-            Node::Component(component) => validate_component(component, diagnostics, &mut ids),
+            Node::Component(component) => {
+                validate_component(component, diagnostics, &mut ids, resolver)
+            }
             _ => {}
         }
     }
@@ -77,10 +80,206 @@ struct PageIds {
     seen_recipe_names: HashSet<String>,
 }
 
+#[derive(Clone)]
+struct RecipeDefinition {
+    source_line: usize,
+    references: Vec<String>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RecipeVisitState {
+    Visiting,
+    Visited,
+}
+
+fn validate_recipe_expansion_cycles(
+    page: &PageNode,
+    diagnostics: &mut Vec<Diagnostic>,
+    resolver: &Resolver,
+) {
+    let mut definitions = BTreeMap::new();
+    let mut seen_imports = HashSet::new();
+    for child in &page.children {
+        collect_root_recipe_definitions(child, &mut definitions, resolver, &mut seen_imports);
+    }
+
+    let mut states = BTreeMap::new();
+    let mut stack = Vec::new();
+    let mut cycle_members = BTreeSet::new();
+    for name in definitions.keys().cloned().collect::<Vec<_>>() {
+        visit_recipe(
+            &name,
+            &definitions,
+            &mut states,
+            &mut stack,
+            &mut cycle_members,
+        );
+    }
+
+    for name in cycle_members {
+        let definition = &definitions[&name];
+        diagnostics.push(error(
+            "recursive_recipe",
+            format!("Recipe \"{name}\" participates in a recursive expansion."),
+            definition.source_line,
+        ));
+    }
+}
+
+fn collect_root_recipe_definitions(
+    node: &Node,
+    definitions: &mut BTreeMap<String, RecipeDefinition>,
+    resolver: &Resolver,
+    seen_imports: &mut HashSet<String>,
+) {
+    let Node::Component(component) = node else {
+        return;
+    };
+
+    if component.name == "import"
+        && let Some(from) = component
+            .attributes
+            .get("from")
+            .and_then(|value| value.as_str())
+        && is_valid_import_path(from)
+        && seen_imports.insert(from.to_string())
+        && let Ok(source) = resolver.resolve(from)
+    {
+        let imported_document = parse_page_script(&source);
+        for child in &imported_document.children {
+            collect_imported_recipe_definitions(child, definitions, resolver, seen_imports);
+        }
+    }
+
+    if component.name == "recipe"
+        && let Some(name) = component
+            .attributes
+            .get("name")
+            .and_then(|value| value.as_str())
+    {
+        definitions.insert(name.to_string(), recipe_definition(component));
+    }
+
+    for child in &component.children {
+        collect_root_recipe_definitions(child, definitions, resolver, seen_imports);
+    }
+}
+
+fn collect_imported_recipe_definitions(
+    node: &Node,
+    definitions: &mut BTreeMap<String, RecipeDefinition>,
+    resolver: &Resolver,
+    seen_imports: &mut HashSet<String>,
+) {
+    match node {
+        Node::Page(page) => {
+            for child in &page.children {
+                collect_imported_recipe_definitions(child, definitions, resolver, seen_imports);
+            }
+        }
+        Node::Component(component) => {
+            if component.name == "import"
+                && let Some(from) = component
+                    .attributes
+                    .get("from")
+                    .and_then(|value| value.as_str())
+                && is_valid_import_path(from)
+                && seen_imports.insert(from.to_string())
+                && let Ok(source) = resolver.resolve(from)
+            {
+                let imported_document = parse_page_script(&source);
+                for child in &imported_document.children {
+                    collect_imported_recipe_definitions(child, definitions, resolver, seen_imports);
+                }
+            }
+
+            if component.name == "recipe"
+                && let Some(name) = component
+                    .attributes
+                    .get("name")
+                    .and_then(|value| value.as_str())
+            {
+                definitions
+                    .entry(name.to_string())
+                    .or_insert_with(|| recipe_definition(component));
+            }
+
+            for child in &component.children {
+                collect_imported_recipe_definitions(child, definitions, resolver, seen_imports);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn recipe_definition(component: &ComponentNode) -> RecipeDefinition {
+    RecipeDefinition {
+        source_line: component.source.line,
+        references: recipe_references(component),
+    }
+}
+
+fn recipe_references(component: &ComponentNode) -> Vec<String> {
+    let mut references = BTreeSet::new();
+    collect_recipe_references(component, &mut references);
+    references.into_iter().collect()
+}
+
+fn collect_recipe_references(component: &ComponentNode, references: &mut BTreeSet<String>) {
+    for child in &component.children {
+        let Node::Component(child) = child else {
+            continue;
+        };
+        if child.name == "recipe" {
+            continue;
+        }
+        if child.name == "use"
+            && let Some(recipe) = child
+                .attributes
+                .get("recipe")
+                .and_then(|value| value.as_str())
+        {
+            references.insert(recipe.to_string());
+        }
+        collect_recipe_references(child, references);
+    }
+}
+
+fn visit_recipe(
+    name: &str,
+    definitions: &BTreeMap<String, RecipeDefinition>,
+    states: &mut BTreeMap<String, RecipeVisitState>,
+    stack: &mut Vec<String>,
+    cycle_members: &mut BTreeSet<String>,
+) {
+    match states.get(name) {
+        Some(RecipeVisitState::Visited) => return,
+        Some(RecipeVisitState::Visiting) => {
+            if let Some(index) = stack.iter().position(|item| item == name) {
+                cycle_members.extend(stack[index..].iter().cloned());
+            }
+            return;
+        }
+        None => {}
+    }
+
+    states.insert(name.to_string(), RecipeVisitState::Visiting);
+    stack.push(name.to_string());
+    let references = definitions[name].references.clone();
+    for reference in references {
+        if definitions.contains_key(&reference) {
+            visit_recipe(&reference, definitions, states, stack, cycle_members);
+        }
+    }
+    stack.pop();
+    states.insert(name.to_string(), RecipeVisitState::Visited);
+}
+
 fn validate_component(
     component: &ComponentNode,
     diagnostics: &mut Vec<Diagnostic>,
     ids: &mut PageIds,
+    resolver: &Resolver,
 ) {
     let required = match component.name.as_str() {
         "nav" => &[][..],
@@ -130,11 +329,11 @@ fn validate_component(
         }
     }
 
-    validate_component_semantics(component, diagnostics, ids);
+    validate_component_semantics(component, diagnostics, ids, resolver);
 
     for child in &component.children {
         if let Node::Component(component) = child {
-            validate_component(component, diagnostics, ids);
+            validate_component(component, diagnostics, ids, resolver);
         }
     }
 }
@@ -143,6 +342,7 @@ fn validate_component_semantics(
     component: &ComponentNode,
     diagnostics: &mut Vec<Diagnostic>,
     ids: &mut PageIds,
+    resolver: &Resolver,
 ) {
     match component.name.as_str() {
         "scene" => record_unique_id(
@@ -205,6 +405,13 @@ fn validate_component_semantics(
                     component.source.line,
                 ));
             }
+            if contains_style_terminator(component) {
+                diagnostics.push(error(
+                    "unsafe_style_content",
+                    "Style content must not contain \"</style\".",
+                    component.source.line,
+                ));
+            }
         }
         "tokens" => {
             for (key, value) in &component.attributes {
@@ -217,6 +424,9 @@ fn validate_component_semantics(
                 }
             }
         }
+        "nav-item" => validate_component_url_attribute(component, "href", diagnostics),
+        "image" => validate_component_url_attribute(component, "src", diagnostics),
+        "form" => validate_component_url_attribute(component, "action", diagnostics),
         "el" => {
             if let Some(tag) = component
                 .attributes
@@ -224,6 +434,9 @@ fn validate_component_semantics(
                 .and_then(|value| value.as_str())
             {
                 validate_element_tag(tag, component, diagnostics);
+            }
+            for (name, value) in &component.attributes {
+                validate_url_attribute(name, value.as_str(), component, diagnostics);
             }
         }
         "attr" => {
@@ -233,8 +446,22 @@ fn validate_component_semantics(
                 .and_then(|value| value.as_str())
             {
                 validate_attribute_name(name, component, diagnostics);
+                validate_url_attribute(
+                    name,
+                    component
+                        .attributes
+                        .get("value")
+                        .and_then(|value| value.as_str()),
+                    component,
+                    diagnostics,
+                );
             }
         }
+        "style-rule" if contains_style_terminator(component) => diagnostics.push(error(
+            "unsafe_style_content",
+            "Style content must not contain \"</style\".",
+            component.source.line,
+        )),
         "recipe" => record_unique_attr(
             &mut ids.seen_recipe_names,
             component,
@@ -257,20 +484,7 @@ fn validate_component_semantics(
                 ));
             }
         }
-        "import" => {
-            if let Some(from) = component
-                .attributes
-                .get("from")
-                .and_then(|value| value.as_str())
-                && !is_valid_import_path(from)
-            {
-                diagnostics.push(error(
-                    "invalid_import_path",
-                    "Import paths must be relative and must not contain \"..\".",
-                    component.source.line,
-                ));
-            }
-        }
+        "import" => validate_import(component, diagnostics, resolver),
         "raw" | "script" => diagnostics.push(error(
             "unsafe_escape_hatch",
             format!(
@@ -281,6 +495,95 @@ fn validate_component_semantics(
         )),
         _ => {}
     }
+}
+
+fn validate_import(
+    component: &ComponentNode,
+    diagnostics: &mut Vec<Diagnostic>,
+    resolver: &Resolver,
+) {
+    let Some(from) = component
+        .attributes
+        .get("from")
+        .and_then(|value| value.as_str())
+    else {
+        return;
+    };
+
+    if !is_valid_import_path(from) {
+        diagnostics.push(error(
+            "invalid_import_path",
+            "Import paths must be relative and must not contain \"..\".",
+            component.source.line,
+        ));
+    } else if let Err(message) = resolver.resolve(from) {
+        diagnostics.push(error("unresolved_import", message, component.source.line));
+    }
+}
+
+fn contains_style_terminator(component: &ComponentNode) -> bool {
+    component
+        .attributes
+        .get("props")
+        .and_then(|value| value.as_str())
+        .into_iter()
+        .chain(component.children.iter().filter_map(|child| match child {
+            Node::Markdown(markdown) => Some(markdown.value.as_str()),
+            _ => None,
+        }))
+        .any(|content| content.to_ascii_lowercase().contains("</style"))
+}
+
+fn validate_component_url_attribute(
+    component: &ComponentNode,
+    attribute: &str,
+    diagnostics: &mut Vec<Diagnostic>,
+) {
+    validate_url_attribute(
+        attribute,
+        component
+            .attributes
+            .get(attribute)
+            .and_then(|value| value.as_str()),
+        component,
+        diagnostics,
+    );
+}
+
+fn validate_url_attribute(
+    name: &str,
+    value: Option<&str>,
+    component: &ComponentNode,
+    diagnostics: &mut Vec<Diagnostic>,
+) {
+    if is_url_attribute(name) && value.is_some_and(|value| !is_safe_url(value)) {
+        diagnostics.push(error(
+            "unsafe_url_scheme",
+            format!("Attribute \"{name}\" has an unsafe URL scheme."),
+            component.source.line,
+        ));
+    }
+}
+
+fn is_url_attribute(name: &str) -> bool {
+    matches!(
+        name.to_ascii_lowercase().as_str(),
+        "href" | "src" | "action"
+    )
+}
+
+fn is_safe_url(value: &str) -> bool {
+    if value.chars().any(char::is_control) {
+        return false;
+    }
+    let value = value.trim();
+    let Some((scheme, _)) = value.split_once(':') else {
+        return true;
+    };
+    matches!(
+        scheme.to_ascii_lowercase().as_str(),
+        "http" | "https" | "mailto" | "tel"
+    )
 }
 
 fn collect_recipe_names(

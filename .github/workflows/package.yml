@@ -48,12 +48,17 @@ jobs:
           pagescript new "$RUNNER_TEMP/demo.page"
           pagescript validate "$RUNNER_TEMP/demo.page"
           pagescript render "$RUNNER_TEMP/demo.page" --out "$RUNNER_TEMP/demo.html"
+          pagescript stats examples/revenue-map-demo.page --page revenue-map > "$RUNNER_TEMP/revenue.o200k.json"
           pagescript-rs validate examples/revenue-map-demo.page
           pagescript-rs ast examples/dashboard.page > "$RUNNER_TEMP/dashboard.ast.json"
           pagescript-rs ir examples/revenue-map-demo.page --page revenue-map > "$RUNNER_TEMP/revenue.ir.json"
           pagescript-rs render examples/revenue-map-demo.page --page revenue-map > "$RUNNER_TEMP/revenue.html"
           pagescript-rs convert examples/dashboard.page --target shepherd --tour dashboard-onboarding > "$RUNNER_TEMP/dashboard.shepherd.json"
           pagescript-rs convert examples/dashboard.page --target intro --tour dashboard-onboarding > "$RUNNER_TEMP/dashboard.intro.json"
+          pagescript evidence validate conformance/evidence/valid/minimal.evidence.json --json
+          pagescript explain conformance/evidence/valid/minimal.evidence.json --spec conformance/explainer/valid/minimal.explainer.json --out "$RUNNER_TEMP/fixture-explainer.html"
           jq -e '.id == "dashboard-onboarding"' "$RUNNER_TEMP/dashboard.shepherd.json"
           jq -e '.tokens["color.accent"] == "#4dd6a0"' "$RUNNER_TEMP/revenue.ir.json"
+          diff -u conformance/stats/revenue-map.o200k.json "$RUNNER_TEMP/revenue.o200k.json"
           grep -F 'Revenue flow mapped from source notes' "$RUNNER_TEMP/revenue.html"
+          grep -F 'Fixture architecture' "$RUNNER_TEMP/fixture-explainer.html"

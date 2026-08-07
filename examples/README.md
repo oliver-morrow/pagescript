@@ -46,7 +46,10 @@ Useful commands:
 pagescript validate examples/revenue-map-demo.page
 pagescript ir examples/revenue-map-demo.page --page revenue-map
 pagescript render examples/revenue-map-demo.page --out revenue-map.html
+pagescript stats examples/revenue-map-demo.page --page revenue-map
 ```
+
+`conformance/stats/revenue-map.o200k.json` is the checked-in reproducible report. It compares LF-normalized authored `.page` source with the compiler's standalone HTML using the named `o200k_base` tokenizer; it does not claim to measure prompts, context, or repair turns.
 
 ## `interactive-doc.page`
 

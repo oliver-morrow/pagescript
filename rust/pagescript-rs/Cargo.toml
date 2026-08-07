@@ -1,6 +1,6 @@
 [package]
 name = "pagescript-rs"
-version = "1.0.0"
+version = "1.1.0-alpha.1"
 edition = "2024"
 default-run = "pagescript-rs"
 description = "Rust compiler and CLI for PageScript .page files."
@@ -24,6 +24,8 @@ path = "src/bin/pagescript.rs"
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["preserve_order"] }
+sha2 = "0.10"
+tiktoken-rs = "0.12"
 
 [dev-dependencies]
 jsonschema = "0.18"

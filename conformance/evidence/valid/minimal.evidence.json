@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "subject": {
+    "kind": "repository",
+    "name": "fixture-service",
+    "root": ".",
+    "revision": "0123456789abcdef"
+  },
+  "sources": [
+    {
+      "id": "src:main",
+      "path": "src/main.rs",
+      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "entities": [
+    {
+      "id": "module:main",
+      "kind": "module",
+      "label": "Main module",
+      "provenance": {
+        "confidence": "extracted",
+        "evidence": [{"source": "src:main", "start_line": 1, "end_line": 4}]
+      }
+    },
+    {
+      "id": "service:api",
+      "kind": "service",
+      "label": "API service",
+      "provenance": {
+        "confidence": "inferred",
+        "rationale": "The module initializes the API server.",
+        "evidence": [{"source": "src:main", "symbol": "main"}]
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "module:main-contains-service:api",
+      "kind": "contains",
+      "from": "module:main",
+      "to": "service:api",
+      "provenance": {
+        "confidence": "inferred",
+        "rationale": "The entry point constructs the API service.",
+        "evidence": [{"source": "src:main", "start_line": 1, "end_line": 4}]
+      }
+    }
+  ]
+}

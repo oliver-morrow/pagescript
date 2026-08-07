@@ -11,6 +11,10 @@ on:
       - docs/**
       - examples/**
       - schemas/**
+      - conformance/**
+      - rust/**
+      - Cargo.toml
+      - Cargo.lock
       - .github/workflows/docs.yml
   workflow_dispatch:
 
@@ -40,9 +44,9 @@ jobs:
       - name: Validate docs JSON assets
         run: |
           set -euo pipefail
-          for file in schemas/*.json examples/*.json conformance/**/*.json; do
+          while IFS= read -r file; do
             jq empty "$file"
-          done
+          done < <(find schemas examples conformance -type f -name '*.json' -print | sort)
 
       - name: Validate PageScript docs source
         run: cargo run -p pagescript-rs --locked -- validate docs/index.page
@@ -60,7 +64,10 @@ jobs:
           cp -R conformance/. _site/conformance/
           cargo run -p pagescript-rs --locked -- render docs/index.page --page pagescript-docs > _site/index.html
           cargo run -p pagescript-rs --locked -- render examples/product-metrics-demo.page --page product-metrics-demo > _site/examples/product-metrics-demo.html
+          cargo run -p pagescript-rs --locked -- stats examples/revenue-map-demo.page --page revenue-map > _site/examples/revenue-map.o200k.json
+          diff -u conformance/stats/revenue-map.o200k.json _site/examples/revenue-map.o200k.json
           grep -F 'PageScript' _site/index.html
+          grep -F '64.08%' _site/index.html
           grep -F 'ps-runtime-config' _site/index.html
           grep -F 'Product Metrics' _site/examples/product-metrics-demo.html
 

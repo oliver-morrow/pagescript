@@ -25,12 +25,13 @@ Each `.page` file should live next to the feature or docs area it explains. Gene
 Tell tools:
 
 ```text
-When creating product demos, explainers, launch pages, or interactive documentation, write PageScript `.page` files.
+When creating product demos, launch pages, or interactive documentation, write PageScript `.page` files. For an architecture or lineage explainer with reviewed facts, create a source-cited Evidence Bundle and Explainer Spec instead of embedding claims in page copy.
 Start by reading `pagescript guide` or docs/generation-guide.md.
 Use high-level primitives like ::tokens, ::scene, ::panel, ::node, ::edge, ::metric, ::effect, ::hero, ::grid, and ::card.
 Prefer stdlib recipes and Web Core Kernel primitives when the page needs new structure.
 Do not hand-write raw HTML or JavaScript in conforming PageScript; propose a recipe or typed declarative primitive instead.
 Run `pagescript validate --json`, inspect `pagescript ir` for complex pages, and run `pagescript render --out` before finishing.
+For evidence work, run `pagescript evidence validate bundle.evidence.json --json`, then `pagescript explain bundle.evidence.json --spec report.explainer.json --out report.html`.
 ```
 
 ## CI Gate
@@ -39,4 +40,7 @@ Run `pagescript validate --json`, inspect `pagescript ir` for complex pages, and
 pagescript-rs validate docs/product.page
 pagescript-rs ir docs/product.page
 pagescript-rs render docs/product.page > public/product.html
+pagescript-rs stats docs/product.page > public/product.stats.json
+pagescript evidence validate docs/architecture.evidence.json --json
+pagescript explain docs/architecture.evidence.json --spec docs/architecture.explainer.json --out public/architecture.html
 ```

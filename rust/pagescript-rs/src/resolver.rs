@@ -28,7 +28,7 @@ impl Resolver {
         );
 
         Self {
-            base_path,
+            base_path: base_path.and_then(|path| fs::canonicalize(path).ok()),
             embedded,
         }
     }
@@ -43,20 +43,20 @@ impl Resolver {
             return Ok(content.to_string());
         }
 
-        // 2. Try filesystem relative to base_path
-        if let Some(base) = &self.base_path {
-            let path = base.join(path_str);
-            if let Ok(content) = fs::read_to_string(&path) {
-                return Ok(content);
-            }
+        let Some(base) = &self.base_path else {
+            return Err(format!(
+                "Could not resolve path without an explicit import root: {path_str}"
+            ));
+        };
+        let candidate = base.join(path_str);
+        let path = fs::canonicalize(&candidate)
+            .map_err(|_| format!("Could not resolve path: {path_str}"))?;
+        if !path.starts_with(base) {
+            return Err(format!(
+                "Import path escapes the configured root: {path_str}"
+            ));
         }
-
-        // 3. Try filesystem relative to current dir
-        if let Ok(content) = fs::read_to_string(path_str) {
-            return Ok(content);
-        }
-
-        Err(format!("Could not resolve path: {path_str}"))
+        fs::read_to_string(&path).map_err(|_| format!("Could not resolve path: {path_str}"))
     }
 
     pub fn base_path(&self) -> Option<&Path> {
