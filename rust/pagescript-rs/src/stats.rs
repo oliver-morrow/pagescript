@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::{Deserialize, Serialize};
 use tiktoken_rs::o200k_base;
 
@@ -28,8 +30,8 @@ pub fn measure_token_savings(
     generated_html: &str,
 ) -> Result<TokenSavingsReport, String> {
     let tokenizer = o200k_base().map_err(|error| format!("Could not load o200k_base: {error}"))?;
-    let source = measure(&tokenizer, authored_source);
-    let html = measure(&tokenizer, generated_html);
+    let source = measure(&tokenizer, &canonicalize_line_endings(authored_source));
+    let html = measure(&tokenizer, &canonicalize_line_endings(generated_html));
     let reduction = if html.tokens == 0 {
         0.0
     } else {
@@ -43,7 +45,7 @@ pub fn measure_token_savings(
         authored_source: source,
         generated_html: html,
         authored_source_token_reduction_percent: reduction,
-        methodology: "Counts both checked-in artifacts with o200k_base; excludes prompts, system instructions, tool calls, repair turns, and prior context.".to_string(),
+        methodology: "Counts LF-normalized checked-in artifacts with o200k_base; excludes prompts, system instructions, tool calls, repair turns, and prior context.".to_string(),
     })
 }
 
@@ -51,6 +53,14 @@ fn measure(tokenizer: &tiktoken_rs::CoreBPE, content: &str) -> ArtifactTokenMeas
     ArtifactTokenMeasure {
         bytes: content.len(),
         tokens: tokenizer.encode_with_special_tokens(content).len(),
+    }
+}
+
+fn canonicalize_line_endings(content: &str) -> Cow<'_, str> {
+    if content.contains('\r') {
+        Cow::Owned(content.replace("\r\n", "\n").replace('\r', "\n"))
+    } else {
+        Cow::Borrowed(content)
     }
 }
 

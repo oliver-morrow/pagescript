@@ -47,7 +47,7 @@ The flagship benchmark measures the authored source needed to create a real stan
 cargo run -p pagescript-rs -- stats examples/revenue-map-demo.page --page revenue-map
 ```
 
-The checked-in [report](./conformance/stats/revenue-map.o200k.json) and [schema](./schemas/token-savings.schema.json) make the number reproducible. This deliberately excludes prompt templates, tool calls, repair turns, and prior context; those require workflow-specific measurement.
+The checked-in [report](./conformance/stats/revenue-map.o200k.json) and [schema](./schemas/token-savings.schema.json) make the number reproducible. The benchmark canonicalizes artifact line endings to LF, and deliberately excludes prompt templates, tool calls, repair turns, and prior context; those require workflow-specific measurement.
 
 ## Source-cited explainer
 

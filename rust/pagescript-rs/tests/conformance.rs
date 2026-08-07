@@ -245,6 +245,9 @@ fn reports_reproducible_o200k_token_savings_for_authored_pagescript_source() {
     assert!(report.methodology.contains("excludes prompts"));
     assert_eq!(serde_json::to_value(&report).unwrap(), expected);
     assert_schema_valid(&JSONSchema::compile(&schema).unwrap(), &expected);
+
+    let crlf_source = source.replace('\n', "\r\n");
+    assert_eq!(measure_token_savings(&crlf_source, &html).unwrap(), report);
 }
 
 fn assert_schema_valid(schema: &JSONSchema, value: &Value) {

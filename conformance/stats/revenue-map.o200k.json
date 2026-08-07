@@ -11,5 +11,5 @@
     "tokens": 4975
   },
   "authored_source_token_reduction_percent": 64.08,
-  "methodology": "Counts both checked-in artifacts with o200k_base; excludes prompts, system instructions, tool calls, repair turns, and prior context."
+  "methodology": "Counts LF-normalized checked-in artifacts with o200k_base; excludes prompts, system instructions, tool calls, repair turns, and prior context."
 }

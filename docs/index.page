@@ -74,7 +74,7 @@
 
   ::section spacing=lg
     heading="Measured source reduction"
-    body="The revenue-map fixture uses 1,787 o200k_base tokens as authored PageScript source and 4,975 tokens as generated standalone HTML: 64.08% fewer tokens in the authored artifact. The checked-in benchmark measures those two artifacts only; it excludes prompts, tool calls, repair turns, and prior context."
+    body="The revenue-map fixture uses 1,787 o200k_base tokens as LF-normalized authored PageScript source and 4,975 tokens as generated standalone HTML: 64.08% fewer tokens in the authored artifact. The checked-in benchmark measures those two artifacts only; it excludes prompts, tool calls, repair turns, and prior context."
 
     ::grid columns=3 gap=md density=compact
       ::metric id=source-tokens label="PageScript source" value="1,787 tokens" tone=good
