@@ -246,7 +246,8 @@ fn reports_reproducible_o200k_token_savings_for_authored_pagescript_source() {
     assert_eq!(serde_json::to_value(&report).unwrap(), expected);
     assert_schema_valid(&JSONSchema::compile(&schema).unwrap(), &expected);
 
-    let crlf_source = source.replace('\n', "\r\n");
+    let lf_source = source.replace("\r\n", "\n").replace('\r', "\n");
+    let crlf_source = lf_source.replace('\n', "\r\n");
     assert_eq!(measure_token_savings(&crlf_source, &html).unwrap(), report);
 }
 
