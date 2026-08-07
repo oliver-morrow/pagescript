@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
@@ -6,15 +6,16 @@ use serde_json::{Map, Value};
 use crate::parser::parse_page_script;
 use crate::resolver::Resolver;
 use crate::types::{AttributeValue, ComponentNode, DocumentNode, MarkdownNode, Node, PageNode};
+use crate::validator::validate_document;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PageIr {
     pub id: Option<String>,
     pub title: String,
     pub tokens: Map<String, Value>,
-    pub recipes: HashMap<String, RecipeIr>,
+    pub recipes: BTreeMap<String, RecipeIr>,
     pub body: Vec<IrNode>,
-    pub effects: HashMap<String, EffectIr>,
+    pub effects: BTreeMap<String, EffectIr>,
     pub states: Vec<StateIr>,
     pub events: Vec<EventIr>,
     pub scoped_css: String,
@@ -91,14 +92,14 @@ pub struct EffectIr {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StateIr {
     pub id: String,
-    pub default_value: String,
+    pub default_value: Value,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct EventIr {
     pub on: String,
     pub set: String,
-    pub value: String,
+    pub value: Value,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -112,12 +113,20 @@ pub fn compile_page_ir(
     page_id: Option<&str>,
     resolver: &Resolver,
 ) -> Result<PageIr, String> {
+    let diagnostics = validate_document(document, resolver);
+    if let Some(diagnostic) = diagnostics.first() {
+        return Err(format!(
+            "{} at {}:{}: {}",
+            diagnostic.code, diagnostic.line, diagnostic.column, diagnostic.message
+        ));
+    }
+
     let page = select_page(document, page_id)?;
     let mut context = IrContext {
         resolver,
         tokens: Map::new(),
-        recipes: HashMap::new(),
-        effects: HashMap::new(),
+        recipes: BTreeMap::new(),
+        effects: BTreeMap::new(),
         states: Vec::new(),
         events: Vec::new(),
         scoped_css: String::new(),
@@ -164,8 +173,8 @@ pub fn compile_page_ir(
 struct IrContext<'a> {
     resolver: &'a Resolver,
     tokens: Map<String, Value>,
-    recipes: HashMap<String, RecipeDef>,
-    effects: HashMap<String, EffectIr>,
+    recipes: BTreeMap<String, RecipeDef>,
+    effects: BTreeMap<String, EffectIr>,
     states: Vec<StateIr>,
     events: Vec<EventIr>,
     scoped_css: String,
@@ -199,11 +208,11 @@ fn collect_head_data(node: &Node, context: &mut IrContext) {
         "state" => {
             if let (Some(id), Some(default_value)) = (
                 string_attr(component, "id"),
-                string_attr(component, "default"),
+                component.attributes.get("default"),
             ) {
                 context.states.push(StateIr {
                     id: id.to_string(),
-                    default_value: default_value.to_string(),
+                    default_value: default_value.clone(),
                 });
             }
         }
@@ -211,12 +220,12 @@ fn collect_head_data(node: &Node, context: &mut IrContext) {
             if let (Some(on), Some(set), Some(value)) = (
                 string_attr(component, "on"),
                 string_attr(component, "set"),
-                string_attr(component, "value"),
+                component.attributes.get("value"),
             ) {
                 context.events.push(EventIr {
                     on: on.to_string(),
                     set: set.to_string(),
-                    value: value.to_string(),
+                    value: value.clone(),
                 });
             }
         }
@@ -361,7 +370,7 @@ fn expand_recipe<'a>(component: &ComponentNode, context: &IrContext<'a>) -> Vec<
         }
     }
 
-    let mut slots = HashMap::new();
+    let mut slots = BTreeMap::new();
     let mut default_slot_children = Vec::new();
 
     for child in &component.children {
@@ -404,7 +413,7 @@ fn recipe_template(component: &ComponentNode) -> Vec<Node> {
 fn substitute_node(
     node: &Node,
     values: &Map<String, Value>,
-    slots: &HashMap<String, Vec<Node>>,
+    slots: &BTreeMap<String, Vec<Node>>,
 ) -> Vec<Node> {
     match node {
         Node::Markdown(markdown) => vec![Node::Markdown(MarkdownNode {

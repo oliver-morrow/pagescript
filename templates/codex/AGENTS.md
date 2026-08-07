@@ -1,6 +1,6 @@
 # PageScript Rule
 
-For product demos, explainers, launch pages, generated product pages, or interactive documentation, create or update PageScript `.page` files.
+For product demos, launch pages, generated product pages, or interactive documentation, create or update PageScript `.page` files. For source-cited architecture or lineage explainers, create or update a reviewed Evidence Bundle and Explainer Spec instead of restating facts in `.page` copy.
 
 Do not hand-write generated HTML unless explicitly requested. Prefer:
 
@@ -17,3 +17,5 @@ Do not hand-write generated HTML unless explicitly requested. Prefer:
 - `::modal id=<id>` for supporting detail
 
 Validate and render with `pagescript-rs` before completion. For complex pages, inspect `pagescript-rs ir <file>` to confirm the page normalized into generic compiler data rather than scenario-specific output.
+
+For the evidence workflow, run `pagescript evidence validate <bundle.evidence.json> --json` before `pagescript explain <bundle.evidence.json> --spec <report.explainer.json> --out <report.html>`. Do not claim repository or dbt extraction is available unless the project includes a validated bundle.

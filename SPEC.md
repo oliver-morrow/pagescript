@@ -1,14 +1,16 @@
-# PageScript code generator-Native Web Composition
+# PageScript Draft 0.7: Code-Generator-Native Composition and Evidence Explainers
 
-PageScript is a compact source language for pages written for code generators. Humans and code generators write `.page` files with semantic layout, design tokens, data, interaction, effect, and Web Core Kernel primitives; the compiler emits standalone HTML/CSS/SVG with a fixed declarative runtime.
+PageScript is a compact source format for pages written by humans and code generators, plus a source-cited evidence format for architecture and lineage explainers. `.page` files express semantic layout, design tokens, data, interaction, effect, and Web Core Kernel primitives; the compiler emits standalone HTML/CSS/SVG with a fixed declarative runtime. Evidence Bundles and Explainer Specs express reviewed facts and presentation separately, then render standalone source-cited HTML.
 
 Interactive documentation is one use case. The broader target is product demo pages, architecture explainers, launch pages, onboarding pages, generated product pages, and codebase-aware web experiences.
 
 ## File Model
 
-- Main extension: `.page`
+- Page extension: `.page`
+- Evidence extension: `.evidence.json`
+- Explainer extension: `.explainer.json`
 - Encoding: UTF-8 text
-- Output target: standalone HTML through a normalized PageScript IR
+- Output target: standalone HTML through a normalized `PageIr` or `ExplainerIr`
 - Primary implementation: Rust compiler and CLI
 - Interaction model: declarative runtime only; source-authored JavaScript is not allowed
 - Design system: declarative tokens through `::tokens`
@@ -26,6 +28,15 @@ PageScript is not a collection of hardcoded demo templates. A conforming compile
 4. Render the IR into a target such as standalone HTML/CSS/SVG.
 5. Attach only the fixed declarative runtime required by state, events, and effects.
 
+The evidence path is separate from `.page` parsing:
+
+1. Parse an Evidence Bundle and an optional Explainer Spec.
+2. Validate IDs, paths, digests, provenance, citations, and bundle/spec binding.
+3. Normalize the selected facts into `ExplainerIr`.
+4. Render a standalone HTML explainer with local source references.
+
+The current Draft 0.7 implementation supports reviewed, checked-in Evidence Bundles. Repository and dbt extraction adapters are not yet a supported public workflow.
+
 The IR is the compiler boundary. It contains normalized page metadata, design tokens, recipe definitions, layout metadata, component nodes, graph nodes and edges, declared state, events, effects, and scoped CSS. Output renderers should consume IR rather than walking raw source syntax directly.
 
 Draft 0.5 adds a Web Core Kernel. The intent is similar to compressed data transport: `.page` source stays small and semantic for generation, while recipes and kernel primitives act as the decompression key that expands into browser-native HTML/CSS/SVG at render time.
@@ -39,7 +50,7 @@ Conforming implementations must preserve this deterministic contract:
 - same source, compiler version, and imported recipe versions produce the same AST, diagnostics, IR, and rendered output
 - compilers must not perform network access during parse, validation, IR compilation, or rendering
 - generated IDs, ordering, diagnostics, and emitted runtime hooks must be stable
-- source-authored JavaScript is not part of Draft 0.6
+- source-authored JavaScript is not part of Draft 0.7
 - every conforming feature must lower into typed IR before rendering
 
 Extension tiers:
@@ -302,6 +313,8 @@ Unknown directive diagnostics should be useful for code generator repair loops. 
 
 Success is measured by end-to-end generation cost: prompt examples, generated source, compiler diagnostics, repair turns, and final rendered output. Final file size alone is not enough.
 
+`pagescript stats <file.page> --page <id>` provides a reproducible artifact-level measurement using the named `o200k_base` tokenizer. It compares authored `.page` source to compiler-generated standalone HTML; it does not estimate prompts, tool calls, repair turns, or prior context.
+
 ## Project Workflow
 
 1. Cursor, Claude Code, Codex, or humans author `.page` files.
@@ -309,5 +322,11 @@ Success is measured by end-to-end generation cost: prompt examples, generated so
 3. CI runs `pagescript-rs validate`.
 4. CI or review can inspect `pagescript-rs ir`.
 5. Publishing runs `pagescript-rs render`.
+
+For source-cited explainers, review a bundle and specification before rendering:
+
+1. Run `pagescript evidence validate bundle.evidence.json --json`.
+2. Run `pagescript explain bundle.evidence.json --spec architecture.explainer.json --out architecture.html`.
+3. Review each rendered `path:line` citation with the corresponding source.
 
 This creates a shared source format for code generator-generated product demos, explainers, interactive docs, and codebase-aware web pages.

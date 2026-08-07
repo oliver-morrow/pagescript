@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pagescript.org/schemas/token-savings.schema.json",
+  "title": "PageScript Token Savings Report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "tokenizer",
+    "comparison",
+    "authored_source",
+    "generated_html",
+    "authored_source_token_reduction_percent",
+    "methodology"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "tokenizer": {"const": "o200k_base"},
+    "comparison": {"const": "authored PageScript source vs generated standalone HTML"},
+    "authored_source": {"$ref": "#/$defs/artifact"},
+    "generated_html": {"$ref": "#/$defs/artifact"},
+    "authored_source_token_reduction_percent": {"type": "number", "minimum": 0},
+    "methodology": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": ["bytes", "tokens"],
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {"type": "integer", "minimum": 0},
+        "tokens": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

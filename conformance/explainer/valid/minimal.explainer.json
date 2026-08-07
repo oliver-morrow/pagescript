@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "bundle_digest": "sha256:1d6401a422c4d786d9f11f9a8b6af470d104c010a10fd6154e1cbb2a739787e0",
+  "title": "Fixture architecture",
+  "summary": "A source-cited fixture view.",
+  "tokens": {
+    "color.accent": "#4dd6a0"
+  },
+  "views": [
+    {
+      "id": "overview",
+      "kind": "architecture",
+      "title": "Overview",
+      "entities": ["module:main", "service:api"],
+      "relationships": ["module:main-contains-service:api"],
+      "callouts": [
+        {
+          "id": "api-callout",
+          "title": "API entry point",
+          "body": "The main module constructs the API service.",
+          "entities": ["module:main", "service:api"],
+          "relationships": ["module:main-contains-service:api"]
+        }
+      ]
+    }
+  ]
+}

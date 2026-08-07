@@ -18,7 +18,7 @@
 
   ::hero class=docs-hero spacing=xl
     heading="PageScript"
-    body="A draft standard for pages written for code generators: compact .page source, normalized compiler IR, standalone HTML output, and a fixed declarative runtime."
+    body="1,787 authored tokens become a 4,975-token standalone page: 64.08% fewer tokens in the PageScript source under o200k_base. The compiler also turns reviewed evidence bundles into deterministic, source-cited HTML."
   ::/hero
 
   ::section spacing=lg
@@ -27,11 +27,11 @@
 
     ::grid columns=4 gap=md density=compact
       ::card class=docs-card icon="01" title="Specification"
-        body="Normative Draft 0.6 language model, compiler pipeline, tokens, recipes, Standard Library, named slots, and recursive imports. See SPEC.md."
+        body="Draft 0.7 language model, compiler pipeline, safety rules, recipes, and source-cited explainer direction. See SPEC.md."
       ::/card
 
       ::card class=docs-card icon="02" title="Conformance"
-        body="Parser, validator, IR, renderer, fixtures, schemas, and compatibility expectations for Draft 0.6. See CONFORMANCE.md."
+        body="Parser, validator, IR, renderer, token benchmark fixture, schemas, and compatibility expectations. See CONFORMANCE.md."
       ::/card
 
       ::card class=docs-card icon="03" title="Generation Guide"
@@ -63,12 +63,26 @@
     ::/panel
 
     ::panel id=release-checks title="Release gates" tone=muted density=compact
-      ::metric id=tests label="Conformance tests" value="15" tone=good
+      ::metric id=tests label="Conformance tests" value="34" tone=good
       ::/metric
       ::metric id=stdlib label="Standard Library" value="4 recipe packs" tone=accent
       ::/metric
-      ::metric id=workflow label="Docs build" value=".page -> HTML" tone=good
+      ::metric id=workflow label="Docs build" value="source -> verified HTML" tone=good
       ::/metric
     ::/panel
   ::/scene
+
+  ::section spacing=lg
+    heading="Measured source reduction"
+    body="The revenue-map fixture uses 1,787 o200k_base tokens as authored PageScript source and 4,975 tokens as generated standalone HTML: 64.08% fewer tokens in the authored artifact. The checked-in benchmark measures those two artifacts only; it excludes prompts, tool calls, repair turns, and prior context."
+
+    ::grid columns=3 gap=md density=compact
+      ::metric id=source-tokens label="PageScript source" value="1,787 tokens" tone=good
+      ::/metric
+      ::metric id=html-tokens label="Standalone HTML" value="4,975 tokens" tone=accent
+      ::/metric
+      ::metric id=token-reduction label="Authored reduction" value="64.08%" tone=good
+      ::/metric
+    ::/grid
+  ::/section
 ::/page

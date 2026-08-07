@@ -23,7 +23,7 @@ Recipes can move faster than the core language because they stay compile-time an
 
 ### Escape hatches
 
-Raw HTML, source-authored scripts, remote runtime plugins, and renderer-specific extensions are outside Draft 0.6 conformance. They may be useful in downstream tools, but they should be clearly labeled as non-standard and must not silently weaken the deterministic core.
+Raw HTML, source-authored scripts, remote runtime plugins, and renderer-specific extensions are outside Draft 0.7 conformance. They may be useful in downstream tools, but they should be clearly labeled as non-standard and must not silently weaken the deterministic core.
 
 The reference validator reserves `::raw` and `::script` as explicit escape-hatch names and rejects them in conformance mode.
 

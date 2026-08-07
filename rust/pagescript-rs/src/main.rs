@@ -5,8 +5,10 @@ use std::{
 };
 
 use pagescript_rs::{
-    Resolver, compile_page_ir, parse_page_script, render_to_html, to_intro_config,
-    to_shepherd_config, validate_document,
+    Resolver, compile_page_ir, measure_token_savings, parse_evidence_bundle, parse_explainer_spec,
+    parse_page_script, project_explainer_ir, render_explainer_to_html, render_to_html,
+    to_intro_config, to_shepherd_config, validate_document, validate_evidence_bundle,
+    validate_explainer_spec,
 };
 
 #[derive(Default)]
@@ -17,6 +19,7 @@ struct CliOptions {
     tour_id: Option<String>,
     page_id: Option<String>,
     template: Option<String>,
+    spec: Option<String>,
     out: Option<String>,
     version: bool,
     force: bool,
@@ -60,7 +63,15 @@ fn run(args: Vec<String>) -> i32 {
 
     if !matches!(
         command,
-        "validate" | "ast" | "ir" | "convert" | "render" | "new"
+        "validate"
+            | "ast"
+            | "ir"
+            | "convert"
+            | "render"
+            | "stats"
+            | "new"
+            | "evidence-validate"
+            | "explain"
     ) {
         eprintln!("Unknown command: {command}");
         print_usage();
@@ -81,6 +92,14 @@ fn run(args: Vec<String>) -> i32 {
     let file_path = std::path::Path::new(file);
     let base_path = file_path.parent().map(|p| p.to_path_buf());
     let resolver = Resolver::new(base_path);
+
+    if command == "evidence-validate" {
+        return validate_evidence_source(&source, options.json);
+    }
+
+    if command == "explain" {
+        return explain_evidence_source(&source, options.spec.as_deref(), options.out.as_deref());
+    }
 
     let document = parse_page_script(&source);
     let diagnostics = validate_document(&document, &resolver);
@@ -146,6 +165,18 @@ fn run(args: Vec<String>) -> i32 {
         };
     }
 
+    if command == "stats" {
+        return match render_to_html(&document, options.page_id.as_deref(), &resolver)
+            .and_then(|html| measure_token_savings(&source, &html))
+        {
+            Ok(report) => print_json(&report),
+            Err(error) => {
+                eprintln!("{error}");
+                1
+            }
+        };
+    }
+
     let Some(target) = options.target.as_deref() else {
         eprintln!("Missing --target shepherd|intro");
         return 1;
@@ -178,7 +209,18 @@ fn parse_args(args: Vec<String>) -> Result<CliOptions, String> {
         }
         return Ok(options);
     }
-    options.file = iter.next();
+    if options.command.as_deref() == Some("evidence") {
+        let Some(subcommand) = iter.next() else {
+            return Err("Missing evidence subcommand. Expected validate.".to_string());
+        };
+        if subcommand != "validate" {
+            return Err(format!("Unknown evidence subcommand: {subcommand}"));
+        }
+        options.command = Some("evidence-validate".to_string());
+        options.file = iter.next();
+    } else {
+        options.file = iter.next();
+    }
 
     while let Some(arg) = iter.next() {
         match arg.as_str() {
@@ -186,6 +228,7 @@ fn parse_args(args: Vec<String>) -> Result<CliOptions, String> {
             "--tour" => options.tour_id = Some(next_flag_value(&mut iter, "--tour")?),
             "--page" => options.page_id = Some(next_flag_value(&mut iter, "--page")?),
             "--template" => options.template = Some(next_flag_value(&mut iter, "--template")?),
+            "--spec" => options.spec = Some(next_flag_value(&mut iter, "--spec")?),
             "--out" => options.out = Some(next_flag_value(&mut iter, "--out")?),
             "--force" => options.force = true,
             "--json" => options.json = true,
@@ -195,6 +238,89 @@ fn parse_args(args: Vec<String>) -> Result<CliOptions, String> {
     }
 
     Ok(options)
+}
+
+fn validate_evidence_source(source: &str, json: bool) -> i32 {
+    let bundle = match parse_evidence_bundle(source) {
+        Ok(bundle) => bundle,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let diagnostics = validate_evidence_bundle(&bundle);
+    if json {
+        let status = print_json(&diagnostics);
+        return if status == 0 && diagnostics.is_empty() {
+            0
+        } else {
+            1
+        };
+    }
+    if diagnostics.is_empty() {
+        println!("Evidence bundle is valid");
+        0
+    } else {
+        print_diagnostics(&diagnostics);
+        1
+    }
+}
+
+fn explain_evidence_source(source: &str, spec_path: Option<&str>, out: Option<&str>) -> i32 {
+    let Some(spec_path) = spec_path else {
+        eprintln!("Missing --spec <file> for explain.");
+        return 1;
+    };
+    let bundle = match parse_evidence_bundle(source) {
+        Ok(bundle) => bundle,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let spec_source = match fs::read_to_string(spec_path) {
+        Ok(source) => source,
+        Err(error) => {
+            eprintln!("Failed to read {spec_path}: {error}");
+            return 1;
+        }
+    };
+    let spec = match parse_explainer_spec(&spec_source) {
+        Ok(spec) => spec,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let mut diagnostics = validate_evidence_bundle(&bundle);
+    diagnostics.extend(validate_explainer_spec(&spec, &bundle));
+    if !diagnostics.is_empty() {
+        print_diagnostics(&diagnostics);
+        return 1;
+    }
+    let ir = match project_explainer_ir(&bundle, &spec) {
+        Ok(ir) => ir,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let html = render_explainer_to_html(&ir);
+    if let Some(out) = out {
+        match write_file(out, &html) {
+            Ok(()) => {
+                println!("Rendered explainer to {out}");
+                0
+            }
+            Err(error) => {
+                eprintln!("{error}");
+                1
+            }
+        }
+    } else {
+        println!("{html}");
+        0
+    }
 }
 
 fn next_flag_value(iter: &mut impl Iterator<Item = String>, flag: &str) -> Result<String, String> {
@@ -287,7 +413,7 @@ fn cli_name() -> &'static str {
 fn print_usage() {
     let name = cli_name();
     eprintln!(
-        "PageScript Draft 0.6\nUsage:\n  {name} --version\n  {name} guide\n  {name} new <file.page> [--template product|dashboard|docs] [--force]\n  {name} validate <file> [--json]\n  {name} ast <file>\n  {name} ir <file> [--page id]\n  {name} render <file> [--page id] [--out output.html]\n  {name} convert <file> --target shepherd|intro [--tour id]"
+        "PageScript Draft 0.7\nUsage:\n  {name} --version\n  {name} guide\n  {name} new <file.page> [--template product|dashboard|docs] [--force]\n  {name} validate <file> [--json]\n  {name} ast <file>\n  {name} ir <file> [--page id]\n  {name} render <file> [--page id] [--out output.html]\n  {name} stats <file.page> [--page id]\n  {name} convert <file> --target shepherd|intro [--tour id]\n  {name} evidence validate <bundle.json> [--json]\n  {name} explain <bundle.json> --spec <explainer.json> [--out output.html]"
     );
 }
 
@@ -713,6 +839,49 @@ mod tests {
                 "--json".into()
             ]),
             1
+        );
+    }
+
+    #[test]
+    fn evidence_commands_validate_and_render_a_source_cited_explainer() {
+        let bundle_path = temp_path("evidence.json");
+        let spec_path = temp_path("explainer.json");
+        let out_path = temp_path("explainer.html");
+        fs::write(
+            &bundle_path,
+            include_str!("../../../conformance/evidence/valid/minimal.evidence.json"),
+        )
+        .unwrap();
+        fs::write(
+            &spec_path,
+            include_str!("../../../conformance/explainer/valid/minimal.explainer.json"),
+        )
+        .unwrap();
+
+        assert_eq!(
+            run(vec![
+                "evidence".into(),
+                "validate".into(),
+                bundle_path.display().to_string(),
+                "--json".into(),
+            ]),
+            0
+        );
+        assert_eq!(
+            run(vec![
+                "explain".into(),
+                bundle_path.display().to_string(),
+                "--spec".into(),
+                spec_path.display().to_string(),
+                "--out".into(),
+                out_path.display().to_string(),
+            ]),
+            0
+        );
+        assert!(
+            fs::read_to_string(out_path)
+                .unwrap()
+                .contains("Fixture architecture")
         );
     }
 }

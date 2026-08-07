@@ -1,4 +1,4 @@
-# PageScript Conformance
+# PageScript Draft 0.7 Conformance
 
 This document defines what it means for an implementation to conform to the PageScript draft standard.
 
@@ -32,12 +32,14 @@ A conforming validator must report structured diagnostics for:
 - missing required renderable component attributes
 - invalid token values
 - invalid effect types and style scopes
+- unsafe style-tag terminators and executable URL schemes
 - unsafe Web Core Kernel tags and attributes
 - deterministic-core escape hatches such as `raw` and `script`
 - useful unknown-directive diagnostics with suggestions when a close directive spelling exists
 - duplicate scene, node, state, effect, and recipe names within a page
 - unknown recipe references
 - invalid `import` paths (absolute or containing `..`)
+- unresolved imports and recursive recipe expansion
 - duplicate page IDs in a document
 - duplicate tour IDs in a document
 - duplicate step IDs within a tour
@@ -51,8 +53,10 @@ The `conformance/` directory is the compatibility contract:
 - `conformance/valid/*.ir.json` files define expected normalized PageScript IR output where present.
 - `conformance/invalid/*.page` files must parse and return diagnostics.
 - `conformance/invalid/*.diagnostics.json` files define expected diagnostics.
+- `conformance/evidence/` and `conformance/explainer/` contain public-contract fixtures for source-cited explainers.
+- `conformance/stats/revenue-map.o200k.json` freezes the reproducible authored-source token report for the revenue-map fixture.
 
-Implementations in other languages should pass the fixture suite before claiming Draft 0.6 support.
+Implementations in other languages should pass the applicable fixture suite before claiming Draft 0.7 support.
 
 ## Compiler IR Requirements
 
@@ -69,7 +73,7 @@ A conforming compiler should normalize validated AST into PageScript IR before r
 - graph nodes and edges as data, not pre-rendered SVG strings
 - declared state, events, effects, and scoped CSS
 
-The reference CLI exposes this boundary through `pagescript-rs ir <file> [--page id]`. IR snapshots in `conformance/valid/*.ir.json` are part of the Draft 0.6 compatibility contract where present.
+The reference CLI exposes this boundary through `pagescript-rs ir <file> [--page id]`. IR snapshots in `conformance/valid/*.ir.json` are part of the Draft 0.7 compatibility contract where present.
 
 `schemas/page-ir.schema.json` defines the current machine-readable IR shape.
 
@@ -82,7 +86,7 @@ The Rust implementation must pass the conformance fixtures before release. The T
 
 ## Render Requirements
 
-A conforming Draft 0.6 renderer must compile PageScript IR to standalone HTML/CSS/SVG and support:
+A conforming Draft 0.7 renderer must compile PageScript IR to standalone HTML/CSS/SVG and support:
 
 - scene, panel, metric, log, graph node, and graph edge primitives
 - semantic UI primitives for navigation, filters, tables, and empty states
@@ -99,4 +103,4 @@ A conforming Draft 0.6 renderer must compile PageScript IR to standalone HTML/CS
 
 For the same source tree and compiler version, conforming implementations must produce stable AST, diagnostics, IR, and rendered output. Compilers must not perform network access during parse, validation, IR compilation, or rendering.
 
-Velocity belongs at the recipe boundary. Raw HTML blocks, source-authored scripts, remote runtime plugins, or renderer-specific extension components are outside Draft 0.6 conformance unless an implementation clearly labels a separate non-standard mode.
+Velocity belongs at the recipe boundary. Raw HTML blocks, source-authored scripts, remote runtime plugins, or renderer-specific extension components are outside Draft 0.7 conformance unless an implementation clearly labels a separate non-standard mode.

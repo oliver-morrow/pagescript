@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pagescript.org/schemas/explainer-spec.schema.json",
+  "title": "PageScript Explainer Specification",
+  "type": "object",
+  "required": ["schema_version", "bundle_digest", "title", "views"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "bundle_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string"},
+    "tokens": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {"type": "string"},
+          {"type": "number"},
+          {"type": "boolean"}
+        ]
+      }
+    },
+    "views": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/view"}
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9:_-]*$"
+    },
+    "view": {
+      "type": "object",
+      "required": ["id", "kind", "title", "entities", "relationships"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["overview", "architecture", "lineage"]},
+        "title": {"type": "string", "minLength": 1},
+        "summary": {"type": "string"},
+        "entities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "relationships": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "callouts": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/callout"}
+        }
+      }
+    },
+    "callout": {
+      "type": "object",
+      "required": ["id", "title", "body", "entities"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "title": {"type": "string", "minLength": 1},
+        "body": {"type": "string", "minLength": 1},
+        "entities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "relationships": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        }
+      }
+    }
+  }
+}

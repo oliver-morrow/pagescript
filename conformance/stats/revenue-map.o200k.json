@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "tokenizer": "o200k_base",
+  "comparison": "authored PageScript source vs generated standalone HTML",
+  "authored_source": {
+    "bytes": 6286,
+    "tokens": 1787
+  },
+  "generated_html": {
+    "bytes": 15826,
+    "tokens": 4975
+  },
+  "authored_source_token_reduction_percent": 64.08,
+  "methodology": "Counts both checked-in artifacts with o200k_base; excludes prompts, system instructions, tool calls, repair turns, and prior context."
+}

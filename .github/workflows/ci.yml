@@ -61,9 +61,9 @@ jobs:
       - name: Validate JSON schemas and fixtures
         run: |
           set -euo pipefail
-          for file in schemas/*.json conformance/**/*.json examples/*.json; do
+          while IFS= read -r file; do
             jq empty "$file"
-          done
+          done < <(find schemas conformance examples -type f -name '*.json' -print | sort)
 
       - name: Validate PageScript examples
         run: |
@@ -86,9 +86,11 @@ jobs:
           cargo run -p pagescript-rs --locked -- render examples/interactive-doc.page --page tool-docs > target/pagescript-smoke/interactive-doc.html
           cargo run -p pagescript-rs --locked -- render conformance/valid/release-hardening.page --page release-hardening > target/pagescript-smoke/release-hardening.html
           cargo run -p pagescript-rs --locked -- render docs/index.page --page pagescript-docs > target/pagescript-smoke/docs-index.html
+          cargo run -p pagescript-rs --locked -- stats examples/revenue-map-demo.page --page revenue-map > target/pagescript-smoke/revenue-map.o200k.json
 
           grep -F '<svg class="ps-graph"' target/pagescript-smoke/lineage-demo.html
           grep -F 'PageScript Documentation' target/pagescript-smoke/docs-index.html
+          grep -F '64.08%' target/pagescript-smoke/docs-index.html
           grep -F 'Local Override' target/pagescript-smoke/release-hardening.html
           grep -F 'Base recipe resolved' target/pagescript-smoke/release-hardening.html
           grep -F 'Open details' target/pagescript-smoke/release-hardening.html
@@ -97,6 +99,7 @@ jobs:
           grep -F -- '--ps-token-color-accent' target/pagescript-smoke/revenue-map.html
           ! grep -F 'transform:scale' target/pagescript-smoke/*.html
           ! grep -F '<script' examples/*.page
+          diff -u conformance/stats/revenue-map.o200k.json target/pagescript-smoke/revenue-map.o200k.json
 
       - name: Inspect normalized IR
         run: |

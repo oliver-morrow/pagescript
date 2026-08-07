@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.0-alpha.1](https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1) - 2026-08-07
+
+### Added
+
+- deterministic `pagescript stats` reports with a checked-in `o200k_base` token-savings fixture
+- source-cited Evidence Bundle and Explainer Spec schemas with an offline standalone explainer renderer
+- compiler validation for executable URL schemes, style-tag termination, unresolved imports, recipe-expansion cycles, and resolver root boundaries
+- release artifacts checksums and release, package, docs, and CI checks for the public demo contracts
+
+### Changed
+
+- public docs now lead with the reproducible revenue-map benchmark: 1,787 authored tokens versus 4,975 standalone-HTML tokens (64.08% reduction)
+- GitHub release tags containing a pre-release suffix publish as GitHub pre-releases
+
+### Alpha scope
+
+- Evidence bundles are currently reviewed JSON input. Repository and dbt extraction adapters remain planned for a later release.
+
 ## [1.0.0](https://github.com/oliver-morrow/pagescript/releases/tag/v1.0.0) - 2026-05-11
 
 ### Added
