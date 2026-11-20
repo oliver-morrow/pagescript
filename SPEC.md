@@ -1,8 +1,8 @@
-# PageScript Draft 0.7: Code-Generator-Native Composition and Evidence Explainers
+# PageScript language reference
 
-PageScript is a compact source format for pages written by humans and code generators, plus a source-cited evidence format for architecture and lineage explainers. `.page` files express semantic layout, design tokens, data, interaction, effect, and Web Core Kernel primitives; the compiler emits standalone HTML/CSS/SVG with a fixed declarative runtime. Evidence Bundles and Explainer Specs express reviewed facts and presentation separately, then render standalone source-cited HTML.
+This reference describes the syntax in the v1.1 alpha. A `.page` file describes a page's layout, styling, content, and interactions. The Rust compiler renders it as standalone HTML with CSS, SVG, and a small runtime.
 
-Interactive documentation is one use case. The broader target is product demo pages, architecture explainers, launch pages, onboarding pages, generated product pages, and codebase-aware web experiences.
+The explainer renderer uses reviewed evidence and keeps the file and line citations in the output.
 
 ## File Model
 
@@ -20,7 +20,7 @@ The main parser AST remains generic: `document`, `page`, `component`, `markdown`
 
 ## Compiler Pipeline
 
-PageScript is not a collection of hardcoded demo templates. A conforming compiler should keep these stages separate:
+The Rust compiler runs these steps.
 
 1. Parse `.page` source into the main AST.
 2. Validate source-level syntax, required attributes, and duplicate IDs.
@@ -28,7 +28,7 @@ PageScript is not a collection of hardcoded demo templates. A conforming compile
 4. Render the IR into a target such as standalone HTML/CSS/SVG.
 5. Attach only the fixed declarative runtime required by state, events, and effects.
 
-The evidence path is separate from `.page` parsing:
+The explainer renderer has its own input format and steps.
 
 1. Parse an Evidence Bundle and an optional Explainer Spec.
 2. Validate IDs, paths, digests, provenance, citations, and bundle/spec binding.
@@ -43,21 +43,15 @@ Draft 0.5 adds a Web Core Kernel. The intent is similar to compressed data trans
 
 ## Deterministic Extension Boundary
 
-PageScript keeps iteration by expanding what can be expressed with recipes and Web Core Kernel primitives, not by accepting arbitrary browser code in the core language.
-
-Conforming implementations must preserve this deterministic contract:
+The compiler expands recipes and generic elements before rendering. These rules keep the output reproducible.
 
 - same source, compiler version, and imported recipe versions produce the same AST, diagnostics, IR, and rendered output
 - compilers must not perform network access during parse, validation, IR compilation, or rendering
 - generated IDs, ordering, diagnostics, and emitted runtime hooks must be stable
 - source-authored JavaScript is not part of Draft 0.7
-- every conforming feature must lower into typed IR before rendering
+- the compiler lowers features into typed IR before rendering
 
-Extension tiers:
-
-- Core standard: deterministic primitives, declarative interactions, Web Core Kernel, validation, IR, and rendering.
-- Standard library: recipes built from core primitives and imported at compile time.
-- Escape hatches: raw HTML, source-authored scripts, remote runtime plugins, or renderer-specific extensions. These are outside the deterministic core and must be rejected by conforming validators unless an implementation explicitly offers a non-standard mode.
+The standard library bundles recipes made from the same primitives. Source can import them at compile time. The validator rejects raw HTML directives and source-authored JavaScript.
 
 ## Core Web Composition Example
 
@@ -232,7 +226,7 @@ Compiler behavior:
 
 Validators must reject unsafe element tags such as `script`, `iframe`, `object`, and `embed`, and unsafe attributes such as `onclick` and `srcdoc`.
 
-`::raw` and `::script` are reserved escape-hatch names. They are intentionally outside the Draft 0.6 deterministic core and must produce a validation diagnostic in conformance mode.
+`::raw` and `::script` produce validation errors.
 
 ## Design Tokens
 
@@ -297,7 +291,7 @@ Renderers inject scoped style text into the compiled document. Validators must r
 
 ## Validation
 
-Conforming validators report structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, deterministic-core escape hatches, unknown recipes, and compatibility-tour errors.
+The validator reports structured diagnostics for malformed directives, unknown directives, mismatched closing tags, unclosed blocks, missing required attributes, duplicate page/scene/node/state/effect/recipe IDs or names, invalid effect types, invalid style scopes, invalid token values, unsafe Web Core Kernel tags or attributes, unsupported raw and script directives, unknown recipes, and compatibility-tour errors.
 
 Unknown directive diagnostics should be useful for code generator repair loops. When a close match exists, validators should suggest the correct directive spelling.
 
