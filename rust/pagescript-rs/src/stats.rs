@@ -14,6 +14,13 @@ pub struct ArtifactTokenMeasure {
     pub tokens: usize,
 }
 
+impl ArtifactTokenMeasure {
+    /// Count the LF-normalized artifact with the same tokenizer as the stats command.
+    pub fn from_text(content: &str) -> Result<Self, String> {
+        Ok(measure(&load_tokenizer()?, content))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TokenSavingsReport {
     pub schema_version: String,
@@ -29,9 +36,9 @@ pub fn measure_token_savings(
     authored_source: &str,
     generated_html: &str,
 ) -> Result<TokenSavingsReport, String> {
-    let tokenizer = o200k_base().map_err(|error| format!("Could not load o200k_base: {error}"))?;
-    let source = measure(&tokenizer, &canonicalize_line_endings(authored_source));
-    let html = measure(&tokenizer, &canonicalize_line_endings(generated_html));
+    let tokenizer = load_tokenizer()?;
+    let source = measure(&tokenizer, authored_source);
+    let html = measure(&tokenizer, generated_html);
     let reduction = if html.tokens == 0 {
         0.0
     } else {
@@ -49,10 +56,15 @@ pub fn measure_token_savings(
     })
 }
 
+fn load_tokenizer() -> Result<tiktoken_rs::CoreBPE, String> {
+    o200k_base().map_err(|error| format!("Could not load o200k_base: {error}"))
+}
+
 fn measure(tokenizer: &tiktoken_rs::CoreBPE, content: &str) -> ArtifactTokenMeasure {
+    let content = canonicalize_line_endings(content);
     ArtifactTokenMeasure {
         bytes: content.len(),
-        tokens: tokenizer.encode_with_special_tokens(content).len(),
+        tokens: tokenizer.encode_with_special_tokens(&content).len(),
     }
 }
 

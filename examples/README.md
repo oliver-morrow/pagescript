@@ -1,5 +1,7 @@
 # PageScript Examples
 
+The browser playground includes paper sizes, service status, a rollout guide, a build summary, and an incident timeline. Each has a hand-written HTML counterpart. [Sources and token counts](../benchmarks/README.md)
+
 ## `product-metrics-demo.page`
 
 Draft 0.6 stdlib example. Demonstrates the PageScript standard library, named slots, and recursive imports. Composes a detailed landing page with metrics and data flows using mostly imported recipes from `stdlib/`.

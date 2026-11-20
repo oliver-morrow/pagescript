@@ -1,0 +1,33 @@
+::page id=incident-timeline title="Incident timeline"
+  ::el tag=main
+    # Incident timeline
+
+    Example incident. All times UTC.
+
+    ## 09:04 · Alert
+
+    The search API's error rate crossed 5%.
+
+    ## 09:08 · Triage
+
+    The on-call engineer traced timeouts to the new query path.
+
+    ## 09:13 · Recovery
+
+    Rolling back the release returned errors to baseline.
+
+    ## Follow-up
+
+    - Add a timeout test against the larger index.
+    - Alert on query latency before it reaches the error budget.
+  ::/el
+
+  ::style scope=page
+    body { background: #fbfcfe; color: #182c4b; font-family: system-ui, sans-serif; }
+    main { width: min(660px, calc(100% - 36px)); margin: 24px auto; }
+    h1 { max-width: none; font-size: clamp(28px, 7vw, 48px); }
+    h2 { margin-top: 20px; font-size: 20px; }
+    p { margin-top: 6px; }
+    ul { margin: 6px 0 0; padding-left: 24px; }
+  ::/style
+::/page

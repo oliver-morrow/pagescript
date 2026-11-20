@@ -1,8 +1,10 @@
 # PageScript
 
-PageScript is a Rust compiler and CLI that turns `.page` text files into standalone HTML with styling and interactions. The current release is [v1.1.0-alpha.1](https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1).
+PageScript is a text format for coding agents that write web pages. The Rust compiler turns `.page` files into standalone HTML with styling and interactions. The current release is [v1.1.0-alpha.1](https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1).
 
 ## Try it
+
+Teach your coding agent to write and render PageScript with the [agent skill](skills/pagescript/SKILL.md).
 
 From this checkout:
 
@@ -36,15 +38,15 @@ pagescript explain conformance/evidence/valid/minimal.evidence.json \
 
 The [explainer docs](docs/v1-explainer-design.md) describe the input and the evidence each citation carries.
 
-## Token-count example
+## Token benchmarks
 
-The checked-in revenue map uses 1,787 tokens as PageScript source and 4,975 tokens as generated HTML with the `o200k_base` tokenizer. The comparison measures just those two files.
+Five examples compare authored PageScript with hand-written HTML using `o200k_base`. The results range from 29.87% fewer tokens for the incident timeline to 22.42% more for paper sizes. [Counts, inputs, and reproduction](benchmarks/README.md)
+
+The original revenue map has 1,787 source tokens and 4,975 tokens in the compiler's standalone HTML. The output bundles shared CSS and JavaScript. [Revenue map report](conformance/stats/revenue-map.o200k.json)
 
 ```sh
 pagescript stats examples/revenue-map-demo.page --page revenue-map
 ```
-
-[Expected report](conformance/stats/revenue-map.o200k.json)
 
 ## Reference and development
 

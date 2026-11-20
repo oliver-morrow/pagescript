@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Incident timeline</title>
+  <style>
+    body { margin: 0; background: #fbfcfe; color: #182c4b; font: 16px/1.5 system-ui, sans-serif; }
+    main { width: min(660px, calc(100% - 36px)); margin: 24px auto; }
+    h1 { margin: 0; font-size: clamp(28px, 7vw, 48px); line-height: .98; }
+    h2 { margin: 20px 0 0; font-size: 20px; line-height: 1.05; }
+    p, ul { margin: 6px 0 0; }
+    ul { padding-left: 24px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Incident timeline</h1>
+    <p>Example incident. All times UTC.</p>
+    <h2>09:04 · Alert</h2>
+    <p>The search API's error rate crossed 5%.</p>
+    <h2>09:08 · Triage</h2>
+    <p>The on-call engineer traced timeouts to the new query path.</p>
+    <h2>09:13 · Recovery</h2>
+    <p>Rolling back the release returned errors to baseline.</p>
+    <h2>Follow-up</h2>
+    <ul>
+      <li>Add a timeout test against the larger index.</li>
+      <li>Alert on query latency before it reaches the error budget.</li>
+    </ul>
+  </main>
+</body>
+</html>

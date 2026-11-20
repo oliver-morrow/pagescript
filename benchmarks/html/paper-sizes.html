@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paper sizes</title>
+  <style>
+    body { margin: 0; background: #fbfcfe; color: #182c4b; font: 16px/1.5 system-ui, sans-serif; }
+    main { max-width: 780px; width: calc(100% - clamp(36px, 11vw, 88px)); margin: 0 auto; padding-top: clamp(21px, 5vw, 40px); }
+    h1 { margin: 0; padding-bottom: clamp(14px, 3vw, 22px); border-bottom: 1px solid #d3deeb; font-size: clamp(32px, 9vw, 64px); font-weight: 800; line-height: 1.05; letter-spacing: -.04em; }
+    .sizes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: clamp(12px, 4vw, 30px); max-width: 620px; margin: 0 auto; padding: clamp(20px, 5vw, 28px) 0 25px; }
+    article { min-width: 0; text-align: center; }
+    .sheet { box-sizing: border-box; width: calc(min(100%, clamp(114px, 30vw, 181px)) * var(--scale, 1)); aspect-ratio: var(--ratio); margin: 0 auto; border: 1px solid #7891b1; background: var(--fill); }
+    .a4 { --scale: calc(210 / 215.9); --ratio: 210 / 297; --fill: #e0ebf8; }
+    .letter { --ratio: 8.5 / 11; --fill: #eaf0f8; }
+    h2 { margin: 15px 0 1px; font-size: clamp(16px, 4vw, 24px); line-height: 1.25; }
+    p { margin: 4px 0 0; color: #3a567c; font: 500 clamp(11px, 2.5vw, 15px)/1.5 ui-monospace, monospace; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Paper sizes</h1>
+    <div class="sizes">
+      <article>
+        <div class="sheet a4" aria-hidden="true"></div>
+        <h2>A4</h2>
+        <p>210 × 297 mm</p>
+      </article>
+      <article>
+        <div class="sheet letter" aria-hidden="true"></div>
+        <h2>US Letter</h2>
+        <p>8½ × 11 in</p>
+      </article>
+    </div>
+  </main>
+</body>
+</html>

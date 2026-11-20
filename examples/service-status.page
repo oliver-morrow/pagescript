@@ -1,0 +1,29 @@
+::page id=service-status title="Service status"
+  ::el tag=main
+    ::hero heading="Service status"
+      body="Sample status for the API, queue, and dashboard."
+    ::/hero
+
+    ::section
+      | Service | State | Latency |
+      | --- | --- | --- |
+      | Public API | Operational | 42 ms |
+      | Job queue | Backlogged | 280 ms |
+      | Dashboard | Operational | 61 ms |
+    ::/section
+  ::/el
+
+  ::style scope=page
+    body { background: #fbfcfe; color: #182c4b; font-family: system-ui, sans-serif; }
+    .ps-container { width: min(660px, calc(100% - 36px)); }
+    .ps-hero { display: block; min-height: 0; padding: 24px 0 0; }
+    .ps-hero-inner { gap: 8px; }
+    .ps-hero h1 { max-width: none; font-size: clamp(28px, 7vw, 48px); }
+    .ps-section { padding: 20px 0 24px; }
+    .ps-table { border: 1px solid #becddd; border-radius: 8px; }
+    .ps-table th, .ps-table td { padding: 9px; border-color: #d9e3ef; font-size: 14px; }
+    .ps-table th { background: #dbe6f2; color: #182c4b; text-transform: none; }
+    .ps-table tbody tr:last-child td { border-bottom: none; }
+    .ps-reveal { opacity: 1; transform: none; transition: none; }
+  ::/style
+::/page

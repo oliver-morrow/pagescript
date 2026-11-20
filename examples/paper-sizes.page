@@ -1,0 +1,116 @@
+::page id=paper-sizes title="Paper sizes"
+  ::el tag=main
+    ::hero heading="Paper sizes"
+    ::/hero
+
+    ::section
+      ::grid columns=2
+        ::card class=a4
+          ## A4
+
+          210 × 297 mm
+        ::/card
+        ::card class=letter
+          ## US Letter
+
+          8½ × 11 in
+        ::/card
+      ::/grid
+    ::/section
+  ::/el
+
+  ::style scope=page
+    body {
+      background: #fbfcfe;
+      color: #182c4b;
+      font-family: system-ui, sans-serif;
+    }
+
+    .ps-hero {
+      display: block;
+      min-height: 0;
+      padding: clamp(21px, 5vw, 40px) 0 0;
+      background: none;
+    }
+
+    .ps-hero .ps-container, .ps-section .ps-container {
+      max-width: 780px;
+      width: calc(100% - clamp(36px, 11vw, 88px));
+    }
+
+    .ps-hero h1 {
+      margin: 0;
+      max-width: none;
+      padding-bottom: clamp(14px, 3vw, 22px);
+      border-bottom: 1px solid #d3deeb;
+      font: 800 clamp(32px, 9vw, 64px)/1.05 system-ui, sans-serif;
+      letter-spacing: -.04em;
+      overflow-wrap: anywhere;
+    }
+
+    .ps-section {
+      padding: clamp(20px, 5vw, 28px) 0 25px;
+    }
+
+    .ps-section .ps-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: end;
+      gap: clamp(12px, 4vw, 30px);
+      max-width: 620px;
+      margin-inline: auto;
+    }
+
+    .ps-section .ps-card {
+      display: grid;
+      justify-items: center;
+      gap: 0;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+      background: none;
+      text-align: center;
+      transform: none;
+    }
+
+    .ps-reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    .a4 {
+      --sheet-ratio: 210 / 297;
+      --sheet-width-scale: calc(210 / 215.9);
+      --sheet-color: #e0ebf8;
+    }
+
+    .letter {
+      --sheet-ratio: 8.5 / 11;
+      --sheet-color: #eaf0f8;
+    }
+
+    .ps-section .ps-card::before {
+      content: "";
+      box-sizing: border-box;
+      width: calc(min(100%, clamp(114px, 30vw, 181px)) * var(--sheet-width-scale, 1));
+      aspect-ratio: var(--sheet-ratio, 210 / 297);
+      border: 1px solid #7891b1;
+      background: var(--sheet-color, #e0ebf8);
+    }
+
+    .ps-section .ps-card h2 {
+      margin: 15px 0 1px;
+      font-size: clamp(16px, 4vw, 24px);
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .ps-section .ps-card p {
+      margin: 4px 0 0;
+      color: #3a567c;
+      font: 500 clamp(11px, 2.5vw, 15px)/1.5 ui-monospace, monospace;
+      overflow-wrap: anywhere;
+    }
+  ::/style
+::/page

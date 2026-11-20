@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Service status</title>
+  <style>
+    body { margin: 0; background: #fbfcfe; color: #182c4b; font: 16px/1.5 system-ui, sans-serif; }
+    main { width: min(660px, calc(100% - 36px)); margin: 24px auto; }
+    h1 { margin: 0; font-size: clamp(28px, 7vw, 48px); line-height: .98; }
+    p { margin: 8px 0 20px; }
+    .table { overflow: auto; border: 1px solid #becddd; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 9px; border-bottom: 1px solid #d9e3ef; font-size: 14px; text-align: left; }
+    th { background: #dbe6f2; }
+    tr:last-child td { border-bottom: 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Service status</h1>
+    <p>Sample status for the API, queue, and dashboard.</p>
+    <div class="table">
+      <table>
+        <thead>
+          <tr><th scope="col">Service</th><th scope="col">State</th><th scope="col">Latency</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Public API</td><td>Operational</td><td>42 ms</td></tr>
+          <tr><td>Job queue</td><td>Backlogged</td><td>280 ms</td></tr>
+          <tr><td>Dashboard</td><td>Operational</td><td>61 ms</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

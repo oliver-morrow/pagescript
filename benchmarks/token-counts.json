@@ -1,0 +1,101 @@
+{
+  "tokenizer": "o200k_base",
+  "line_endings": "LF",
+  "cases": [
+    {
+      "id": "paper-sizes",
+      "title": "Paper sizes",
+      "source_path": "examples/paper-sizes.page",
+      "handwritten_path": "benchmarks/html/paper-sizes.html",
+      "authored_source": {
+        "bytes": 2516,
+        "tokens": 830
+      },
+      "handwritten_html": {
+        "bytes": 1778,
+        "tokens": 678
+      },
+      "generated_html": {
+        "bytes": 9267,
+        "tokens": 2954
+      },
+      "source_delta_vs_handwritten_percent": 22.42
+    },
+    {
+      "id": "service-status",
+      "title": "Service status",
+      "source_path": "examples/service-status.page",
+      "handwritten_path": "benchmarks/html/service-status.html",
+      "authored_source": {
+        "bytes": 1164,
+        "tokens": 386
+      },
+      "handwritten_html": {
+        "bytes": 1355,
+        "tokens": 465
+      },
+      "generated_html": {
+        "bytes": 8027,
+        "tokens": 2558
+      },
+      "source_delta_vs_handwritten_percent": -16.99
+    },
+    {
+      "id": "rollout-guide",
+      "title": "Rollout guide",
+      "source_path": "examples/rollout-guide.page",
+      "handwritten_path": "benchmarks/html/rollout-guide.html",
+      "authored_source": {
+        "bytes": 1341,
+        "tokens": 435
+      },
+      "handwritten_html": {
+        "bytes": 1392,
+        "tokens": 472
+      },
+      "generated_html": {
+        "bytes": 7924,
+        "tokens": 2513
+      },
+      "source_delta_vs_handwritten_percent": -7.84
+    },
+    {
+      "id": "build-summary",
+      "title": "Build summary",
+      "source_path": "examples/build-summary.page",
+      "handwritten_path": "benchmarks/html/build-summary.html",
+      "authored_source": {
+        "bytes": 1575,
+        "tokens": 521
+      },
+      "handwritten_html": {
+        "bytes": 1208,
+        "tokens": 457
+      },
+      "generated_html": {
+        "bytes": 8527,
+        "tokens": 2700
+      },
+      "source_delta_vs_handwritten_percent": 14.0
+    },
+    {
+      "id": "incident-timeline",
+      "title": "Incident timeline",
+      "source_path": "examples/incident-timeline.page",
+      "handwritten_path": "benchmarks/html/incident-timeline.html",
+      "authored_source": {
+        "bytes": 898,
+        "tokens": 277
+      },
+      "handwritten_html": {
+        "bytes": 1139,
+        "tokens": 395
+      },
+      "generated_html": {
+        "bytes": 7465,
+        "tokens": 2364
+      },
+      "source_delta_vs_handwritten_percent": -29.87
+    }
+  ]
+}

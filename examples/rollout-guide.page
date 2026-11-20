@@ -1,0 +1,39 @@
+::page id=rollout-guide title="Rollout guide"
+  ::el tag=main
+    ::hero heading="Rollout guide"
+      body="Staged release for the queue worker."
+    ::/hero
+
+    ## Before widening traffic
+
+    - Send 5% of jobs to the new worker.
+    - Watch job timeouts for 15 minutes.
+    - Widen traffic if the error rate stays below 1%.
+
+    ::el tag=details
+      ::el tag=summary
+        ::text value="Rollback steps"
+        ::/text
+      ::/el
+
+      1. Route all jobs to the previous worker.
+      2. Wait for the new worker to drain.
+      3. Record the failed release in the incident log.
+    ::/el
+  ::/el
+
+  ::style scope=page
+    body { background: #fbfcfe; color: #182c4b; font-family: system-ui, sans-serif; }
+    main { width: min(660px, calc(100% - 36px)); margin: 24px auto; }
+    .ps-container { width: 100%; }
+    .ps-hero { display: block; min-height: 0; padding: 0; }
+    .ps-hero-inner { gap: 8px; }
+    .ps-hero h1 { max-width: none; font-size: clamp(28px, 7vw, 48px); }
+    h2 { margin-top: 20px; font-size: 20px; }
+    ul, ol { padding-left: 24px; }
+    details { border: 1px solid #becddd; border-radius: 8px; }
+    summary { min-height: 44px; padding: 10px 12px; cursor: pointer; font-weight: 650; }
+    details ol { margin: 0 12px 12px; }
+    .ps-reveal { opacity: 1; transform: none; transition: none; }
+  ::/style
+::/page

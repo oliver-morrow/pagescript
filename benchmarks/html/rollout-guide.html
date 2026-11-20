@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rollout guide</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fbfcfe; color: #182c4b; font: 16px/1.5 system-ui, sans-serif; }
+    main { width: min(660px, calc(100% - 36px)); margin: 24px auto; }
+    h1 { margin: 0; font-size: clamp(28px, 7vw, 48px); line-height: .98; }
+    p { margin: 8px 0 0; }
+    h2 { margin: 20px 0 0; font-size: 20px; line-height: 1.05; }
+    ul, ol { padding-left: 24px; }
+    details { border: 1px solid #becddd; border-radius: 8px; }
+    summary { min-height: 44px; padding: 10px 12px; cursor: pointer; font-weight: 650; }
+    details ol { margin: 0 12px 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Rollout guide</h1>
+    <p>Staged release for the queue worker.</p>
+    <h2>Before widening traffic</h2>
+    <ul>
+      <li>Send 5% of jobs to the new worker.</li>
+      <li>Watch job timeouts for 15 minutes.</li>
+      <li>Widen traffic if the error rate stays below 1%.</li>
+    </ul>
+    <details>
+      <summary>Rollback steps</summary>
+      <ol>
+        <li>Route all jobs to the previous worker.</li>
+        <li>Wait for the new worker to drain.</li>
+        <li>Record the failed release in the incident log.</li>
+      </ol>
+    </details>
+  </main>
+</body>
+</html>
