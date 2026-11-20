@@ -19,6 +19,16 @@ test("browser compiler matches the CLI for a page using built-in recipes", async
   assert.deepEqual(result, { status: "rendered", html: expectedHtml });
 });
 
+test("every benchmark example renders identically in the browser compiler", async () => {
+  const { cases } = JSON.parse(await readSiteFile("benchmarks/token-counts.json"));
+  for (const { id, source_path } of cases) {
+    const source = await readSiteFile(source_path);
+    const expectedHtml = await readSiteFile(`examples/${id}.html`);
+    const result = JSON.parse(compile_page(source, id));
+    assert.deepEqual(result, { status: "rendered", html: expectedHtml }, id);
+  }
+});
+
 test("invalid source returns diagnostics with the CLI's source locations", async () => {
   const source = await readSiteFile("conformance/invalid/required-fields.page");
   const expected = await readSiteFile("conformance/invalid/required-fields.diagnostics.json");

@@ -10,10 +10,14 @@ on:
       - CONFORMANCE.md
       - docs/**
       - examples/**
+      - benchmarks/**
       - schemas/**
       - conformance/**
       - rust/**
+      - web/**
+      - skills/pagescript/**
       - scripts/build-site.sh
+      - scripts/render-benchmarks.mjs
       - Cargo.toml
       - Cargo.lock
       - .github/workflows/docs.yml
