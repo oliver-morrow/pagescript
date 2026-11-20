@@ -1,0 +1,8 @@
+{
+  "name": "pagescript",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "cf": "1.0.0-rc.2"
+  }
+}

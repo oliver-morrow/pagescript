@@ -20,3 +20,7 @@ Pass a page ID to select a page from a multi-page input. Leave it undefined to r
 - `{ status: "render_error", message }` describes a rendering error without a source position.
 
 Preview the generated document in a sandboxed iframe without same-origin access. The browser compiler resolves built-in recipe imports. Use the CLI for imports from disk and for the evidence explainer.
+
+## Production
+
+A push to `prod` runs the compiler checks, builds the static site, and deploys it to `pagescript.olivermorrow.com` with Cloudflare Workers Static Assets. The workflow uses the `CLOUDFLARE_API_TOKEN` Actions secret and the `CLOUDFLARE_ACCOUNT_ID` repository variable.
