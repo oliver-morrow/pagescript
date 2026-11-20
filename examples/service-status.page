@@ -15,7 +15,7 @@
 
   ::style scope=page
     body { background: #fbfcfe; color: #182c4b; font-family: system-ui, sans-serif; }
-    .ps-container { width: min(660px, calc(100% - 36px)); }
+    .ps-container { width: min(660px, calc(100% - 24px)); }
     .ps-hero { display: block; min-height: 0; padding: 24px 0 0; }
     .ps-hero-inner { gap: 8px; }
     .ps-hero h1 { max-width: none; font-size: clamp(28px, 7vw, 48px); }
