@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T20:26:45Z",
+  "title": "Design System: PageScript",
+  "extensions": {
+    "colorMeta": {
+      "navy": {
+        "role": "neutral",
+        "displayName": "Navigation navy",
+        "tonalRamp": [
+          "oklch(15% 0.0175 258.9)",
+          "oklch(27% 0.0319 258.9)",
+          "oklch(39% 0.0457 258.9)",
+          "oklch(50% 0.0575 258.9)",
+          "oklch(62% 0.0625 258.9)",
+          "oklch(73% 0.0532 258.9)",
+          "oklch(84% 0.0338 258.9)",
+          "oklch(95% 0.0125 258.9)"
+        ]
+      },
+      "shell": {
+        "role": "neutral",
+        "displayName": "Blue-gray shell",
+        "tonalRamp": [
+          "oklch(15% 0.0030 256.7)",
+          "oklch(27% 0.0055 256.7)",
+          "oklch(39% 0.0079 256.7)",
+          "oklch(50% 0.0100 256.7)",
+          "oklch(62% 0.0109 256.7)",
+          "oklch(73% 0.0092 256.7)",
+          "oklch(84% 0.0059 256.7)",
+          "oklch(95% 0.0022 256.7)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Pale surface",
+        "tonalRamp": [
+          "oklch(15% 0.0008 264.5)",
+          "oklch(27% 0.0015 264.5)",
+          "oklch(39% 0.0021 264.5)",
+          "oklch(50% 0.0026 264.5)",
+          "oklch(62% 0.0029 264.5)",
+          "oklch(73% 0.0024 264.5)",
+          "oklch(84% 0.0015 264.5)",
+          "oklch(95% 0.0006 264.5)"
+        ]
+      },
+      "sign": {
+        "role": "neutral",
+        "displayName": "Blue-gray sign",
+        "tonalRamp": [
+          "oklch(15% 0.0056 250.4)",
+          "oklch(27% 0.0103 250.4)",
+          "oklch(39% 0.0147 250.4)",
+          "oklch(50% 0.0186 250.4)",
+          "oklch(62% 0.0202 250.4)",
+          "oklch(73% 0.0171 250.4)",
+          "oklch(84% 0.0109 250.4)",
+          "oklch(95% 0.0040 250.4)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Panel border",
+        "tonalRamp": [
+          "oklch(15% 0.0078 249.9)",
+          "oklch(27% 0.0141 249.9)",
+          "oklch(39% 0.0202 249.9)",
+          "oklch(50% 0.0255 249.9)",
+          "oklch(62% 0.0277 249.9)",
+          "oklch(73% 0.0236 249.9)",
+          "oklch(84% 0.0150 249.9)",
+          "oklch(95% 0.0055 249.9)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Inner rule",
+        "tonalRamp": [
+          "oklch(15% 0.0055 252.9)",
+          "oklch(27% 0.0100 252.9)",
+          "oklch(39% 0.0143 252.9)",
+          "oklch(50% 0.0180 252.9)",
+          "oklch(62% 0.0196 252.9)",
+          "oklch(73% 0.0167 252.9)",
+          "oklch(84% 0.0106 252.9)",
+          "oklch(95% 0.0039 252.9)"
+        ]
+      },
+      "blue": {
+        "role": "neutral",
+        "displayName": "Link blue",
+        "tonalRamp": [
+          "oklch(15% 0.0241 257.3)",
+          "oklch(27% 0.0439 257.3)",
+          "oklch(39% 0.0628 257.3)",
+          "oklch(50% 0.0792 257.3)",
+          "oklch(62% 0.0861 257.3)",
+          "oklch(73% 0.0732 257.3)",
+          "oklch(84% 0.0465 257.3)",
+          "oklch(95% 0.0172 257.3)"
+        ]
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus blue",
+        "tonalRamp": [
+          "oklch(15% 0.0342 254.4)",
+          "oklch(27% 0.0623 254.4)",
+          "oklch(39% 0.0891 254.4)",
+          "oklch(50% 0.1123 254.4)",
+          "oklch(62% 0.1221 254.4)",
+          "oklch(73% 0.1038 254.4)",
+          "oklch(84% 0.0659 254.4)",
+          "oklch(95% 0.0244 254.4)"
+        ]
+      },
+      "yellow": {
+        "role": "primary",
+        "displayName": "Render yellow",
+        "tonalRamp": [
+          "oklch(15% 0.0403 93.2)",
+          "oklch(27% 0.0735 93.2)",
+          "oklch(39% 0.1052 93.2)",
+          "oklch(50% 0.1325 93.2)",
+          "oklch(62% 0.1441 93.2)",
+          "oklch(73% 0.1225 93.2)",
+          "oklch(84% 0.0778 93.2)",
+          "oklch(95% 0.0288 93.2)"
+        ]
+      },
+      "yellow-hover": {
+        "role": "primary",
+        "displayName": "Render hover",
+        "tonalRamp": [
+          "oklch(15% 0.0301 92.8)",
+          "oklch(27% 0.0548 92.8)",
+          "oklch(39% 0.0784 92.8)",
+          "oklch(50% 0.0988 92.8)",
+          "oklch(62% 0.1074 92.8)",
+          "oklch(73% 0.0913 92.8)",
+          "oklch(84% 0.0580 92.8)",
+          "oklch(95% 0.0215 92.8)"
+        ]
+      },
+      "code-field": {
+        "role": "neutral",
+        "displayName": "Code field blue",
+        "tonalRamp": [
+          "oklch(15% 0.0029 247.9)",
+          "oklch(27% 0.0053 247.9)",
+          "oklch(39% 0.0075 247.9)",
+          "oklch(50% 0.0095 247.9)",
+          "oklch(62% 0.0103 247.9)",
+          "oklch(73% 0.0088 247.9)",
+          "oklch(84% 0.0056 247.9)",
+          "oklch(95% 0.0021 247.9)"
+        ]
+      },
+      "error": {
+        "role": "neutral",
+        "displayName": "Error text",
+        "tonalRamp": [
+          "oklch(15% 0.0300 28.4)",
+          "oklch(27% 0.0547 28.4)",
+          "oklch(39% 0.0783 28.4)",
+          "oklch(50% 0.0987 28.4)",
+          "oklch(62% 0.1073 28.4)",
+          "oklch(73% 0.0912 28.4)",
+          "oklch(84% 0.0580 28.4)",
+          "oklch(95% 0.0215 28.4)"
+        ]
+      },
+      "error-field": {
+        "role": "neutral",
+        "displayName": "Error field",
+        "tonalRamp": [
+          "oklch(15% 0.0054 41.8)",
+          "oklch(27% 0.0098 41.8)",
+          "oklch(39% 0.0140 41.8)",
+          "oklch(50% 0.0176 41.8)",
+          "oklch(62% 0.0192 41.8)",
+          "oklch(73% 0.0163 41.8)",
+          "oklch(84% 0.0104 41.8)",
+          "oklch(95% 0.0038 41.8)"
+        ]
+      },
+      "directive": {
+        "role": "neutral",
+        "displayName": "Directive blue",
+        "tonalRamp": [
+          "oklch(15% 0.0302 256.4)",
+          "oklch(27% 0.0551 256.4)",
+          "oklch(39% 0.0788 256.4)",
+          "oklch(50% 0.0994 256.4)",
+          "oklch(62% 0.1080 256.4)",
+          "oklch(73% 0.0918 256.4)",
+          "oklch(84% 0.0583 256.4)",
+          "oklch(95% 0.0216 256.4)"
+        ]
+      },
+      "string": {
+        "role": "neutral",
+        "displayName": "String green",
+        "tonalRamp": [
+          "oklch(15% 0.0188 178.3)",
+          "oklch(27% 0.0343 178.3)",
+          "oklch(39% 0.0490 178.3)",
+          "oklch(50% 0.0618 178.3)",
+          "oklch(62% 0.0672 178.3)",
+          "oklch(73% 0.0571 178.3)",
+          "oklch(84% 0.0363 178.3)",
+          "oklch(95% 0.0134 178.3)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control border",
+        "tonalRamp": [
+          "oklch(15% 0.0132 252.6)",
+          "oklch(27% 0.0240 252.6)",
+          "oklch(39% 0.0344 252.6)",
+          "oklch(50% 0.0433 252.6)",
+          "oklch(62% 0.0471 252.6)",
+          "oklch(73% 0.0400 252.6)",
+          "oklch(84% 0.0254 252.6)",
+          "oklch(95% 0.0094 252.6)"
+        ]
+      },
+      "disabled-fill": {
+        "role": "neutral",
+        "displayName": "Disabled fill",
+        "tonalRamp": [
+          "oklch(15% 0.0024 264.5)",
+          "oklch(27% 0.0044 264.5)",
+          "oklch(39% 0.0064 264.5)",
+          "oklch(50% 0.0080 264.5)",
+          "oklch(62% 0.0087 264.5)",
+          "oklch(73% 0.0074 264.5)",
+          "oklch(84% 0.0047 264.5)",
+          "oklch(95% 0.0017 264.5)"
+        ]
+      },
+      "disabled-text": {
+        "role": "neutral",
+        "displayName": "Disabled text",
+        "tonalRamp": [
+          "oklch(15% 0.0149 256.6)",
+          "oklch(27% 0.0272 256.6)",
+          "oklch(39% 0.0389 256.6)",
+          "oklch(50% 0.0491 256.6)",
+          "oklch(62% 0.0533 256.6)",
+          "oklch(73% 0.0453 256.6)",
+          "oklch(84% 0.0288 256.6)",
+          "oklch(95% 0.0107 256.6)"
+        ]
+      },
+      "download-hover": {
+        "role": "neutral",
+        "displayName": "Download hover",
+        "tonalRamp": [
+          "oklch(15% 0.0037 251.6)",
+          "oklch(27% 0.0067 251.6)",
+          "oklch(39% 0.0096 251.6)",
+          "oklch(50% 0.0120 251.6)",
+          "oklch(62% 0.0131 251.6)",
+          "oklch(73% 0.0111 251.6)",
+          "oklch(84% 0.0071 251.6)",
+          "oklch(95% 0.0026 251.6)"
+        ]
+      },
+      "copy-hover": {
+        "role": "neutral",
+        "displayName": "Copy hover",
+        "tonalRamp": [
+          "oklch(15% 0.0037 251.6)",
+          "oklch(27% 0.0067 251.6)",
+          "oklch(39% 0.0096 251.6)",
+          "oklch(50% 0.0121 251.6)",
+          "oklch(62% 0.0131 251.6)",
+          "oklch(73% 0.0111 251.6)",
+          "oklch(84% 0.0071 251.6)",
+          "oklch(95% 0.0026 251.6)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page heading."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings."
+      },
+      "title": {
+        "displayName": "Pane title",
+        "purpose": "Source and Preview labels."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Explanatory copy, the prompt, and the table."
+      },
+      "label": {
+        "displayName": "Action label",
+        "purpose": "Render and Download HTML."
+      },
+      "copy-label": {
+        "displayName": "Copy label",
+        "purpose": "Copy prompt."
+      },
+      "source": {
+        "displayName": "Source",
+        "purpose": "Source and line numbers on 27px lines, or 26px at 760px and below."
+      },
+      "filename": {
+        "displayName": "Filename",
+        "purpose": "The current .page filename."
+      }
+    },
+    "breakpoints": [
+      {
+        "name": "compact-workbench",
+        "value": "1160px"
+      },
+      {
+        "name": "stacked-workbench",
+        "value": "760px"
+      },
+      {
+        "name": "taller-prompt",
+        "value": "390px"
+      },
+      {
+        "name": "compact-navigation",
+        "value": "360px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Render",
+      "kind": "button",
+      "refersTo": "button-render",
+      "description": "The yellow action submits the source.",
+      "html": "<button class=\"ds-render\" type=\"button\">Render</button>",
+      "css": ".ds-render { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 12px; border-radius: 6px; font: 700 15px/1.2 var(--ui, Barlow, system-ui, sans-serif); white-space: nowrap; border: 1px solid #b18c1e; background: var(--yellow, #f9d65c); color: var(--navy, #182c4b); }\n.ds-render:enabled { cursor: pointer; }\n.ds-render:hover:enabled:not([aria-disabled=\"true\"]) { background: var(--yellow-hover, #ffe591); }\n.ds-render:disabled, .ds-render[aria-disabled=\"true\"] { background: #e7eaf0; color: #4d627f; border-color: #95a8bd; cursor: default; }\n.ds-render:focus-visible { outline: 3px solid var(--focus, #235c9e); outline-offset: 3px; }\n@media (max-width: 760px) { .ds-render { padding-inline: 9px; } }"
+    },
+    {
+      "name": "Download HTML",
+      "kind": "button",
+      "refersTo": "button-download",
+      "description": "An outlined link for the current HTML.",
+      "html": "<a class=\"ds-download\" href=\"./examples/paper-sizes.html\" download=\"paper-sizes.html\">Download HTML</a>",
+      "css": ".ds-download { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 12px; border-radius: 6px; font: 700 15px/1.2 var(--ui, Barlow, system-ui, sans-serif); white-space: nowrap; border: 1px solid #91a8c3; background: var(--surface, #fbfcfe); color: var(--navy, #182c4b); text-decoration: none; }\n.ds-download:hover { background: #edf4fc; color: var(--navy, #182c4b); }\n.ds-download:focus-visible { outline: 3px solid var(--focus, #235c9e); outline-offset: 3px; }\n@media (max-width: 760px) { .ds-download { padding-inline: 9px; } }"
+    },
+    {
+      "name": "Copy prompt",
+      "kind": "button",
+      "refersTo": "button-copy",
+      "description": "An outlined button beside the prompt label.",
+      "html": "<button class=\"ds-copy\" type=\"button\">Copy prompt</button>",
+      "css": ".ds-copy { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 12px; border-radius: 6px; font: 700 15px/1.2 var(--ui, Barlow, system-ui, sans-serif); white-space: nowrap; border: 1px solid #91a8c3; background: var(--surface, #fbfcfe); color: var(--navy, #182c4b); font-weight: 600; }\n.ds-copy:enabled { cursor: pointer; }\n.ds-copy:hover:enabled { background: #eaf1f9; }\n.ds-copy:disabled { color: var(--blue, #3a5b8a); }\n.ds-copy:focus-visible { outline: 3px solid var(--focus, #235c9e); outline-offset: 3px; }"
+    },
+    {
+      "name": "Sample prompt",
+      "kind": "input",
+      "refersTo": "prompt-field",
+      "description": "A read-only, vertically resizable field with a visible label.",
+      "html": "<div class=\"ds-prompt\">\n  <label class=\"ds-prompt-label\" for=\"ds-sample-prompt\">Sample prompt</label>\n  <textarea class=\"ds-prompt-field\" id=\"ds-sample-prompt\" rows=\"4\" readonly>Use the PageScript skill to compare A4 and US Letter. Include their dimensions and draw both to scale. Save the .page file and render standalone HTML.</textarea>\n</div>",
+      "css": ".ds-prompt { display: grid; gap: 7px; font: 400 17px/1.45 var(--ui, Barlow, system-ui, sans-serif); color: var(--navy, #182c4b); }\n.ds-prompt-label { font-weight: 600; }\n.ds-prompt-field { box-sizing: border-box; display: block; width: 100%; resize: vertical; min-height: 95px; padding: 10px 12px; border: 1px solid #91a8c3; border-radius: 8px; background: var(--surface, #fbfcfe); color: var(--navy, #182c4b); font: inherit; }\n.ds-prompt-field:focus-visible { outline: 3px solid var(--focus, #235c9e); outline-offset: 3px; }\n.ds-prompt-field::selection { background: var(--yellow, #f9d65c); color: var(--navy, #182c4b); }\n@media (max-width: 390px) { .ds-prompt-field { min-height: 148px; } }"
+    },
+    {
+      "name": "Project navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "A plain wordmark and text links on a navy header.",
+      "html": "<header class=\"ds-header\">\n  <div class=\"ds-header-inner\">\n    <a class=\"ds-wordmark\" href=\"./\">PageScript</a>\n    <nav class=\"ds-links\" aria-label=\"Project\">\n      <a href=\"#examples\">Examples</a>\n      <a href=\"https://github.com/oliver-morrow/pagescript/blob/main/SPEC.md\">Syntax</a>\n      <a href=\"https://github.com/oliver-morrow/pagescript\">GitHub</a>\n    </nav>\n  </div>\n</header>",
+      "css": ".ds-header { background: var(--navy, #182c4b); color: var(--surface, #fbfcfe); font: 400 17px/1.45 var(--ui, Barlow, system-ui, sans-serif); }\n.ds-header-inner { width: min(1440px, calc(100% - 2 * var(--page-padding, clamp(16px, 3.6vw, 60px)))); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px; }\n.ds-header a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; text-decoration: none; }\n.ds-header a:hover { text-decoration: underline; text-underline-offset: 4px; }\n.ds-header a:focus-visible { outline: 3px solid var(--yellow, #f9d65c); outline-offset: 3px; }\n.ds-wordmark { font: 700 29px/1 var(--display, \"Barlow Semi Condensed\", Arial, sans-serif); letter-spacing: -.02em; }\n.ds-links { display: flex; gap: clamp(14px, 2.3vw, 32px); font-weight: 600; }\n@media (max-width: 760px) {\n  .ds-header-inner { min-height: 57px; }\n  .ds-wordmark { font-size: 25px; }\n  .ds-links { gap: clamp(10px, 3vw, 18px); font-size: 16px; }\n}\n@media (max-width: 360px) {\n  .ds-header-inner, .ds-links { gap: 8px; }\n  .ds-links { font-size: 15px; }\n}"
+    },
+    {
+      "name": "Source pane",
+      "kind": "custom",
+      "refersTo": "pane",
+      "description": "A source excerpt with the pane label, file action, and numbered editor gutter.",
+      "html": "<section class=\"ds-source-pane\" aria-label=\"Source pane\">\n  <header class=\"ds-pane-bar\">\n    <h2 class=\"ds-pane-title\">Source</h2>\n    <div class=\"ds-file-actions\">\n      <span class=\"ds-filename\">paper-sizes.page</span>\n      <button class=\"ds-render\" type=\"button\">Render</button>\n    </div>\n  </header>\n  <div class=\"ds-editor\">\n    <pre class=\"ds-gutter\" aria-hidden=\"true\">1\n2\n3\n4</pre>\n    <pre class=\"ds-source\" tabindex=\"0\"><span class=\"ds-directive\">::page</span> id=paper-sizes\n  <span class=\"ds-directive\">::el</span> tag=main\n    <span class=\"ds-directive\">::hero</span> heading=<span class=\"ds-string\">\"Paper sizes\"</span>\n    <span class=\"ds-directive\">::/hero</span></pre>\n  </div>\n</section>",
+      "css": ".ds-source-pane { min-width: 0; overflow: hidden; border: 1px solid var(--border, #becddd); border-radius: 13px; background: var(--surface, #fbfcfe); color: var(--navy, #182c4b); }\n.ds-pane-bar { box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 60px; padding: 7px 18px; border-bottom: 1px solid var(--border, #becddd); background: var(--sign, #dbe6f2); }\n.ds-pane-title { flex: none; margin: 0; font: 700 20px/1.2 var(--ui, Barlow, system-ui, sans-serif); }\n.ds-file-actions { display: flex; gap: 12px; align-items: center; min-width: 0; }\n.ds-filename { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--blue, #3a5b8a); font: 500 13px/1.25 var(--mono, \"IBM Plex Mono\", ui-monospace, monospace); }\n.ds-render { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 12px; border-radius: 6px; font: 700 15px/1.2 var(--ui, Barlow, system-ui, sans-serif); white-space: nowrap; border: 1px solid #b18c1e; background: var(--yellow, #f9d65c); color: var(--navy, #182c4b); flex: none; }\n.ds-render:enabled { cursor: pointer; }\n.ds-render:hover:enabled:not([aria-disabled=\"true\"]) { background: var(--yellow-hover, #ffe591); }\n.ds-render:disabled, .ds-render[aria-disabled=\"true\"] { background: #e7eaf0; color: #4d627f; border-color: #95a8bd; cursor: default; }\n.ds-render:focus-visible { outline: 3px solid var(--focus, #235c9e); outline-offset: 3px; }\n.ds-editor { display: grid; grid-template-columns: 52px minmax(0, 1fr); }\n.ds-editor:focus-within { outline: 2px solid #779ac3; outline-offset: -2px; }\n.ds-gutter, .ds-source { box-sizing: border-box; margin: 0; padding: var(--editor-inset, 20px) 14px; font: 400 var(--editor-size, 14px)/var(--editor-line, 27px) var(--mono, \"IBM Plex Mono\", ui-monospace, monospace); tab-size: 2; white-space: pre; }\n.ds-gutter { overflow: hidden; user-select: none; text-align: right; color: var(--blue, #3a5b8a); background: var(--code-field, #edf3f9); border-right: 1px solid var(--rule, #d9e3ef); font-variant-numeric: tabular-nums; }\n.ds-source { overflow: auto; scrollbar-color: #91a8c3 var(--surface, #fbfcfe); }\n.ds-source:focus-visible { outline: 3px solid var(--focus, #235c9e); outline-offset: -3px; }\n.ds-source::selection, .ds-source span::selection { background: rgb(249 214 92 / 55%); }\n.ds-directive { color: #234f89; font-weight: 500; }\n.ds-string { color: #236256; }\n@media (max-width: 1160px) {\n  .ds-pane-bar { padding-inline: 12px; }\n  .ds-editor { grid-template-columns: 43px minmax(0, 1fr); }\n}\n@media (max-width: 760px) {\n  .ds-pane-bar { min-height: 55px; }\n  .ds-pane-title { font-size: 18px; }\n  .ds-file-actions { gap: 7px; }\n  .ds-filename { font-size: 11px; }\n  .ds-render { padding-inline: 9px; }\n  .ds-editor { grid-template-columns: 37px minmax(0, 1fr); }\n  .ds-gutter, .ds-source { padding: var(--editor-inset, 12px) 9px; font-size: var(--editor-size, 16px); line-height: var(--editor-line, 26px); }\n}"
+    },
+    {
+      "name": "Preview notices",
+      "kind": "custom",
+      "refersTo": "preview-notice",
+      "description": "Neutral and error notices for an out-of-date or failed preview.",
+      "html": "<p class=\"ds-preview-note\" data-state=\"stale\">Choose Render to preview your edits.</p>\n<p class=\"ds-preview-note\" data-state=\"error\">Fix the source errors. The preview shows the last successful render.</p>",
+      "css": ".ds-preview-note { margin: 0; padding: 9px 14px; border-top: 1px solid var(--rule, #d9e3ef); background: var(--code-field, #edf3f9); color: var(--blue, #3a5b8a); font: 600 15px/1.45 var(--ui, Barlow, system-ui, sans-serif); }\n.ds-preview-note[data-state=\"error\"] { border-color: #d4a296; background: var(--error-field, #ffefe9); color: var(--error, #7f332b); }"
+    },
+    {
+      "name": "Examples table",
+      "kind": "custom",
+      "refersTo": "examples-table",
+      "description": "A comparison table with a tinted header and right-aligned counts.",
+      "html": "<table class=\"ds-examples\" aria-label=\"Authored tokens for PageScript and hand-written HTML\">\n  <thead>\n    <tr><th scope=\"col\">Example</th><th scope=\"col\">PageScript</th><th scope=\"col\">HTML</th><th scope=\"col\">Change</th></tr>\n  </thead>\n  <tbody>\n    <tr><th scope=\"row\"><a href=\"?example=paper-sizes\">Paper sizes</a></th><td>830</td><td><a href=\"./benchmarks/html/paper-sizes.html\">678</a></td><td>22.42% more</td></tr>\n  </tbody>\n</table>",
+      "css": ".ds-examples { width: min(100%, 840px); border-collapse: collapse; background: var(--surface, #fbfcfe); color: var(--navy, #182c4b); text-align: left; font: 400 17px/1.45 var(--ui, Barlow, system-ui, sans-serif); font-variant-numeric: tabular-nums; }\n.ds-examples th, .ds-examples td { padding: 10px 14px; border-bottom: 1px solid var(--border, #becddd); }\n.ds-examples thead { background: var(--sign, #dbe6f2); }\n.ds-examples thead th:not(:first-child), .ds-examples td { text-align: right; }\n.ds-examples a { display: inline-block; padding-block: 2px; color: var(--blue, #3a5b8a); text-underline-offset: 4px; }\n.ds-examples a:hover { color: var(--navy, #182c4b); }\n.ds-examples a:focus-visible { outline: 3px solid var(--focus, #235c9e); outline-offset: 3px; }\n@media (max-width: 760px) {\n  .ds-examples { font-size: 14px; }\n  .ds-examples th, .ds-examples td { padding: 9px 6px; }\n}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Wayfinding",
+    "overview": "The compiler workspace uses labeled panels for source and output. Each panel header puts its action beside the panel title.",
+    "keyCharacteristics": [],
+    "rules": [],
+    "dos": [
+      "Do use the PageScript name as a plain text wordmark.",
+      "Do keep the preview footer clear when the result is current."
+    ],
+    "donts": []
+  }
+}
