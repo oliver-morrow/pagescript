@@ -50,6 +50,7 @@ pagescript stats examples/revenue-map-demo.page --page revenue-map
 
 - [Language reference](SPEC.md)
 - [Compiler tests and fixtures](CONFORMANCE.md)
+- [Browser compiler](docs/browser-compiler.md)
 - [Documentation index](docs/index.md)
 
 ```sh

@@ -1,3 +1,3 @@
 [workspace]
-members = ["rust/pagescript-rs"]
+members = ["rust/pagescript-rs", "rust/pagescript-web"]
 resolver = "3"
