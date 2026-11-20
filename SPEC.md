@@ -105,6 +105,16 @@ Directive headers and field lines use `key=value` attributes. Supported values a
 
 Attribute keys may contain letters, numbers, `_`, `-`, and `.`. Dotted keys are intended for token namespaces such as `color.accent` and `radius.panel`.
 
+Markdown blocks support level-one and level-two headings, paragraphs, and flat lists with `- ` or numbered markers such as `1. `. Put a blank line before and after a list.
+
+For a text-only table, enclose each row in pipes. Give every row the same number of cells. The second row uses three or more dashes per cell. Write `\|` for a literal pipe. Use the table directives for cells with nested content.
+
+```text
+| Service | Latency |
+| --- | --- |
+| API | 42 ms |
+```
+
 ## General Page Primitives
 
 - `::page`: root page

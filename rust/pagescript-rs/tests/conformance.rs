@@ -18,6 +18,74 @@ fn resolver_with_path(path: &str) -> Resolver {
 }
 
 #[test]
+fn renders_flat_markdown_lists_and_escapes_item_text() {
+    let document = parse_page_script(
+        r#"::page id=lists
+  - Prepare <strong>the plan</strong>
+  - Check the queue
+
+  3. Resume traffic
+  4. Record the result
+
+  - This block contains prose.
+  Keep the paragraph.
+::/page"#,
+    );
+    let html = render_to_html(&document, None, &resolver()).unwrap();
+
+    assert!(html.contains(
+        "<ul><li>Prepare &lt;strong&gt;the plan&lt;/strong&gt;</li><li>Check the queue</li></ul>"
+    ));
+    assert!(
+        html.contains("<ol start=\"3\"><li>Resume traffic</li><li>Record the result</li></ol>")
+    );
+    assert!(html.contains("<p>- This block contains prose.\n  Keep the paragraph.</p>"));
+}
+
+#[test]
+fn markdown_table_matches_the_semantic_table_directives() {
+    let shorthand = parse_page_script(
+        r#"::page id=table
+  | Service | Notes |
+  | --- | --- |
+  | API \| queue | A & B |
+  | Dashboard | |
+::/page"#,
+    );
+    let explicit = parse_page_script(
+        r#"::page id=table
+  ::table
+    ::column label="Service"
+    ::/column
+    ::column label="Notes"
+    ::/column
+    ::row
+      ::cell value="API | queue"
+      ::/cell
+      ::cell value="A & B"
+      ::/cell
+    ::/row
+    ::row
+      ::cell value="Dashboard"
+      ::/cell
+      ::cell value=""
+      ::/cell
+    ::/row
+  ::/table
+::/page"#,
+    );
+    let html = render_to_html(&shorthand, None, &resolver()).unwrap();
+
+    assert_eq!(html, render_to_html(&explicit, None, &resolver()).unwrap());
+    assert!(html.contains("<th scope=\"col\">Service</th>"));
+    assert!(html.contains("<td>API | queue</td><td>A &amp; B</td>"));
+
+    let ragged = parse_page_script("::page id=table\n| A | B |\n| --- | --- |\n| One |\n::/page");
+    let html = render_to_html(&ragged, None, &resolver()).unwrap();
+    assert!(html.contains("<p>| A | B |"));
+}
+
+#[test]
 fn valid_fixture_matches_expected_ast() {
     let source = fs::read_to_string("../../conformance/valid/basic.page").unwrap();
     let expected: Value = serde_json::from_str(

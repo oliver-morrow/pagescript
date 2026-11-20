@@ -291,17 +291,22 @@ fn render_table(node: &ComponentIr, context: &RenderContext<'_>) -> String {
         })
         .collect::<Vec<_>>()
         .join("\n");
+    table_markup(
+        &component_classes(node, &["ps-table"], context),
+        &id_attr(node),
+        &header,
+        &rows,
+    )
+}
+
+fn table_markup(classes: &str, id: &str, header: &str, rows: &str) -> String {
     let head = if header.is_empty() {
         String::new()
     } else {
         format!("<thead><tr>{header}</tr></thead>")
     };
 
-    format!(
-        "<div class=\"{}\"{}><table>{head}<tbody>{rows}</tbody></table></div>",
-        component_classes(node, &["ps-table"], context),
-        id_attr(node)
-    )
+    format!("<div class=\"{classes}\"{id}><table>{head}<tbody>{rows}</tbody></table></div>")
 }
 
 fn render_row(node: &ComponentIr, context: &RenderContext<'_>) -> String {
@@ -546,11 +551,105 @@ fn render_markdown(node: &MarkdownIr) -> String {
             } else if let Some(heading) = text.strip_prefix("## ") {
                 Some(format!("<h2>{}</h2>", escape_html(heading)))
             } else {
-                Some(format!("<p>{}</p>", escape_html(text)))
+                Some(
+                    render_markdown_list(block)
+                        .or_else(|| render_markdown_table(text))
+                        .unwrap_or_else(|| format!("<p>{}</p>", escape_html(text))),
+                )
             }
         })
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+fn render_markdown_list(block: &str) -> Option<String> {
+    let mut lines = block
+        .trim_end()
+        .lines()
+        .skip_while(|line| line.trim().is_empty());
+    let first_line = lines.next()?;
+    let first_text = first_line.trim_start();
+    let indent = first_line.len() - first_text.len();
+    let (start, first_item) = list_item(first_text)?;
+    let mut items = format!("<li>{}</li>", escape_html(first_item));
+    for line in lines {
+        let text = line.trim_start();
+        let (number, item) = list_item(text)?;
+        if line.len() - text.len() != indent || number.is_some() != start.is_some() {
+            return None;
+        }
+        items.push_str(&format!("<li>{}</li>", escape_html(item)));
+    }
+
+    Some(match start {
+        None => format!("<ul>{items}</ul>"),
+        Some(1) => format!("<ol>{items}</ol>"),
+        Some(start) => format!("<ol start=\"{start}\">{items}</ol>"),
+    })
+}
+
+fn list_item(line: &str) -> Option<(Option<u32>, &str)> {
+    let (number, text) = if let Some(text) = line.strip_prefix("- ") {
+        (None, text)
+    } else {
+        let (digits, text) = line.split_once(". ")?;
+        if digits.is_empty() || !digits.bytes().all(|byte| byte.is_ascii_digit()) {
+            return None;
+        }
+        (Some(digits.parse().ok()?), text)
+    };
+    let text = text.trim();
+    (!text.is_empty()).then_some((number, text))
+}
+
+fn render_markdown_table(block: &str) -> Option<String> {
+    let mut lines = block.lines();
+    let columns = pipe_cells(lines.next()?)?;
+    let separator = pipe_cells(lines.next()?)?;
+    if separator.len() != columns.len()
+        || !separator
+            .iter()
+            .all(|cell| cell.len() >= 3 && cell.bytes().all(|byte| byte == b'-'))
+    {
+        return None;
+    }
+
+    let header = columns
+        .iter()
+        .map(|column| format!("<th scope=\"col\">{}</th>", escape_html(column)))
+        .collect::<String>();
+    let mut rows = Vec::new();
+    for line in lines {
+        let cells = pipe_cells(line)?;
+        if cells.len() != columns.len() {
+            return None;
+        }
+        let cells = cells
+            .iter()
+            .map(|cell| format!("<td>{}</td>", escape_html(cell)))
+            .collect::<String>();
+        rows.push(format!("<tr>{cells}</tr>"));
+    }
+    Some(table_markup("ps-table", "", &header, &rows.join("\n")))
+}
+
+fn pipe_cells(line: &str) -> Option<Vec<String>> {
+    let mut chars = line.trim().strip_prefix('|')?.chars().peekable();
+    let mut cells = Vec::new();
+    let mut cell = String::new();
+    while let Some(ch) = chars.next() {
+        match ch {
+            '\\' if matches!(chars.peek(), Some('|' | '\\')) => {
+                cell.push(chars.next().expect("escaped character"));
+            }
+            '|' => {
+                cells.push(cell.trim().to_string());
+                cell.clear();
+            }
+            _ => cell.push(ch),
+        }
+    }
+    (cell.is_empty() && !cells.is_empty()).then_some(cells)
 }
 
 fn heading(node: &ComponentIr, tag: &str) -> String {
