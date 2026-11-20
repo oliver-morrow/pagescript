@@ -31,7 +31,7 @@
       ::/card
 
       ::card class=docs-card icon="02" title="Conformance"
-        body="Parser, validator, IR, renderer, token benchmark fixture, schemas, and compatibility expectations. See CONFORMANCE.md."
+        body="Parser, validator, IR, renderer, and compiler fixtures."
       ::/card
 
       ::card class=docs-card icon="03" title="Generation Guide"

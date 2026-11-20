@@ -1,24 +1,9 @@
 # Contributing
 
-PageScript is draft-stage standard work. Contributions should distinguish between standard changes and reference implementation changes.
-
-## Development
-
 ```sh
-pnpm install
-pnpm verify
+cargo fmt --all --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo test --workspace --locked
 ```
 
-## Standard Changes
-
-Changes to syntax, AST shape, diagnostics, or validation rules must update:
-
-- `SPEC.md`
-- `CONFORMANCE.md`
-- JSON schemas
-- conformance fixtures
-- tests
-
-## Implementation Changes
-
-Reference implementation changes should keep runtime dependencies at zero unless a standards requirement makes that impossible.
+Update the language reference, schemas, and compiler fixtures when their behavior changes. Run the site build when changing the playground. [Browser compiler guide](docs/browser-compiler.md)

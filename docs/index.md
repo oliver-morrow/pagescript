@@ -4,7 +4,7 @@ Start with the [quick start](../README.md#try-it) or an [example](../examples/RE
 
 - [Language reference](../SPEC.md)
 - [Rationale](../RATIONALE.md)
-- [Compiler tests](../CONFORMANCE.md)
+- [Compiler fixtures](../conformance/)
 - [Generation guide](./generation-guide.md)
 - [Extension model](./extension-model.md)
 - [Tool workflows](./tool-workflows.md)

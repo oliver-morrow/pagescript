@@ -7,7 +7,6 @@ on:
       - README.md
       - SPEC.md
       - RATIONALE.md
-      - CONFORMANCE.md
       - docs/**
       - examples/**
       - benchmarks/**
@@ -59,7 +58,7 @@ jobs:
 
   deploy:
     name: Deploy GitHub Pages
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     environment:

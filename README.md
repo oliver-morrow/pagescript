@@ -51,7 +51,7 @@ pagescript stats examples/revenue-map-demo.page --page revenue-map
 ## Reference and development
 
 - [Language reference](SPEC.md)
-- [Compiler tests and fixtures](CONFORMANCE.md)
+- [Compiler fixtures](conformance/)
 - [Browser compiler](docs/browser-compiler.md)
 - [Documentation index](docs/index.md)
 

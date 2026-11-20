@@ -9,6 +9,5 @@ The current project is broader: `.page` files describe small web pages, demos, d
 Current source of truth:
 
 - [SPEC.md](./SPEC.md)
-- [CONFORMANCE.md](./CONFORMANCE.md)
 - [docs/generation-guide.md](./docs/generation-guide.md)
 - [docs/extension-model.md](./docs/extension-model.md)
