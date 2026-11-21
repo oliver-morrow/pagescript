@@ -31,6 +31,9 @@ while IFS= read -r id; do
     cargo run -p pagescript-rs --locked -- render "examples/$id.page" --page "$id" --out "_site/examples/$id.html"
 done <<< "$case_ids"
 node scripts/render-benchmarks.mjs _site/benchmarks/token-counts.json _site/index.html
+compiler_version=$(cargo pkgid -p pagescript-rs | sed 's/.*[#@]//')
+sed -i.bak "s/__PAGESCRIPT_VERSION__/$compiler_version/" _site/index.html && rm _site/index.html.bak
+grep -Fq "$compiler_version" _site/index.html
 cargo run -p pagescript-rs --locked -- stats examples/revenue-map-demo.page --page revenue-map > _site/examples/revenue-map.o200k.json
 diff -u conformance/stats/revenue-map.o200k.json _site/examples/revenue-map.o200k.json
 grep -Fq 'PageScript' _site/index.html
