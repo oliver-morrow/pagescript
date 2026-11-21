@@ -18,4 +18,4 @@ cargo run --quiet --locked -p pagescript-rs --example token_benchmarks
 
 The runner normalizes line endings to LF and uses the CLI's `o200k_base` tokenizer. The results measure files only. Prompts, tool calls, and revisions are outside this measurement. [Checked counts](token-counts.json)
 
-The original revenue map compared 1,787 PageScript tokens with 4,975 tokens of compiler output. [Revenue map report](../conformance/stats/revenue-map.o200k.json)
+The original revenue map compared 1,787 PageScript tokens with 5,901 tokens of compiler output. [Revenue map report](../conformance/stats/revenue-map.o200k.json)

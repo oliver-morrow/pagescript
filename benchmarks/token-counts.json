@@ -16,8 +16,8 @@
         "tokens": 678
       },
       "generated_html": {
-        "bytes": 9267,
-        "tokens": 2954
+        "bytes": 12359,
+        "tokens": 3869
       },
       "source_delta_vs_handwritten_percent": 22.42
     },
@@ -35,8 +35,8 @@
         "tokens": 465
       },
       "generated_html": {
-        "bytes": 8027,
-        "tokens": 2558
+        "bytes": 11119,
+        "tokens": 3473
       },
       "source_delta_vs_handwritten_percent": -16.99
     },
@@ -54,8 +54,8 @@
         "tokens": 472
       },
       "generated_html": {
-        "bytes": 7924,
-        "tokens": 2513
+        "bytes": 11016,
+        "tokens": 3428
       },
       "source_delta_vs_handwritten_percent": -7.84
     },
@@ -73,8 +73,8 @@
         "tokens": 457
       },
       "generated_html": {
-        "bytes": 8527,
-        "tokens": 2700
+        "bytes": 11619,
+        "tokens": 3615
       },
       "source_delta_vs_handwritten_percent": 14.0
     },
@@ -92,8 +92,8 @@
         "tokens": 395
       },
       "generated_html": {
-        "bytes": 7465,
-        "tokens": 2364
+        "bytes": 10557,
+        "tokens": 3279
       },
       "source_delta_vs_handwritten_percent": -29.87
     }

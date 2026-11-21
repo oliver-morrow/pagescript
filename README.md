@@ -42,7 +42,7 @@ The [explainer docs](docs/v1-explainer-design.md) describe the input and the evi
 
 Five examples compare authored PageScript with hand-written HTML using `o200k_base`. The results range from 29.87% fewer tokens for the incident timeline to 22.42% more for paper sizes. [Counts, inputs, and reproduction](benchmarks/README.md)
 
-The original revenue map has 1,787 source tokens and 4,975 tokens in the compiler's standalone HTML. The output bundles shared CSS and JavaScript. [Revenue map report](conformance/stats/revenue-map.o200k.json)
+The original revenue map has 1,787 source tokens and 5,901 tokens in the compiler's standalone HTML. The output bundles shared CSS and JavaScript. [Revenue map report](conformance/stats/revenue-map.o200k.json)
 
 ```sh
 pagescript stats examples/revenue-map-demo.page --page revenue-map

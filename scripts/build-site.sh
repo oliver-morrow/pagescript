@@ -37,7 +37,7 @@ grep -Fq "$compiler_version" _site/index.html
 cargo run -p pagescript-rs --locked -- stats examples/revenue-map-demo.page --page revenue-map > _site/examples/revenue-map.o200k.json
 diff -u conformance/stats/revenue-map.o200k.json _site/examples/revenue-map.o200k.json
 grep -Fq 'PageScript' _site/index.html
-grep -Fq '64.08%' _site/docs/index.html
+grep -Fq '69.72%' _site/docs/index.html
 grep -Fq 'ps-runtime-config' _site/docs/index.html
 grep -Fq 'Product Metrics' _site/examples/product-metrics-demo.html
 grep -Fq 'Paper sizes' _site/examples/paper-sizes.html

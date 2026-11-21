@@ -17,6 +17,36 @@ fn resolver_with_path(path: &str) -> Resolver {
     Resolver::new(Some(std::path::PathBuf::from(path)))
 }
 
+fn render_with_tokens(tokens: &str) -> String {
+    let source = format!(
+        "::page id=themed\n  ::tokens\n{tokens}  ::/tokens\n  ::button label=\"Save\"\n  ::/button\n::/page\n"
+    );
+    render_to_html(&parse_page_script(&source), Some("themed"), &resolver()).unwrap()
+}
+
+#[test]
+fn light_accent_tokens_switch_button_text_to_dark_ink() {
+    let light = render_with_tokens("    color.accent=\"#4dd6a0\"\n");
+    assert!(light.contains("--ps-accent:#4dd6a0;--ps-accent-ink:#18263b;"));
+
+    let dark = render_with_tokens("    color.accent=\"#1f6b75\"\n");
+    assert!(dark.contains("--ps-accent:#1f6b75;"));
+    assert!(!dark.contains("--ps-accent-ink:#18263b"));
+
+    let explicit =
+        render_with_tokens("    color.accent=\"#4dd6a0\"\n    color.accent-ink=\"#ffffff\"\n");
+    assert!(explicit.contains("--ps-accent-ink:#ffffff;"));
+    assert!(!explicit.contains("--ps-accent-ink:#18263b"));
+}
+
+#[test]
+fn default_theme_keeps_motion_opt_in() {
+    let html = render_with_tokens("");
+    assert!(html.contains("@media (prefers-reduced-motion:no-preference)"));
+    assert!(html.contains("document.querySelectorAll(\".ps-effect-reveal\")"));
+    assert!(!html.contains(".ps-card:hover"));
+}
+
 #[test]
 fn renders_flat_markdown_lists_and_escapes_item_text() {
     let document = parse_page_script(

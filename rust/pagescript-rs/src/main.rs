@@ -470,75 +470,81 @@ Repair loop:
 4. Repeat until diagnostics are `[]`.
 5. Run `pagescript render file.page --out index.html`.
 "##;
-const PRODUCT_TEMPLATE: &str = r##"::page id=product-demo title="Product Demo"
+const PRODUCT_TEMPLATE: &str = r##"::page id=project title="Tide Tables"
   ::tokens
-    color.accent="#4dd6a0"
-    radius.panel=14
+    color.accent="#1f6b75"
+    radius.panel=10
   ::/tokens
 
   ::hero spacing=xl
-    heading="Launch a useful page from one file"
-    body="PageScript turns compact semantic source into standalone HTML that code generators and humans can both edit."
+    heading="Tide Tables"
+    body="A command-line tool that prints high and low tide times for a coastal station. It works offline after the first run and writes plain text, CSV, or JSON."
   ::/hero
 
   ::section spacing=lg
-    heading="Why it works"
-    body="Start with a source file, render it locally, and publish the generated HTML anywhere static files can go."
+    heading="What it does"
+    body="Tide Tables downloads the published constants for a station once, then computes each prediction on your machine."
 
     ::grid columns=3 gap=md density=compact
-      ::card icon="01" title="Compact source"
-        body="Write the intent of the page instead of hand-authoring every div, class, and runtime hook."
+      ::card title="Offline predictions"
+        body="Station data is cached on first use, so later runs need no network connection."
       ::/card
-      ::card icon="02" title="Standalone output"
-        body="The renderer emits browser-native HTML and CSS with no application server required."
+      ::card title="Three output formats"
+        body="Read a table in the terminal, or pipe CSV or JSON into another program."
       ::/card
-      ::card icon="03" title="Tool friendly"
-        body="Codex, Claude, and Cursor can review and modify PageScript without losing the page structure."
+      ::card title="Station search"
+        body="Find a station by name or ID. The full station index ships with the tool."
       ::/card
     ::/grid
   ::/section
 ::/page
 "##;
 
-const DASHBOARD_TEMPLATE: &str = r##"::page id=dashboard title="Dashboard"
+const DASHBOARD_TEMPLATE: &str = r##"::page id=dashboard title="Build health"
   ::tokens
-    color.accent="#3b82f6"
-    radius.panel=12
+    color.accent="#4d5fae"
+    radius.panel=10
   ::/tokens
 
-  ::scene id=overview layout=split title="Operating dashboard"
-    heading="Live business health"
-    body="Use PageScript to express metrics, panels, and next actions in a compact source file."
+  ::scene id=overview layout=split
+    heading="Build health"
+    body="Continuous integration results for the main branch over the last seven days."
 
-    ::panel id=metrics title="Key metrics" density=compact
-      ::metric id=activation label="Activation" value="72%" tone=good
+    ::panel id=metrics title="This week" density=compact
+      ::metric id=pass-rate label="Passing runs" value="94%" tone=good
       ::/metric
-      ::metric id=pipeline label="Pipeline" value="$184k" tone=accent
+      ::metric id=duration label="Median duration" value="6 min 40 s" tone=accent
       ::/metric
-      ::metric id=risk label="At risk" value="6 accounts" tone=warning
+      ::metric id=flaky label="Flaky tests" value="7" tone=warning
       ::/metric
     ::/panel
 
-    ::panel id=actions title="Next actions" density=spacious
-      ::filter id=account-search label="Search accounts" placeholder="Company or owner"
+    ::panel id=attention title="Needs attention" density=spacious
+      ::filter id=test-search label="Search tests" placeholder="Test name or file"
       ::/filter
       ::stack gap=md
-        ::card icon="A" title="Review account drift"
-          body="Find accounts where usage dropped after onboarding and assign follow-up owners."
+        ::card title="Quarantine flaky tests"
+          body="Seven tests failed and then passed on retry. Move them to the quarantine suite until they are fixed."
         ::/card
-        ::card icon="B" title="Publish update"
-          body="Render the latest dashboard and share the standalone HTML with peers."
+        ::card title="Cache dependencies"
+          body="Installing dependencies takes about two minutes on every run."
         ::/card
       ::/stack
-      ::table id=accounts
-        ::column label="Account"
+      ::table id=slowest
+        ::column label="Slowest test file"
         ::/column
-        ::column label="Status"
+        ::column label="Duration"
         ::/column
         ::row
-          ::cell value="Acme"
+          ::cell value="checkout.spec.ts"
           ::/cell
-          ::cell value="Healthy"
+          ::cell value="48 s"
+          ::/cell
+        ::/row
+        ::row
+          ::cell value="search.spec.ts"
+          ::/cell
+          ::cell value="31 s"
           ::/cell
         ::/row
       ::/table
@@ -547,30 +553,30 @@ const DASHBOARD_TEMPLATE: &str = r##"::page id=dashboard title="Dashboard"
 ::/page
 "##;
 
-const DOCS_TEMPLATE: &str = r##"::page id=docs title="Project Docs"
+const DOCS_TEMPLATE: &str = r##"::page id=docs title="Getting started"
   ::tokens
     color.accent="#116149"
-    radius.panel=14
+    radius.panel=10
   ::/tokens
 
   ::hero spacing=lg
-    heading="Project documentation"
-    body="A compact PageScript docs page with sections, cards, and standalone rendered output."
+    heading="Getting started"
+    body="Install the project, run it once, and find the reference for each command."
   ::/hero
 
   ::section spacing=lg
     heading="Start here"
-    body="Replace these cards with the workflow, API, and examples your peers need first."
+    body="Most people need these three pages first."
 
     ::grid columns=3 gap=md density=compact
-      ::card icon="01" title="Install"
-        body="Document the shortest path from a fresh checkout to a working local command."
+      ::card title="Install"
+        body="The shortest path from a fresh checkout to a working local command."
       ::/card
-      ::card icon="02" title="Use"
-        body="Show one realistic command sequence that creates a visible result."
+      ::card title="First run"
+        body="One realistic command sequence that produces a visible result."
       ::/card
-      ::card icon="03" title="Extend"
-        body="Explain how to customize the source file without learning the whole standard."
+      ::card title="Reference"
+        body="Every command and option, with the defaults each one uses."
       ::/card
     ::/grid
   ::/section
@@ -706,8 +712,9 @@ mod tests {
 
         assert_eq!(run(vec!["new".into(), path.display().to_string()]), 0);
         let source = fs::read_to_string(path).unwrap();
-        assert!(source.contains("::page id=product-demo"));
-        assert!(source.contains("Launch a useful page from one file"));
+        assert!(source.contains("::page id=project"));
+        assert!(source.contains("heading=\"Tide Tables\""));
+        assert!(!source.contains("icon=\"01\""));
     }
 
     #[test]
@@ -725,7 +732,7 @@ mod tests {
         );
         let source = fs::read_to_string(path).unwrap();
         assert!(source.contains("::page id=dashboard"));
-        assert!(source.contains("Operating dashboard"));
+        assert!(source.contains("heading=\"Build health\""));
     }
 
     #[test]
@@ -751,7 +758,7 @@ mod tests {
             0
         );
         let source = fs::read_to_string(path).unwrap();
-        assert!(source.contains("::page id=product-demo"));
+        assert!(source.contains("::page id=project"));
     }
 
     #[test]

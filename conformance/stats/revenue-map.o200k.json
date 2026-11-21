@@ -7,9 +7,9 @@
     "tokens": 1787
   },
   "generated_html": {
-    "bytes": 15826,
-    "tokens": 4975
+    "bytes": 18942,
+    "tokens": 5901
   },
-  "authored_source_token_reduction_percent": 64.08,
+  "authored_source_token_reduction_percent": 69.72,
   "methodology": "Counts LF-normalized checked-in artifacts with o200k_base; excludes prompts, system instructions, tool calls, repair turns, and prior context."
 }
