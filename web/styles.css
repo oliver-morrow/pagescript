@@ -128,7 +128,24 @@ main:focus { outline: none; }
   outline-offset: -5px;
 }
 .sheet + .sheet, .noscript + .sheet { margin-top: var(--gutter); }
-.sheet:last-child { margin-bottom: var(--gutter); }
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 24px;
+  min-height: 64px;
+  margin-top: 8px;
+}
+.site-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--table-muted);
+  text-decoration: none;
+}
+.site-footer a:hover { color: var(--table-text); text-decoration: underline; }
+.site-footer a:focus-visible { outline-color: var(--table-text); }
 .sheet-inner {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);

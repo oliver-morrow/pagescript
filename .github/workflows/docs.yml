@@ -24,16 +24,14 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: docs-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build static docs artifact
+    name: Build and verify the static site
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,21 +48,3 @@ jobs:
 
       - name: Build and verify the static site
         run: bash scripts/build-site.sh
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-  deploy:
-    name: Deploy GitHub Pages
-    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
