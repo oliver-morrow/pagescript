@@ -3,109 +3,123 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#182c4b">
+  <meta name="theme-color" content="#1d4b8f">
   <meta name="description" content="A page format for coding agents. Edit and render a real PageScript example in your browser.">
   <title>PageScript</title>
   <link rel="icon" href="data:,">
-  <link rel="preload" href="./fonts/barlow-semi-condensed-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/b612-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/b612-700-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
   <script type="module" src="./playground.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#playground">Skip to the playground</a>
-  <header class="site-header">
-    <div class="frame header-inner">
-      <a class="wordmark" href="./" translate="no">PageScript</a>
-      <nav aria-label="Project">
-        <a href="#examples">Examples</a>
-        <a href="https://github.com/oliver-morrow/pagescript/blob/main/SPEC.md">Syntax</a>
-        <a href="https://github.com/oliver-morrow/pagescript">GitHub</a>
-      </nav>
-    </div>
+  <header class="frame site-header">
+    <a class="wordmark" href="./" translate="no">PageScript</a>
+    <nav aria-label="Project">
+      <a href="#examples">Examples</a>
+      <a href="https://github.com/oliver-morrow/pagescript/blob/main/SPEC.md">Syntax</a>
+      <a href="https://github.com/oliver-morrow/pagescript">GitHub</a>
+    </nav>
   </header>
 
-  <main class="frame main" id="playground" tabindex="-1">
-    <div class="intro">
-      <h1>A page format for coding agents</h1>
-      <p>Render <code translate="no">.page</code> files to standalone HTML.</p>
-      <a class="skill-link" href="#agent-skill">Get the agent skill</a>
-    </div>
+  <main id="playground" tabindex="-1">
+    <div class="frame sheet">
+      <div class="sheet-inner">
+        <div class="intro">
+          <h1>A page format for coding agents</h1>
+          <p>Write a <code translate="no">.page</code> file, render it to one standalone HTML file. This editor runs the same Rust compiler as the CLI, built for the browser.</p>
+          <a class="skill-link" href="#agent-skill">Get the agent skill</a>
+        </div>
 
-    <div class="workbench">
-      <form class="pane source-pane" id="source-form" aria-labelledby="source-heading">
-        <header class="pane-bar">
-          <h2 id="source-heading">Source</h2>
-          <div class="file-actions">
+        <form class="view source-view" id="source-form" aria-labelledby="source-heading">
+          <header class="view-bar">
+            <h2 id="source-heading">Source</h2>
             <span class="filename" id="filename" translate="no">paper-sizes.page</span>
-            <button class="render" id="render" type="submit" aria-keyshortcuts="Control+Enter Meta+Enter" disabled>
-              Render
-            </button>
+            <button class="render" id="render" type="submit" aria-keyshortcuts="Control+Enter Meta+Enter" disabled>Render</button>
+          </header>
+          <div class="editor" id="editor">
+            <pre class="line-numbers" id="line-numbers" aria-hidden="true">1</pre>
+            <div class="editor-text">
+              <pre class="highlight" id="highlight" aria-hidden="true" translate="no"></pre>
+              <label class="sr-only" for="source">PageScript source</label>
+              <textarea id="source" name="pagescript-source" wrap="off" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" translate="no" placeholder="Loading example…" aria-describedby="source-help" disabled></textarea>
+            </div>
+            <span class="sr-only" id="source-help">Edit the source and choose Render, or press Control or Command and Enter.</span>
           </div>
-        </header>
-        <div class="editor" id="editor">
-          <pre class="line-numbers" id="line-numbers" aria-hidden="true">1</pre>
-          <div class="editor-text">
-            <pre class="highlight" id="highlight" aria-hidden="true" translate="no"></pre>
-            <label class="sr-only" for="source">PageScript source</label>
-            <textarea id="source" name="pagescript-source" wrap="off" spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off" translate="no" placeholder="Loading example…" aria-describedby="source-help" disabled></textarea>
+          <div class="diagnostics" id="diagnostics" hidden>
+            <ul id="diagnostic-list" aria-label="Compiler errors"></ul>
           </div>
-          <span class="sr-only" id="source-help">Edit the source and choose Render, or press Control or Command and Enter.</span>
-        </div>
-        <div class="diagnostics" id="diagnostics" hidden>
-          <ul id="diagnostic-list" aria-label="Compiler errors"></ul>
-        </div>
-      </form>
-      <section class="pane preview-pane" aria-labelledby="preview-heading">
-        <header class="pane-bar">
-          <h2 id="preview-heading">Preview</h2>
+        </form>
+
+        <section class="view preview-view" aria-labelledby="preview-heading">
+          <header class="view-bar">
+            <h2 id="preview-heading">Rendered HTML</h2>
+          </header>
+          <iframe id="preview" title="Rendered PageScript page" sandbox="allow-scripts" referrerpolicy="no-referrer" tabindex="0"></iframe>
+        </section>
+
+        <div class="title-block" aria-label="Render details">
+          <dl>
+            <div class="cell cell-file"><dt>File</dt><dd id="fact-file" translate="no">paper-sizes.page</dd></div>
+            <div class="cell"><dt>Lines</dt><dd id="fact-lines">–</dd></div>
+            <div class="cell"><dt>Source</dt><dd id="fact-source">–</dd></div>
+            <div class="cell"><dt>HTML</dt><dd id="fact-html">–</dd></div>
+            <div class="cell cell-compiler"><dt>Compiler</dt><dd><span translate="no">__PAGESCRIPT_VERSION__</span>, wasm</dd></div>
+            <div class="cell cell-status"><dt>Status</dt><dd id="preview-note" data-state="loading">Loading the compiler…</dd></div>
+          </dl>
           <a class="download" id="download" href="./examples/paper-sizes.html" download="paper-sizes.html">Download HTML</a>
-        </header>
-        <iframe id="preview" title="Rendered PageScript page" sandbox="allow-scripts" referrerpolicy="no-referrer" tabindex="0"></iframe>
-        <p class="preview-note" id="preview-note" aria-hidden="true" hidden></p>
-        <span class="sr-only" id="render-announcement" role="status"></span>
-      </section>
+          <span class="sr-only" id="render-announcement" role="status"></span>
+        </div>
+      </div>
     </div>
 
-    <noscript><p>Turn on JavaScript to render edits. The example HTML is available above.</p></noscript>
+    <noscript><p class="frame noscript">Turn on JavaScript to render edits. The example HTML is available from Download HTML.</p></noscript>
 
-    <section class="agent-section" id="agent-skill" aria-labelledby="agent-heading">
-      <div>
-        <h2 id="agent-heading">Use PageScript with your agent</h2>
-        <p><a href="./pagescript-skill.zip" download>Download the agent skill</a>, then put the extracted <code translate="no">pagescript</code> folder in your project’s skills directory.</p>
-        <p class="skill-paths">
-          <span><a href="https://learn.chatgpt.com/docs/build-skills">Codex</a> <code translate="no">.agents/skills/</code></span>
-          <span><a href="https://code.claude.com/docs/en/skills#choose-where-skills-load">Claude Code</a> <code translate="no">.claude/skills/</code></span>
-        </p>
-      </div>
-      <div class="agent-prompt">
-        <div class="prompt-header">
-          <label for="sample-prompt">Sample prompt</label>
-          <button class="copy" id="copy-prompt" type="button" disabled>Copy prompt</button>
-        </div>
-        <textarea id="sample-prompt" name="sample-prompt" rows="4" readonly>Use the PageScript skill to compare A4 and US Letter. Include their dimensions and draw both to scale. Save the .page file and render standalone HTML.</textarea>
-        <span class="copy-status" id="copy-status" role="status"></span>
-      </div>
-    </section>
+    <div class="frame sheet">
+      <div class="sheet-inner sheet-reference">
+        <section class="agent-section" id="agent-skill" aria-labelledby="agent-heading">
+          <h2 id="agent-heading">Use PageScript with your agent</h2>
+          <p><a href="./pagescript-skill.zip" download>Download the agent skill</a>, then put the extracted <code translate="no">pagescript</code> folder in your project’s skills directory.</p>
+          <dl class="skill-paths">
+            <div><dt><a href="https://learn.chatgpt.com/docs/build-skills">Codex</a></dt><dd><code translate="no">.agents/skills/</code></dd></div>
+            <div><dt><a href="https://code.claude.com/docs/en/skills#choose-where-skills-load">Claude Code</a></dt><dd><code translate="no">.claude/skills/</code></dd></div>
+          </dl>
+          <div class="agent-prompt">
+            <div class="prompt-header">
+              <label for="sample-prompt">Sample prompt</label>
+              <button class="copy" id="copy-prompt" type="button" disabled>Copy prompt</button>
+            </div>
+            <textarea id="sample-prompt" name="sample-prompt" rows="3" readonly>Use the PageScript skill to compare A4 and US Letter. Include their dimensions and draw both to scale. Save the .page file and render standalone HTML.</textarea>
+            <span class="copy-status" id="copy-status" role="status"></span>
+          </div>
+        </section>
 
-    <section class="examples-section" id="examples" aria-labelledby="examples-heading">
-      <h2 id="examples-heading">Examples and token counts</h2>
-      <p>Open an example to edit it. Each pair has the same content and behavior. Counts use <code translate="no">o200k_base</code> and include any authored styles and scripts.</p>
-      <table class="benchmark-table">
-        <caption class="sr-only">Authored tokens for PageScript and hand-written HTML</caption>
-        <thead>
-          <tr>
-            <th scope="col">Example</th>
-            <th scope="col">PageScript</th>
-            <th scope="col">HTML</th>
-            <th scope="col">Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- benchmark rows -->
-        </tbody>
-      </table>
-      <p class="benchmark-note">HTML counts link to the hand-written versions. <a href="./benchmarks/token-counts.json">Full counts, including compiler output</a></p>
-    </section>
+        <section class="examples-section" id="examples" aria-labelledby="examples-heading">
+          <h2 id="examples-heading">Examples and token counts</h2>
+          <p>Open an example to edit it. Each pair has the same content and behavior. Counts use <code translate="no">o200k_base</code> and include any authored styles and scripts.</p>
+          <div class="table-scroll">
+            <table class="benchmark-table">
+              <caption class="sr-only">Authored tokens for PageScript and hand-written HTML</caption>
+              <colgroup><col class="name"><col class="count"><col class="count"><col class="change"><col class="scale-track"></colgroup>
+              <thead>
+                <tr>
+                  <th scope="col">Example</th>
+                  <th scope="col">PageScript</th>
+                  <th scope="col">HTML</th>
+                  <th scope="col">Change</th>
+                  <th scope="col" class="scale-col"><span class="key key-page">PageScript</span> <span class="key key-html">HTML</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- benchmark rows -->
+              </tbody>
+            </table>
+          </div>
+          <p class="benchmark-note">HTML counts link to the hand-written versions. <a href="./benchmarks/token-counts.json">Full counts, including compiler output</a></p>
+        </section>
+      </div>
+    </div>
   </main>
 </body>
 </html>

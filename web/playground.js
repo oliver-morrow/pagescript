@@ -13,6 +13,13 @@ const download = document.querySelector("#download");
 const prompt = document.querySelector("#sample-prompt");
 const copy = document.querySelector("#copy-prompt");
 const copyStatus = document.querySelector("#copy-status");
+const factFile = document.querySelector("#fact-file");
+const factLines = document.querySelector("#fact-lines");
+const factSource = document.querySelector("#fact-source");
+const factHTML = document.querySelector("#fact-html");
+const encoder = new TextEncoder();
+const sizeFormat = new Intl.NumberFormat("en", { maximumFractionDigits: 1 });
+const countFormat = new Intl.NumberFormat("en");
 const requestedExample = new URLSearchParams(location.search).get("example");
 const knownExample = [...document.querySelectorAll("[data-example]")].some(
   link => link.dataset.example === requestedExample
@@ -22,6 +29,7 @@ const examplePath = "./examples/" + example;
 
 if (example !== "paper-sizes") {
   document.querySelector("#filename").textContent = example + ".page";
+  factFile.textContent = example + ".page";
   download.href = examplePath + ".html";
   download.download = example + ".html";
 }
@@ -33,11 +41,18 @@ let renderedSource = "";
 let initialSource = "";
 let downloadURL;
 
+function formatBytes(bytes) {
+  return bytes < 1024 ? countFormat.format(bytes) + " B" : sizeFormat.format(bytes / 1024) + " KB";
+}
+
 function setStatus(state, message = "") {
   previewNote.dataset.state = state;
-  previewNote.hidden = state === "rendered";
-  previewNote.textContent = previewNote.hidden ? "" : message;
+  previewNote.textContent = state === "rendered" ? "Preview matches the source" : message;
   if (renderAnnouncement.textContent !== message) renderAnnouncement.textContent = message;
+}
+
+function showOutputSize(html) {
+  factHTML.textContent = formatBytes(encoder.encode(html).length);
 }
 
 function syncEditorScroll() {
@@ -48,6 +63,8 @@ function syncEditorScroll() {
 
 function drawSource() {
   const text = source.value;
+  factLines.textContent = countFormat.format(text.split("\n").length - (text.endsWith("\n") ? 1 : 0));
+  factSource.textContent = formatBytes(encoder.encode(text).length);
   const plain = text.length > 120000;
   editor.dataset.plain = String(plain);
   if (plain) {
@@ -107,7 +124,7 @@ function showDiagnostics(errors) {
 
 function updateSourceStatus(message) {
   if (source.value === renderedSource) setStatus("rendered", message);
-  else setStatus("stale", "Choose Render to preview your edits.");
+  else setStatus("stale", "Edited. Render to update the preview.");
 }
 
 function applyCompilation(result) {
@@ -118,6 +135,7 @@ function applyCompilation(result) {
   if (result.status === "rendered") {
     renderedSource = submitted;
     preview.srcdoc = result.html;
+    showOutputSize(result.html);
     if (downloadURL) URL.revokeObjectURL(downloadURL);
     downloadURL = URL.createObjectURL(new Blob([result.html], { type: "text/html" }));
     download.href = downloadURL;
@@ -227,6 +245,7 @@ async function loadSample() {
   const [pageSource, html] = await Promise.all([sourceFile.text(), htmlFile.text()]);
   initialSource = pageSource;
   preview.srcdoc = html;
+  showOutputSize(html);
   source.value = initialSource;
   renderedSource = initialSource;
   source.disabled = false;
