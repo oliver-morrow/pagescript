@@ -38,8 +38,8 @@
         body="Compact syntax guide, small examples, compiler repair loop, and audit question for generated .page files. See docs/generation-guide.md."
       ::/card
 
-      ::card class=docs-card icon="04" title="Extension Model"
-        body="Deterministic core, recipe iteration, Web Core Kernel reach, and explicit non-standard escape boundaries. See docs/extension-model.md."
+      ::card class=docs-card icon="04" title="Browser Compiler"
+        body="The WebAssembly build that powers the playground, its JavaScript API, and its result shapes. See docs/browser-compiler.md."
       ::/card
     ::/grid
   ::/section

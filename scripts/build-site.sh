@@ -12,7 +12,7 @@ rm -rf _site
 mkdir -p _site/docs _site/examples _site/schemas _site/conformance _site/playground/compiler \
     _site/benchmarks/html _site/skills/pagescript
 cp -R web/. _site/
-cp README.md SPEC.md RATIONALE.md CHANGELOG.md LICENSE _site/
+cp README.md SPEC.md CHANGELOG.md LICENSE _site/
 cp -R docs/. _site/docs/
 cp -R examples/. _site/examples/
 cp -R schemas/. _site/schemas/
