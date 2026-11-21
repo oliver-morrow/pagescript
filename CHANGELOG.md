@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.1.0-alpha.2](https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.2) - 2026-11-21
+
+### Added
+
+- flat lists and text tables in Markdown blocks
+- `pagescript-web`, the compiler built for the browser with WebAssembly, which runs the playground at pagescript.olivermorrow.com
+- a portable agent skill (`skills/pagescript/SKILL.md`) for writing, validating, and rendering `.page` files
+- token benchmarks that compare authored PageScript with hand-written HTML for five examples
+- `ArtifactTokenMeasure::from_text` for counting an artifact with the stats tokenizer
+
+### Changed
+
+- a new default theme for compiled pages: a cooler palette, smaller headings, tighter spacing, 44px controls, and no card hover lift. Light accent colors get dark button text unless `color.accent-ink` is set
+- some generated class names changed, for example `ps-scene-inner` is now `ps-scene-body`; custom CSS that targets the old names needs updating
+- `pagescript new` templates use realistic sample content
+- the revenue-map output grows from 4,975 to 5,901 tokens with the new theme, so the checked figure moves from 64.08% to 69.72% fewer tokens in the authored source
+- the site deploys to Cloudflare from the `prod` branch instead of GitHub Pages
+
+### Removed
+
+- contributor templates, SECURITY.md, CONTRIBUTING.md, RATIONALE.md, the per-tool agent templates (replaced by the skill), and draft-era documentation pages
+
 ## [1.1.0-alpha.1](https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1) - 2026-08-07
 
 ### Added

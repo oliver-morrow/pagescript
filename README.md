@@ -1,6 +1,6 @@
 # PageScript
 
-PageScript is a text format for coding agents that write web pages. The Rust compiler turns `.page` files into standalone HTML with styling and interactions. The current release is [v1.1.0-alpha.1](https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1).
+PageScript is a text format for coding agents that write web pages. The Rust compiler turns `.page` files into standalone HTML with styling and interactions. The current release is [v1.1.0-alpha.2](https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.2).
 
 ## Try it
 
