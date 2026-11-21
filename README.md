@@ -36,13 +36,13 @@ pagescript explain conformance/evidence/valid/minimal.evidence.json \
   --spec conformance/explainer/valid/minimal.explainer.json --out explainer.html
 ```
 
-The [explainer docs](docs/v1-explainer-design.md) describe the input and the evidence each citation carries.
+The [evidence bundle](schemas/evidence-bundle.schema.json) and [explainer spec](schemas/explainer-spec.schema.json) schemas describe the input. The [language reference](SPEC.md) covers how it is rendered.
 
 ## Token benchmarks
 
 Five examples compare authored PageScript with hand-written HTML using `o200k_base`. The results range from 29.87% fewer tokens for the incident timeline to 22.42% more for paper sizes. [Counts, inputs, and reproduction](benchmarks/README.md)
 
-The original revenue map has 1,787 source tokens and 4,975 tokens in the compiler's standalone HTML. The output bundles shared CSS and JavaScript. [Revenue map report](conformance/stats/revenue-map.o200k.json)
+The original revenue map has 1,787 source tokens and 5,901 tokens in the compiler's standalone HTML. The output bundles shared CSS and JavaScript. [Revenue map report](conformance/stats/revenue-map.o200k.json)
 
 ```sh
 pagescript stats examples/revenue-map-demo.page --page revenue-map
@@ -52,11 +52,13 @@ pagescript stats examples/revenue-map-demo.page --page revenue-map
 
 - [Language reference](SPEC.md)
 - [Compiler fixtures](conformance/)
+- [Generation guide](docs/generation-guide.md)
 - [Browser compiler](docs/browser-compiler.md)
-- [Documentation index](docs/index.md)
 
 ```sh
 cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace --locked
 ```
+
+When compiler behavior changes, update the language reference, schemas, and fixtures to match. Run `bash scripts/build-site.sh` after changing the playground.

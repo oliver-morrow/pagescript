@@ -90,7 +90,7 @@ jobs:
 
           grep -F '<svg class="ps-graph"' target/pagescript-smoke/lineage-demo.html
           grep -F 'PageScript Documentation' target/pagescript-smoke/docs-index.html
-          grep -F '64.08%' target/pagescript-smoke/docs-index.html
+          grep -F '69.72%' target/pagescript-smoke/docs-index.html
           grep -F 'Local Override' target/pagescript-smoke/release-hardening.html
           grep -F 'Base recipe resolved' target/pagescript-smoke/release-hardening.html
           grep -F 'Open details' target/pagescript-smoke/release-hardening.html

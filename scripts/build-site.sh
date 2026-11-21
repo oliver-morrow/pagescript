@@ -12,7 +12,7 @@ rm -rf _site
 mkdir -p _site/docs _site/examples _site/schemas _site/conformance _site/playground/compiler \
     _site/benchmarks/html _site/skills/pagescript
 cp -R web/. _site/
-cp README.md SPEC.md RATIONALE.md CHANGELOG.md LICENSE _site/
+cp README.md SPEC.md CHANGELOG.md LICENSE _site/
 cp -R docs/. _site/docs/
 cp -R examples/. _site/examples/
 cp -R schemas/. _site/schemas/
@@ -37,7 +37,7 @@ grep -Fq "$compiler_version" _site/index.html
 cargo run -p pagescript-rs --locked -- stats examples/revenue-map-demo.page --page revenue-map > _site/examples/revenue-map.o200k.json
 diff -u conformance/stats/revenue-map.o200k.json _site/examples/revenue-map.o200k.json
 grep -Fq 'PageScript' _site/index.html
-grep -Fq '64.08%' _site/docs/index.html
+grep -Fq '69.72%' _site/docs/index.html
 grep -Fq 'ps-runtime-config' _site/docs/index.html
 grep -Fq 'Product Metrics' _site/examples/product-metrics-demo.html
 grep -Fq 'Paper sizes' _site/examples/paper-sizes.html

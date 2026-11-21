@@ -18,7 +18,7 @@
 
   ::hero class=docs-hero spacing=xl
     heading="PageScript"
-    body="1,787 authored tokens become a 4,975-token standalone page: 64.08% fewer tokens in the PageScript source under o200k_base. The compiler also turns reviewed evidence bundles into deterministic, source-cited HTML."
+    body="1,787 authored tokens become a 5,901-token standalone page: 69.72% fewer tokens in the PageScript source under o200k_base. The compiler also turns reviewed evidence bundles into deterministic, source-cited HTML."
   ::/hero
 
   ::section spacing=lg
@@ -38,8 +38,8 @@
         body="Compact syntax guide, small examples, compiler repair loop, and audit question for generated .page files. See docs/generation-guide.md."
       ::/card
 
-      ::card class=docs-card icon="04" title="Extension Model"
-        body="Deterministic core, recipe iteration, Web Core Kernel reach, and explicit non-standard escape boundaries. See docs/extension-model.md."
+      ::card class=docs-card icon="04" title="Browser Compiler"
+        body="The WebAssembly build that powers the playground, its JavaScript API, and its result shapes. See docs/browser-compiler.md."
       ::/card
     ::/grid
   ::/section
@@ -74,14 +74,14 @@
 
   ::section spacing=lg
     heading="Measured source reduction"
-    body="The revenue-map fixture uses 1,787 o200k_base tokens as LF-normalized authored PageScript source and 4,975 tokens as generated standalone HTML: 64.08% fewer tokens in the authored artifact. The checked-in benchmark measures those two artifacts only; it excludes prompts, tool calls, repair turns, and prior context."
+    body="The revenue-map fixture uses 1,787 o200k_base tokens as LF-normalized authored PageScript source and 5,901 tokens as generated standalone HTML: 69.72% fewer tokens in the authored artifact. The checked-in benchmark measures those two artifacts only; it excludes prompts, tool calls, repair turns, and prior context."
 
     ::grid columns=3 gap=md density=compact
       ::metric id=source-tokens label="PageScript source" value="1,787 tokens" tone=good
       ::/metric
-      ::metric id=html-tokens label="Standalone HTML" value="4,975 tokens" tone=accent
+      ::metric id=html-tokens label="Standalone HTML" value="5,901 tokens" tone=accent
       ::/metric
-      ::metric id=token-reduction label="Authored reduction" value="64.08%" tone=good
+      ::metric id=token-reduction label="Authored reduction" value="69.72%" tone=good
       ::/metric
     ::/grid
   ::/section
