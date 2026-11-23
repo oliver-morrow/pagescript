@@ -11,7 +11,7 @@
 
 ### Added
 
-- deterministic `pagescript stats` reports with a checked-in `o200k_base` token-savings fixture
+- deterministic `pagescript stats` reports with a checked-in `o200k_base` token-count fixture
 - source-cited Evidence Bundle and Explainer Spec schemas with an offline standalone explainer renderer
 - compiler validation for executable URL schemes, style-tag termination, unresolved imports, recipe-expansion cycles, and resolver root boundaries
 - release artifacts checksums and release, package, docs, and CI checks for the public demo contracts

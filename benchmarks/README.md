@@ -1,6 +1,6 @@
 # Authored token counts
 
-Each pair has the same visible content and behavior. The hand-written HTML includes its styles and any scripts, as does the PageScript source. The build summary uses a recipe from the compiler's standard library. Compiler and library code count toward the generated HTML column when bundled.
+Each pair has the same visible content and behavior. The hand-written HTML includes its styles and any scripts, as does the PageScript source. The build summary uses a recipe from the compiler's standard library. The generated HTML column is the compiler's output. Every compiled page includes the same theme CSS and runtime, about 3,000 tokens even for an empty page, so most of that column is fixed cost. Agents edit the PageScript source, not the generated file.
 
 | Example | PageScript | Hand-written HTML | Generated HTML | PageScript vs hand-written |
 | --- | ---: | ---: | ---: | ---: |
@@ -18,4 +18,4 @@ cargo run --quiet --locked -p pagescript-rs --example token_benchmarks
 
 The runner normalizes line endings to LF and uses the CLI's `o200k_base` tokenizer. The results measure files only. Prompts, tool calls, and revisions are outside this measurement. [Checked counts](token-counts.json)
 
-The original revenue map compared 1,787 PageScript tokens with 5,901 tokens of compiler output. [Revenue map report](../conformance/stats/revenue-map.o200k.json)
+The revenue-map example is 1,787 PageScript tokens and compiles to 5,901 tokens of HTML. [Revenue map report](../conformance/stats/revenue-map.o200k.json)

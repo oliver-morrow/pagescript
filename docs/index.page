@@ -63,7 +63,7 @@
     ::/panel
 
     ::panel id=release-checks title="Release gates" tone=muted density=compact
-      ::metric id=tests label="Conformance tests" value="34" tone=good
+      ::metric id=tests label="Conformance tests" value="38" tone=good
       ::/metric
       ::metric id=stdlib label="Standard Library" value="4 recipe packs" tone=accent
       ::/metric
