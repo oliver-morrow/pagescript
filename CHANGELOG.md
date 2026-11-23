@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- replaced the compiled-page theme; the revenue-map standalone HTML is now 5,901 `o200k_base` tokens
+- public docs compare authored PageScript with hand-written HTML across five examples (29.87% fewer to 22.42% more tokens) instead of leading with source versus compiled output
+
 ## [1.1.0-alpha.1](https://github.com/oliver-morrow/pagescript/releases/tag/v1.1.0-alpha.1) - 2026-08-07
 
 ### Added
@@ -11,7 +18,7 @@
 
 ### Changed
 
-- public docs now lead with the reproducible revenue-map benchmark: 1,787 authored tokens versus 4,975 standalone-HTML tokens (64.08% reduction)
+- public docs led with the revenue-map stats report: 1,787 authored tokens and 4,975 tokens of standalone HTML output
 - GitHub release tags containing a pre-release suffix publish as GitHub pre-releases
 
 ### Alpha scope

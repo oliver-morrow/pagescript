@@ -4,11 +4,11 @@ Each pair has the same visible content and behavior. The hand-written HTML inclu
 
 | Example | PageScript | Hand-written HTML | Generated HTML | PageScript vs hand-written |
 | --- | ---: | ---: | ---: | ---: |
-| Paper sizes · [source](../examples/paper-sizes.page) · [HTML](html/paper-sizes.html) | 830 | 678 | 2,954 | 22.42% more |
-| Service status · [source](../examples/service-status.page) · [HTML](html/service-status.html) | 386 | 465 | 2,558 | 16.99% fewer |
-| Rollout guide · [source](../examples/rollout-guide.page) · [HTML](html/rollout-guide.html) | 435 | 472 | 2,513 | 7.84% fewer |
-| Build summary · [source](../examples/build-summary.page) · [HTML](html/build-summary.html) | 521 | 457 | 2,700 | 14.00% more |
-| Incident timeline · [source](../examples/incident-timeline.page) · [HTML](html/incident-timeline.html) | 277 | 395 | 2,364 | 29.87% fewer |
+| Paper sizes · [source](../examples/paper-sizes.page) · [HTML](html/paper-sizes.html) | 830 | 678 | 3,869 | 22.42% more |
+| Service status · [source](../examples/service-status.page) · [HTML](html/service-status.html) | 386 | 465 | 3,473 | 16.99% fewer |
+| Rollout guide · [source](../examples/rollout-guide.page) · [HTML](html/rollout-guide.html) | 435 | 472 | 3,428 | 7.84% fewer |
+| Build summary · [source](../examples/build-summary.page) · [HTML](html/build-summary.html) | 521 | 457 | 3,615 | 14.00% more |
+| Incident timeline · [source](../examples/incident-timeline.page) · [HTML](html/incident-timeline.html) | 277 | 395 | 3,279 | 29.87% fewer |
 
 From the repo root:
 

@@ -18,12 +18,12 @@
 
   ::hero class=docs-hero spacing=xl
     heading="PageScript"
-    body="1,787 authored tokens become a 5,901-token standalone page: 69.72% fewer tokens in the PageScript source under o200k_base. The compiler also turns reviewed evidence bundles into deterministic, source-cited HTML."
+    body="A page format for coding agents. Compared with hand-written HTML across five example pages, PageScript source ranges from 29.87% fewer o200k_base tokens to 22.42% more. The compiler also turns reviewed evidence bundles into deterministic, source-cited HTML."
   ::/hero
 
   ::section spacing=lg
     heading="Start here"
-    body="The docs homepage is itself authored in PageScript and rendered by the GitHub Pages workflow."
+    body="The docs homepage is itself authored in PageScript and rendered by the site build."
 
     ::grid columns=4 gap=md density=compact
       ::card class=docs-card icon="01" title="Specification"
@@ -73,15 +73,15 @@
   ::/scene
 
   ::section spacing=lg
-    heading="Measured source reduction"
-    body="The revenue-map fixture uses 1,787 o200k_base tokens as LF-normalized authored PageScript source and 5,901 tokens as generated standalone HTML: 69.72% fewer tokens in the authored artifact. The checked-in benchmark measures those two artifacts only; it excludes prompts, tool calls, repair turns, and prior context."
+    heading="Token counts"
+    body="The revenue-map fixture uses 1,787 o200k_base tokens of LF-normalized PageScript source and 5,901 tokens of generated standalone HTML, which bundles the shared CSS and runtime. Against hand-written HTML, five example pages range from 29.87% fewer tokens to 22.42% more. These counts cover the files only; they exclude prompts, tool calls, repair turns, and prior context."
 
     ::grid columns=3 gap=md density=compact
       ::metric id=source-tokens label="PageScript source" value="1,787 tokens" tone=good
       ::/metric
       ::metric id=html-tokens label="Standalone HTML" value="5,901 tokens" tone=accent
       ::/metric
-      ::metric id=token-reduction label="Authored reduction" value="69.72%" tone=good
+      ::metric id=handwritten-comparison label="Vs hand-written HTML" value="29.87% fewer to 22.42% more" tone=accent
       ::/metric
     ::/grid
   ::/section
